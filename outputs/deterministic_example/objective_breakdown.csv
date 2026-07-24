@@ -1,0 +1,8 @@
+﻿component,value
+intrinsic_block_value,427.27386784720426
+ordinary_processing_increment,76.8
+precision_processing_increment,70.4
+same_precision_reward,8.0
+precision_mismatch_penalty,8.0
+cross_crack_loss,9.0
+total_objective,565.4738678472042

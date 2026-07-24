@@ -1,0 +1,1323 @@
+﻿\documentclass[UTF8,12pt,a4paper]{ctexart}
+
+\usepackage{amsmath,amssymb,mathtools,bm}
+\usepackage{booktabs,longtable,array}
+\usepackage{geometry}
+\usepackage{enumitem}
+\usepackage{xcolor}
+\usepackage{hyperref}
+
+\geometry{
+  left=2.6cm,
+  right=2.6cm,
+  top=2.5cm,
+  bottom=2.5cm
+}
+\setlength{\parindent}{2em}
+\setlength{\parskip}{0.25em}
+\setlist[itemize]{leftmargin=2em,itemsep=0.2em,topsep=0.3em}
+\setlist[enumerate]{leftmargin=2em,itemsep=0.2em,topsep=0.3em}
+\hypersetup{
+  colorlinks=true,
+  linkcolor=blue!50!black,
+  urlcolor=blue!60!black
+}
+
+\title{\textbf{考虑设备故障、性能下降与隐藏裂缝的\\
+裂纹板材分块加工及滚动重调度模型}}
+\author{}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+本文研究固定等大分块条件下裂纹板材的加工方式选择、异构设备分配及动态重调度问题。
+每块木板已被预先切分为大小相同的矩形木块，各木块加工后按照原位置重新组合；
+每个木块只能在不加工、普通加工和精密加工三种状态中选择一种。
+基础模型综合考虑普通设备与精密设备的能力差异、同类型设备之间的速度差异、
+普通木块与裂缝木块的加工时间差异、相邻木块双精加工奖励、
+单边精加工造成的精度不一致损失以及跨块裂缝额外损失，
+并在共同交付期限内最大化整件成品的总加工价值。
+
+在此基础上，进一步加入设备故障、设备性能下降和隐藏裂缝。
+当运行过程中获得新的设备或裂缝信息时，将木块划分为已完成、正在加工和尚未开始三类：
+已完成木块保持原结果，正在加工木块不得转移，只允许尚未开始的木块重新分配，
+从而形成符合题意的滚动重调度模型。
+模型使用情景集合描述未来不确定性，并通过期望收益与最坏情景收益的加权目标，
+在平均表现与极端风险之间进行权衡。
+确定性基础问题及滚动重调度子问题均可表示为混合整数线性规划模型。
+\end{abstract}
+
+\section{问题描述与建模边界}
+
+设原始木板已经被预先切分为规则网格中的若干个大小相同的矩形木块。
+木块保留其在原木板中的行、列位置；两个木块在原网格中共用一条边时称为相邻木块，
+只考虑上、下、左、右关系，不考虑斜对角关系。
+加工完成后，所有木块按照原位置重新组合为整件成品。
+
+每个木块可以选择不加工、普通加工或精密加工。
+普通设备加工速度较快、加工增值较低，精密设备加工速度较慢、加工增值较高。
+同一类型的不同设备因机器老化程度不同可以具有不同速度，
+同一台设备处理普通木块和裂缝木块时的速度也不同。
+所有设备可以并行工作，但每台设备同一时刻最多处理一个木块，
+分配给同一设备的木块串行完成。
+
+本文严格保留以下题干边界：
+
+\begin{enumerate}
+  \item 木块划分为优化前给定的等大矩形网格，模型不决定切割位置、形状或尺寸；
+  \item 每个木块只能选择不加工、普通加工和精密加工之一，不设置先普通加工再精加工的工艺链；
+  \item 普通设备只执行普通加工，精密设备只执行精密加工；
+  \item 不假设加工能够修复裂缝，裂缝只影响木块价值、加工时间及跨块损失；
+  \item 木块一旦开始加工便不能转移到其他设备；
+  \item 发生故障或发现隐藏裂缝后，只对尚未开始加工的木块进行滚动重调度；
+  \item 不引入题干未给出的刀具切换、设备适配、主动裂缝检测等机制。
+\end{enumerate}
+
+全文分为两个层次：
+
+\begin{itemize}
+  \item \textbf{确定性基础模型：}依据当前已观测的裂缝和设备信息生成初始加工方案；
+  \item \textbf{不确定性扩展模型：}在运行中出现故障、性能下降或裂缝信息更新后，
+        锁定已开始木块，只对未开始木块进行风险感知的滚动重调度。
+\end{itemize}
+
+\section{确定性基础模型的分步建模}
+
+本节按照“对象属性--关系--决策--价值--汇总模型”的顺序建立确定性基础模型。
+该顺序也对应后续展示时的问题建模逻辑。
+
+\subsection{Step 1：木块相关属性建模}
+
+原木板为宽 \(W\)、长 \(H\) 的矩形区域。按照题意，木板只进行等分切块：
+将宽度方向等分为 \(m\) 份，将长度方向等分为 \(n\) 份，
+因此共得到 \(mn\) 个大小相同的矩形木块。
+
+\begin{description}[leftmargin=2em,labelsep=0.5em,itemsep=0.6em]
+  \item[\textbf{木板区域：}]
+\[
+\Omega=[0,W]\times[0,H].
+\]
+
+  \item[\textbf{木块面积：}]
+\[
+A=\frac{W}{m}\cdot\frac{H}{n}
+=\frac{WH}{mn}.
+\]
+
+  \item[\textbf{木块索引集合：}]
+\[
+\mathcal U=\{(i,j)\mid i=1,\ldots,m,\ j=1,\ldots,n\}.
+\]
+其中 \(u=(i,j)\in\mathcal U\) 表示木块位于宽度方向第 \(i\) 列、
+长度方向第 \(j\) 行，其区域表示为 \(B_u\)。
+
+  \item[\textbf{木块区域：}]
+\[
+B_{ij}
+=
+\left[\frac{(i-1)W}{m},\frac{iW}{m}\right]
+\times
+\left[\frac{(j-1)H}{n},\frac{jH}{n}\right].
+\]
+
+  \item[\textbf{基准价值：}]
+由于所有木块大小相同，且题目未区分不同位置木材的初始材质差异，
+设每个木块不考虑裂缝时具有相同的基准价值 \(\bar v\)。
+
+  \item[\textbf{裂缝相关属性：}]
+在木块属性层面，先不展开裂缝的几何计算，只记录裂缝对单块木块造成的影响。
+用 \(C_u\) 表示木块 \(u\) 中是否有裂缝：
+\[
+C_u=
+\begin{cases}
+1, & \text{木块 \(u\) 中有裂缝},\\
+0, & \text{木块 \(u\) 中没有裂缝}.
+\end{cases}
+\]
+用 \(CS_u\in[0,1]\) 表示木块 \(u\) 中裂缝的严重程度；
+因此裂缝后的木块固有价值为
+\[
+v_u=\bar v(1-CS_u).
+\]
+这些裂缝属性如何由裂缝曲线与木块区域的空间关系得到，将在 Step 3 中给出。
+
+  \item[\textbf{相邻关系：}]
+木块 \(u\) 的相邻木块集合定义为
+\[
+\mathcal N_u
+=
+\{v\in\mathcal U\mid |i_u-i_v|+|j_u-j_v|=1\}.
+\]
+为避免重复计数，在 \(\mathcal U\) 上规定字典序 \(\prec\)。
+全局相邻关系集合为
+\[
+E=
+\left\{
+\{u,v\}\ \middle|\
+v\in\mathcal N_u,\ u\prec v
+\right\}.
+\]
+对于 \(\{u,v\}\in E\)，公共边界记为
+\[
+e_{uv}=\partial B_u\cap\partial B_v.
+\]
+\end{description}
+
+\subsection{Step 2：设备相关属性建模}
+
+\begin{description}[leftmargin=2em,labelsep=0.5em,itemsep=0.6em]
+  \item[\textbf{设备集合：}]
+设全部设备集合为
+\[
+\mathcal K=\{1,2,\ldots,K\}.
+\]
+
+  \item[\textbf{设备分类：}]
+普通设备集合与精密设备集合分别为
+\[
+\mathcal K^O,\qquad \mathcal K^P,
+\]
+并满足
+\[
+\mathcal K^O\cap\mathcal K^P=\varnothing,\qquad
+\mathcal K^O\cup\mathcal K^P=\mathcal K.
+\]
+普通设备只执行普通加工，精密设备只执行精密加工。
+
+  \item[\textbf{木块与设备对应：}]
+用 \(x_{u,k}\) 表示木块 \(u\) 是否分配给设备 \(k\)：
+\[
+x_{u,k}
+=
+\begin{cases}
+1, & \text{木块 \(u\) 分配给设备 \(k\)},\\
+0, & \text{否则}.
+\end{cases}
+\]
+该变量是后续判断木块加工方式、设备负载以及总加工价值的核心决策变量。
+
+  \item[\textbf{设备原始性能：}]
+设备 \(k\) 的原始加工速度记为
+\[
+s_k,
+\]
+它表示设备在处理无裂缝木块时的单位面积加工速度。
+同类型不同设备可以具有不同的 \(s_k\)，反映机器老化、性能差异等因素。
+为保持模型简洁，设普通加工和精密加工的单位面积增值分别为
+\[
+r^O,\qquad r^P,\qquad r^P>r^O.
+\]
+也就是说，同类加工设备之间可以速度不同，但同一加工类型带来的单位面积增值相同。
+整块木板的交付工期记为 \(T\)。所有设备并行加工，
+最终只要求被分配到各设备上的加工任务都能在工期 \(T\) 内完成。
+
+  \item[\textbf{\(u,k\) 对应的加工时间：}]
+设备 \(k\) 加工木块 \(u\) 的预计时间定义为
+\[
+\boxed{
+\widehat t_{u,k}
+=
+\frac{A}{s_k}
+\left(1+\alpha C_u CS_u\right).
+}
+\]
+其中 \(\alpha\ge0\) 表示裂缝严重程度对加工时间的附加影响。
+当 \(C_u=0\) 时，\(\widehat t_{u,k}=A/s_k\)；
+当 \(C_u=1\) 时，加工时间随裂缝严重程度 \(CS_u\) 增大而延长。
+
+  \item[\textbf{\(u,k\) 对应的加工增值：}]
+若木块 \(u\) 分配给普通设备，则获得普通加工增值；
+若分配给精密设备，则获得精密加工增值。定义
+\[
+\widehat g_{u,k}
+=
+\begin{cases}
+A r^O, & k\in\mathcal K^O,\\
+A r^P, & k\in\mathcal K^P.
+\end{cases}
+\]
+因此 \(x_{u,k}=1\) 时，设备 \(k\) 对木块 \(u\) 带来的加工增值为
+\(\widehat g_{u,k}x_{u,k}\)。
+\end{description}
+
+\subsection{Step 3：裂缝关系建模}
+
+\begin{description}[leftmargin=2em,labelsep=0.5em,itemsep=0.6em]
+  \item[\textbf{裂缝集合：}]
+设木板中的潜在裂缝集合为
+\[
+\mathcal C=\{1,2,\ldots,C\}.
+\]
+
+  \item[\textbf{单条裂缝属性：}]
+暂时只考虑每条裂缝 \(c\) 的两个属性：
+\[
+\Gamma_c,\qquad D_c.
+\]
+其中 \(\Gamma_c\subseteq\Omega\) 表示裂缝 \(c\) 在木板全局坐标系中的曲线，
+\(D_c\ge0\) 表示裂缝 \(c\) 的深度。
+
+  \item[\textbf{块内裂缝长度：}]
+裂缝 \(c\) 位于木块 \(u\) 内部的有效长度为
+\[
+\ell_{c,u}
+=
+\operatorname{Length}
+\left(
+\Gamma_c\cap\operatorname{int}(B_u)
+\right).
+\]
+
+  \item[\textbf{裂缝--木块关联：}]
+给定几何误差阈值 \(\varepsilon>0\)，定义裂缝是否经过木块 \(u\)：
+\[
+\delta_{c,u}
+=
+\begin{cases}
+1, & \ell_{c,u}>\varepsilon,\ \text{裂缝 \(c\) 经过木块 \(u\)},\\
+0, & \ell_{c,u}\le\varepsilon,\ \text{裂缝 \(c\) 未经过木块 \(u\)}.
+\end{cases}
+\]
+因此木块 \(u\) 是否含裂缝可由所有裂缝与该木块的关联关系汇总得到：
+\[
+C_u=
+\mathbb I\left(
+\sum_{c\in\mathcal C}\delta_{c,u}\ge 1
+\right)
+\]
+得到。
+在确定性基础模型中，\(C_u\) 即由当前输入数据中的裂缝集合计算得到。
+
+  \item[\textbf{块内严重程度与价值损失：}]
+裂缝带来的价值损失来自裂缝对木块内部结构和外观完整性的破坏。
+对于裂缝 \(c\)，其在木块 \(u\) 内部的有效长度为 \(\ell_{c,u}\)，
+裂缝自身深度为 \(D_c\)。
+将所有经过木块 \(u\) 的裂缝按“深度 \(\times\) 块内长度”求和，
+得到木块 \(u\) 的原始裂缝破坏量：
+\[
+R_u
+=
+\sum_{c\in\mathcal C}
+\delta_{c,u}D_c\,\ell_{c,u}.
+\]
+为使严重程度落在 \([0,1]\) 内，设归一化常数 \(R_{\max}>0\)，定义
+\[
+CS_u
+=
+\min\left\{1,\frac{R_u}{R_{\max}}\right\}.
+\]
+其中 \(R_{\max}\) 可取实验样本中 \(R_u\) 的最大值，或根据木块尺寸和最大裂缝深度预先给定。
+当 \(CS_u=0\) 时表示无裂缝影响，\(CS_u=1\) 时表示该木块达到最大裂缝破坏程度。
+于是裂缝后的木块固有价值为
+\[
+v_u=\bar v(1-CS_u).
+\]
+若实验数据直接给出裂缝严重程度，则可直接将 \(CS_u\) 作为输入参数。
+
+  \item[\textbf{跨块裂缝判定：}]
+对于相邻木块 \(\{u,v\}\in E\)，定义裂缝 \(c\) 是否跨越二者公共边界：
+\[
+\kappa_{c,u,v}
+=
+\begin{cases}
+1, &
+\begin{aligned}
+&\Gamma_c\cap\operatorname{int}(B_u)\ne\varnothing,\\[-0.2em]
+&\Gamma_c\cap\operatorname{int}(B_v)\ne\varnothing,\\[-0.2em]
+&\Gamma_c\cap\operatorname{relint}(e_{uv})\ne\varnothing,
+\end{aligned}\\[0.8em]
+0, & \text{否则}.
+\end{cases}
+\]
+若裂缝跨越相邻木块边界，则重新拼接后可能形成跨接缝的连续裂缝，
+从而产生额外损失。这里的损失不宜用裂缝在公共边界上的长度刻画，
+因为一条普通裂缝曲线与公共边界通常只相交于点。同时，裂缝在木块
+内部造成的长度、深度影响已经通过 \(CS_u\) 进入木块实际价值，
+因此这里仅刻画“裂缝跨越相邻边界”这一事件带来的额外损失。于是
+相邻木块 \(u,v\) 之间由跨块裂缝产生的总额外损失为
+\[
+L_{uv}
+=
+\lambda_b
+\sum_{c\in\mathcal C}
+\kappa_{c,u,v},
+\]
+其中 \(\lambda_b\ge0\) 表示每出现一条跨越相邻边界的裂缝时产生的
+额外损失系数。
+\end{description}
+
+\subsection{Step 4：木块与设备分配关系建模}
+
+\begin{description}[leftmargin=2em,labelsep=0.5em,itemsep=0.6em]
+  \item[\textbf{唯一分配约束：}]
+每块木块最多分配给一台设备：
+\[
+\boxed{
+\sum_{k\in\mathcal K}x_{u,k}\le1,
+\qquad \forall u\in\mathcal U.
+}
+\]
+
+  \item[\textbf{加工状态变量：}]
+由设备类型可得到木块的普通加工、精密加工和不加工状态：
+\[
+y_u^O=\sum_{k\in\mathcal K^O}x_{u,k},
+\qquad
+y_u^P=\sum_{k\in\mathcal K^P}x_{u,k},
+\qquad
+y_u^0=1-y_u^O-y_u^P.
+\]
+因此
+\[
+\boxed{
+y_u^0+y_u^O+y_u^P=1,
+\qquad \forall u\in\mathcal U.
+}
+\]
+
+  \item[\textbf{加工状态编码：}]
+为了在展示中直观表示加工方式，可定义加工状态编码
+\[
+q_u=y_u^O+2y_u^P.
+\]
+因此
+\[
+q_u=
+\begin{cases}
+0, & \text{木块 \(u\) 不加工},\\
+1, & \text{木块 \(u\) 进行普通加工},\\
+2, & \text{木块 \(u\) 进行精密加工}.
+\end{cases}
+\]
+
+  \item[\textbf{设备时间约束：}]
+每台设备上的木块串行加工，所有设备并行加工。
+由于只关心整块木板最终何时可以组装完成，
+因此每台设备被分配任务的总加工时间均不能超过共同工期 \(T\)：
+\[
+\boxed{
+\sum_{u\in\mathcal U}
+\widehat t_{u,k}x_{u,k}
+\le T,
+\qquad \forall k\in\mathcal K.
+}
+\]
+该约束等价于要求加工阶段的完工时间不超过 \(T\)。
+\end{description}
+
+\subsection{Step 5：增值与损失价值建模}
+
+价值项分为三部分：设备加工增值、相邻精加工组合价值、
+以及跨块裂缝额外损失。
+
+\begin{description}[leftmargin=2em,labelsep=0.5em,itemsep=0.8em]
+  \item[\textbf{（1）设备加工增值：}]
+只有普通加工和精密加工会带来加工增值。由于本文设同一加工类型的单位面积增值固定，
+木块 \(u\) 的加工增值为
+\[
+A r^O y_u^O+A r^P y_u^P.
+\]
+所有木块的设备加工总增值为
+\[
+\boxed{
+V^{\mathrm{proc}}
+=
+\sum_{u\in\mathcal U}
+\left(
+A r^O y_u^O+A r^P y_u^P
+\right).
+}
+\]
+
+  \item[\textbf{（2）相邻加工状态带来的奖励与损失：}]
+对于相邻木块 \(\{u,v\}\in E\)，若二者均精密加工，
+则获得组合奖励。引入0--1变量 \(h_{uv}\) 表示二者是否均精密加工，
+并用以下线性约束刻画：
+\[
+\begin{aligned}
+h_{uv}&\le y_u^P,\\
+h_{uv}&\le y_v^P,\\
+h_{uv}&\ge y_u^P+y_v^P-1,
+\end{aligned}
+\qquad
+\forall\{u,v\}\in E.
+\]
+当 \(y_u^P,y_v^P\in\{0,1\}\) 时，上述约束等价于
+“\(h_{uv}=1\) 当且仅当 \(u,v\) 均精密加工”。
+双精加工带来的总奖励为
+\[
+\boxed{
+V^{\mathrm{same}}
+=
+\sum_{\{u,v\}\in E}b_{uv}h_{uv}.
+}
+\]
+
+若二者中恰有一块精密加工，则因加工精度不一致产生损失。定义
+\[
+m_{uv}=
+\begin{cases}
+1, & y_u^P+y_v^P=1,\\
+0, & \text{否则}.
+\end{cases}
+\]
+模型中用
+\[
+\boxed{
+m_{uv}=y_u^P+y_v^P-2h_{uv},
+\qquad
+\forall\{u,v\}\in E
+}
+\]
+表示“恰有一块精加工”。
+精度不一致带来的总损失为
+\[
+\boxed{
+V^{\mathrm{diff}}
+=
+\sum_{\{u,v\}\in E}p_{uv}m_{uv}.
+}
+\]
+
+后续目标函数中不再将二者合并为一个净价值项，
+而是将相邻木块均精密加工带来的增值 \(V^{\mathrm{same}}\)
+与精度不一致带来的损失 \(V^{\mathrm{diff}}\) 分开写出。
+
+  \item[\textbf{（3）跨块裂缝额外损失：}]
+若裂缝跨越相邻木块的公共边界，则重新拼接后会产生额外损失。
+总跨块裂缝损失为
+\[
+\boxed{
+V^L
+=
+\sum_{\{u,v\}\in E}
+L_{uv}.
+}
+\]
+该项在给定裂缝观测和固定分块后为常数，
+但它影响最终成品价值，因此在目标函数中保留。
+\end{description}
+
+\subsection{Step 6：目标函数与约束汇总}
+
+\begin{description}[leftmargin=2em,labelsep=0.5em,itemsep=0.8em]
+  \item[\textbf{目标函数：}]
+确定性基础模型的目标是在设备时间限制下最大化整块木板重新组合后的总价值：
+\[
+\boxed{
+\max Z^{\mathrm{det}}
+=
+\sum_{u\in\mathcal U}v_u
++
+V^{\mathrm{proc}}
++
+V^{\mathrm{same}}
+-
+V^{\mathrm{diff}}
+-
+V^L.
+}
+\]
+其中 \(Z^{\mathrm{det}}\) 表示确定性基础模型下的目标函数值，
+上标 \(\mathrm{det}\) 来自 deterministic，用于和后文不确定情景模型的目标值区分。
+
+  \item[\textbf{展开形式：}]
+展开可得
+\[
+\begin{aligned}
+\max\quad
+Z^{\mathrm{det}}
+={}&
+\sum_{u\in\mathcal U}v_u
++
+\sum_{u\in\mathcal U}
+\left(
+A r^O y_u^O+A r^P y_u^P
+\right)\\
+&+
+\sum_{\{u,v\}\in E}
+b_{uv}h_{uv}
+-
+\sum_{\{u,v\}\in E}
+p_{uv}m_{uv}
+-
+\sum_{\{u,v\}\in E}
+L_{uv}.
+\end{aligned}
+\]
+
+  \item[\textbf{约束汇总：}]
+满足
+\[
+\begin{aligned}
+y_u^O&=\sum_{k\in\mathcal K^O}x_{u,k},
+&&\forall u,\\
+y_u^P&=\sum_{k\in\mathcal K^P}x_{u,k},
+&&\forall u,\\
+y_u^0+y_u^O+y_u^P&=1,
+&&\forall u,\\
+\sum_{k\in\mathcal K}x_{u,k}&\le1,
+&&\forall u,\\
+\sum_{u\in\mathcal U}\widehat t_{u,k}x_{u,k}&\le T,
+&&\forall k,\\
+h_{uv}&\le y_u^P,
+&&\forall\{u,v\}\in E,\\
+h_{uv}&\le y_v^P,
+&&\forall\{u,v\}\in E,\\
+h_{uv}&\ge y_u^P+y_v^P-1,
+&&\forall\{u,v\}\in E,\\
+m_{uv}&=y_u^P+y_v^P-2h_{uv},
+&&\forall\{u,v\}\in E,\\
+x_{u,k},y_u^0,y_u^O,y_u^P&\in\{0,1\},
+&&\forall u,k,\\
+h_{uv},m_{uv}&\in\{0,1\},
+&&\forall\{u,v\}\in E.
+\end{aligned}
+\]
+\end{description}
+
+\section{不确定因素及情景表示}
+
+\subsection{情景集合}
+
+\begin{description}[leftmargin=2em,labelsep=0.5em,itemsep=0.6em]
+  \item[\textbf{情景集合：}]
+设不确定情景集合为
+\[
+\mathcal S=\{1,2,\ldots,S\},
+\]
+情景 \(\omega\in\mathcal S\) 的发生概率为 \(\pi_\omega\)，满足
+\[
+\pi_\omega\ge0,\qquad
+\sum_{\omega\in\mathcal S}\pi_\omega=1.
+\]
+
+  \item[\textbf{情景包含的信息：}]
+一个情景同时描述以下信息：
+\begin{itemize}
+  \item 设备是否故障、故障后的恢复时刻或剩余可用时间；
+  \item 未完全失效设备的性能下降程度；
+  \item 初始规划时尚未发现的真实块内裂缝；
+  \item 初始规划时尚未发现的真实跨块裂缝。
+\end{itemize}
+\end{description}
+
+\subsection{设备故障与性能下降}
+
+\begin{description}[leftmargin=2em,labelsep=0.5em,itemsep=0.6em]
+  \item[\textbf{滚动时刻：}]
+设滚动重调度发生在时刻 \(\tau\)，共同交付截止时刻为 \(T\)。
+
+  \item[\textbf{设备可用标志：}]
+情景 \(\omega\) 下，设备 \(k\) 在 \(\tau\) 之后是否可继续使用由
+\[
+a_k^\omega\in\{0,1\}
+\]
+表示。
+若设备发生暂时故障，记其恢复时刻为 \(R_k^\omega\)；
+若设备正常，则可令 \(R_k^\omega=\tau\)；
+若设备在截止时刻前无法恢复，则令 \(a_k^\omega=0\)。
+
+  \item[\textbf{剩余可用时间：}]
+设备在滚动时刻后的剩余日历时间定义为
+\[
+H_k^\omega
+=
+a_k^\omega
+\max\left\{0,\,
+T-\max\{\tau,R_k^\omega\}
+\right\}.
+\]
+上式中的 \(H_k^\omega\) 在生成情景时预先计算，因此是模型参数。
+
+  \item[\textbf{性能保持系数：}]
+设性能保持系数为
+\[
+\eta_k^\omega\in(0,1],
+\]
+其中 \(\eta_k^\omega=1\) 表示性能正常，
+\(\eta_k^\omega<1\) 表示性能下降。
+完全故障由 \(a_k^\omega=0\) 表示，不需要令 \(\eta_k^\omega=0\)，
+从而避免除零。
+\end{description}
+
+\subsection{隐藏裂缝}
+
+\begin{description}[leftmargin=2em,labelsep=0.5em,itemsep=0.6em]
+  \item[\textbf{初始观测裂缝：}]
+初始规划只能使用已观测裂缝状态
+\[
+C_u,\qquad
+CS_u,\qquad
+L_{uv}.
+\]
+
+  \item[\textbf{情景真实裂缝：}]
+情景 \(\omega\) 下的真实裂缝状态记为
+\[
+C_u^\omega,\qquad
+CS_u^\omega,\qquad
+L_{uv}^{\omega}.
+\]
+
+  \item[\textbf{隐藏裂缝含义：}]
+隐藏裂缝意味着可能出现
+\[
+C_u=0,\qquad C_u^\omega=1,
+\]
+或者
+\[
+L_{uv}=0,\qquad
+L_{uv}^{\omega}>0.
+\]
+
+  \item[\textbf{情景加工时间：}]
+情景 \(\omega\) 下设备 \(k\) 完整加工木块 \(u\) 所需时间为
+\[
+\boxed{
+t_{u,k}^{\omega}
+=
+\frac{A}{\eta_k^\omega s_k}
+\left(1+\alpha C_u^\omega CS_u^\omega\right).
+}
+\]
+隐藏裂缝既可能降低实际固有价值，也可能延长加工时间。
+
+  \item[\textbf{情景固有价值：}]
+令
+\[
+v_u^\omega=\bar v(1-CS_u^\omega).
+\]
+本文不假设精密加工或普通加工能够修复隐藏裂缝。
+\end{description}
+
+\section{滚动状态划分与不可转移约束}
+
+\subsection{滚动时刻的三类木块}
+
+\begin{description}[leftmargin=2em,labelsep=0.5em,itemsep=0.6em]
+  \item[\textbf{状态划分：}]
+在时刻 \(\tau\) 触发重调度时，根据车间实际执行状态将木块划分为：
+\[
+\mathcal U_\tau^D
+=
+\{\text{在 \(\tau\) 前已经完成加工的木块}\},
+\]
+\[
+\mathcal U_\tau^S
+=
+\{\text{在 \(\tau\) 时已经开始但尚未完成的木块}\},
+\]
+\[
+\mathcal U_\tau^W
+=
+\{\text{在 \(\tau\) 时尚未开始加工的木块}\}.
+\]
+三者构成互不相交的划分：
+\[
+\mathcal U_\tau^D\dot\cup
+\mathcal U_\tau^S\dot\cup
+\mathcal U_\tau^W
+=\mathcal U.
+\]
+
+  \item[\textbf{初始方案记录：}]
+该划分由当前执行记录直接获得，而不是由滚动模型重新决定。
+设初始方案中木块 \(u\) 的设备分配为
+\[
+\bar x_{u,k}\in\{0,1\},
+\]
+已完成木块的最终加工状态为
+\[
+\bar y_u^O,\qquad \bar y_u^P.
+\]
+
+  \item[\textbf{剩余加工比例：}]
+对于正在加工的木块 \(u\in\mathcal U_\tau^S\)，
+记其在设备 \(k\) 上尚需完成的加工比例为
+\[
+\gamma_{u,k}^\tau\in[0,1].
+\]
+若 \(u\) 并未分配给 \(k\)，则令 \(\gamma_{u,k}^\tau=0\)。
+\end{description}
+
+\subsection{滚动决策变量}
+
+\begin{description}[leftmargin=2em,labelsep=0.5em,itemsep=0.6em]
+  \item[\textbf{最终完成分配：}]
+定义情景 \(\omega\) 下的最终完成分配变量
+\[
+x_{u,k}^{\omega}
+=
+\begin{cases}
+1, & \text{木块 \(u\) 最终在设备 \(k\) 上完成加工},\\
+0, & \text{否则}.
+\end{cases}
+\]
+
+  \item[\textbf{完成加工标志：}]
+定义完成加工标志
+\[
+z_u^\omega=\sum_{k\in\mathcal K}x_{u,k}^\omega.
+\]
+若 \(z_u^\omega=0\)，表示木块最终没有完成普通加工或精密加工，
+在价值计算中按“不加工”处理。
+
+  \item[\textbf{最终加工状态：}]
+定义最终状态变量
+\[
+y_u^{O,\omega}
+=\sum_{k\in\mathcal K^O}x_{u,k}^{\omega},
+\qquad
+y_u^{P,\omega}
+=\sum_{k\in\mathcal K^P}x_{u,k}^{\omega},
+\]
+\[
+y_u^{0,\omega}
+=1-y_u^{O,\omega}-y_u^{P,\omega}.
+\]
+相邻状态变量记为 \(h_{uv}^\omega\) 和 \(m_{uv}^\omega\)。
+\end{description}
+
+\subsection{已完成木块保持不变}
+
+\begin{description}[leftmargin=2em,labelsep=0.5em,itemsep=0.6em]
+  \item[\textbf{固定已完成结果：}]
+对于已完成木块，设备及加工结果均不可改变：
+\[
+\boxed{
+x_{u,k}^{\omega}=\bar x_{u,k},
+\qquad
+\forall u\in\mathcal U_\tau^D,\ k\in\mathcal K,\ \omega\in\mathcal S.
+}
+\]
+\end{description}
+
+\subsection{正在加工木块不得转移}
+
+\begin{description}[leftmargin=2em,labelsep=0.5em,itemsep=0.6em]
+  \item[\textbf{锁定原设备：}]
+对于已经开始加工的木块，只能留在原设备上完成：
+\[
+\boxed{
+x_{u,k}^{\omega}\le\bar x_{u,k},
+\qquad
+\forall u\in\mathcal U_\tau^S,\ k\in\mathcal K,\ \omega\in\mathcal S.
+}
+\]
+由于初始方案中每块木块最多分配给一台设备，
+该约束排除了向任何其他设备转移的可能。
+若原设备在截止时刻前无法恢复，模型允许
+\(z_u^\omega=0\)，即该木块不能获得已完成加工的增值；
+但仍不允许将其转移。
+\end{description}
+
+\subsection{只有未开始木块可以重新分配}
+
+\begin{description}[leftmargin=2em,labelsep=0.5em,itemsep=0.6em]
+  \item[\textbf{可重分配对象：}]
+对于尚未开始的木块，
+\[
+\sum_{k\in\mathcal K}x_{u,k}^{\omega}\le1,
+\qquad
+\forall u\in\mathcal U_\tau^W,\ \omega\in\mathcal S.
+\]
+它们可以：
+
+\begin{itemize}
+  \item 保持原设备；
+  \item 改分配给另一台可用且类型合适的设备；
+  \item 改为普通加工、精密加工或不加工。
+\end{itemize}
+
+因此，“滚动重调度”并不意味着所有木块都可以重新优化，
+真正能够改变设备分配的只有 \(\mathcal U_\tau^W\)。
+\end{description}
+
+\section{情景下的剩余加工能力约束}
+
+\begin{description}[leftmargin=2em,labelsep=0.5em,itemsep=0.6em]
+  \item[\textbf{在制块剩余时间：}]
+对于正在加工的木块，情景 \(\omega\) 下的剩余加工时间为
+\[
+t_{u,k}^{\mathrm{rem},\omega}
+=
+\gamma_{u,k}^\tau t_{u,k}^\omega.
+\]
+
+  \item[\textbf{设备滚动负载：}]
+设备 \(k\) 在滚动时刻之后的总负载包括：
+
+\begin{itemize}
+  \item 原设备上已开始木块的剩余加工时间；
+  \item 重新分配到该设备的未开始木块的完整加工时间。
+\end{itemize}
+
+  \item[\textbf{情景容量约束：}]
+因此，情景容量约束为
+\[
+\boxed{
+\sum_{u\in\mathcal U_\tau^S}
+t_{u,k}^{\mathrm{rem},\omega}x_{u,k}^\omega
++
+\sum_{u\in\mathcal U_\tau^W}
+t_{u,k}^{\omega}x_{u,k}^\omega
+\le H_k^\omega,
+\quad
+\forall k\in\mathcal K,\ \omega\in\mathcal S.
+}
+\]
+已完成木块不再占用 \(\tau\) 之后的设备时间。
+若 \(a_k^\omega=0\)，则 \(H_k^\omega=0\)，
+设备不能再完成任何木块。
+
+  \item[\textbf{未完成木块唯一分配：}]
+对所有未完成木块仍需满足
+\[
+\boxed{
+\sum_{k\in\mathcal K}x_{u,k}^\omega\le1,
+\qquad
+\forall u\in
+\mathcal U_\tau^S\cup\mathcal U_\tau^W,\ 
+\omega\in\mathcal S.
+}
+\]
+
+由于一个滚动时刻每台设备至多有一个正在加工的木块，
+执行时应先让该木块在原设备上继续，再按新方案串行加工等待木块。
+在不考虑切换时间且只有共同截止时间时，上述剩余容量约束即可保证可排程性。
+\end{description}
+
+\section{情景价值与相邻组合关系}
+
+\subsection{相邻状态的线性化}
+
+\begin{description}[leftmargin=2em,labelsep=0.5em,itemsep=0.6em]
+  \item[\textbf{双精加工变量：}]
+对每个情景 \(\omega\) 及相邻木块对 \(\{u,v\}\in E\)，有
+\[
+\begin{aligned}
+h_{uv}^\omega&\le y_u^{P,\omega},\\
+h_{uv}^\omega&\le y_v^{P,\omega},\\
+h_{uv}^\omega&\ge
+y_u^{P,\omega}+y_v^{P,\omega}-1,
+\end{aligned}
+\]
+
+  \item[\textbf{单边精加工变量：}]
+以及
+\[
+\boxed{
+m_{uv}^\omega
+=
+y_u^{P,\omega}+y_v^{P,\omega}-2h_{uv}^\omega.
+}
+\]
+这仍然只对题干规定的两种关系赋值：
+双精加工获得奖励，恰有一块精加工产生损失；
+其他组合不额外设置题干未给出的奖励或惩罚。
+\end{description}
+
+\subsection{情景总价值}
+
+\begin{description}[leftmargin=2em,labelsep=0.5em,itemsep=0.6em]
+  \item[\textbf{情景价值函数：}]
+情景 \(\omega\) 下的整件成品总价值为
+\[
+\boxed{
+\begin{aligned}
+Z^\omega
+={}&
+\sum_{u\in\mathcal U}v_u^\omega
++
+\sum_{u\in\mathcal U}
+\left(
+A r^O y_u^{O,\omega}
++A r^P y_u^{P,\omega}
+\right)\\
+&+
+\sum_{\{u,v\}\in E}
+\left(
+b_{uv}h_{uv}^\omega
+-p_{uv}m_{uv}^\omega
+-L_{uv}^{\omega}
+\right).
+\end{aligned}
+}
+\]
+其中，已完成木块通过固定的 \(x_{u,k}^\omega=\bar x_{u,k}\)
+自动保留其加工增值；
+未完成的正在加工木块若因原设备故障无法在期限前完成，
+则 \(z_u^\omega=0\)，不获得加工增值。
+\end{description}
+
+\section{信息可得性与非预见性}
+
+\begin{description}[leftmargin=2em,labelsep=0.5em,itemsep=0.6em]
+  \item[\textbf{信息限制：}]
+隐藏裂缝的真实状态不能在其被发现之前用于决策，
+未来故障信息也不能被初始方案提前知道。
+
+  \item[\textbf{信息组：}]
+因此需要根据滚动时刻 \(\tau\) 已经获得的信息，
+将情景划分为若干信息组
+\[
+\mathcal G_\tau=\{G_1,G_2,\ldots,G_M\}.
+\]
+若 \(\omega,\omega'\in G_g\)，表示这两个情景在时刻 \(\tau\)
+具有完全相同的可观测信息。
+
+  \item[\textbf{非预见性约束：}]
+对于尚未开始的木块，应施加非预见性约束
+\[
+\boxed{
+x_{u,k}^{\omega}
+=
+x_{u,k}^{\omega'},
+\quad
+\forall u\in\mathcal U_\tau^W,\ k\in\mathcal K,\ 
+\omega,\omega'\in G_g,\ G_g\in\mathcal G_\tau.
+}
+\]
+
+  \item[\textbf{约束含义：}]
+该约束的含义是：
+
+\begin{itemize}
+  \item 已经被发现的故障、性能下降和裂缝信息可以用于当前重调度；
+  \item 仍然隐藏且无法区分的未来状态不能被模型“提前看见”；
+  \item 当后续获得新信息时，再触发下一次滚动优化并更新信息组。
+\end{itemize}
+
+如果一个实验明确假设在时刻 \(\tau\) 已经完整揭示当前情景，
+则各情景可分别构成单元素信息组；
+如果隐藏裂缝尚未揭示，则对应情景必须处于同一信息组。
+\end{description}
+
+\section{期望收益与最坏情景联合优化}
+
+\begin{description}[leftmargin=2em,labelsep=0.5em,itemsep=0.6em]
+  \item[\textbf{最坏情景变量：}]
+定义最坏情景价值下界变量
+\[
+\theta\in\mathbb R.
+\]
+令
+\[
+\boxed{
+\theta\le Z^\omega,
+\qquad \forall\omega\in\mathcal S.
+}
+\]
+于是 \(\theta\) 不超过任意情景价值，
+最大化 \(\theta\) 等价于提高最坏情景收益。
+
+  \item[\textbf{风险权重：}]
+设风险权重
+\[
+\lambda\in[0,1].
+\]
+
+  \item[\textbf{联合目标函数：}]
+联合目标函数为
+\[
+\boxed{
+\max\quad
+(1-\lambda)
+\sum_{\omega\in\mathcal S}\pi_\omega Z^\omega
++
+\lambda\theta.
+}
+\]
+
+  \item[\textbf{权重解释：}]
+\begin{itemize}
+  \item 当 \(\lambda=0\) 时，模型只最大化期望收益；
+  \item 当 \(0<\lambda<1\) 时，模型同时考虑平均表现与最坏情景；
+  \item 当 \(\lambda=1\) 时，模型退化为最大化最坏情景收益的模型。
+\end{itemize}
+
+在实验中可设置
+\[
+\lambda\in\{0,0.25,0.5,0.75,1\},
+\]
+观察风险权重提高后期望价值、最坏价值与方案保守程度的变化。
+\end{description}
+
+\section{滚动随机混合整数规划模型}
+
+\begin{description}[leftmargin=2em,labelsep=0.5em,itemsep=0.8em]
+  \item[\textbf{模型目标：}]
+在滚动时刻 \(\tau\)，扩展模型可写为
+\[
+\boxed{
+\max\quad
+(1-\lambda)
+\sum_{\omega\in\mathcal S}\pi_\omega Z^\omega
++
+\lambda\theta
+}
+\]
+
+  \item[\textbf{约束汇总：}]
+满足：
+
+\[
+\begin{aligned}
+\theta&\le Z^\omega,
+&&\forall\omega\in\mathcal S,\\
+x_{u,k}^\omega&=\bar x_{u,k},
+&&\forall u\in\mathcal U_\tau^D,\ k,\omega,\\
+x_{u,k}^\omega&\le\bar x_{u,k},
+&&\forall u\in\mathcal U_\tau^S,\ k,\omega,\\
+\sum_{k\in\mathcal K}x_{u,k}^\omega&\le1,
+&&\forall u\in
+\mathcal U_\tau^S\cup\mathcal U_\tau^W,\ \omega,\\
+\sum_{u\in\mathcal U_\tau^S}
+t_{u,k}^{\mathrm{rem},\omega}x_{u,k}^\omega
+&+
+\sum_{u\in\mathcal U_\tau^W}
+t_{u,k}^{\omega}x_{u,k}^\omega
+\le H_k^\omega,
+&&\forall k,\omega,\\
+y_u^{O,\omega}&=
+\sum_{k\in\mathcal K^O}x_{u,k}^\omega,
+&&\forall u,\omega,\\
+y_u^{P,\omega}&=
+\sum_{k\in\mathcal K^P}x_{u,k}^\omega,
+&&\forall u,\omega,\\
+y_u^{0,\omega}
++y_u^{O,\omega}
++y_u^{P,\omega}&=1,
+&&\forall u,\omega,\\
+h_{uv}^\omega&\le y_u^{P,\omega},
+&&\forall\{u,v\}\in E,\omega,\\
+h_{uv}^\omega&\le y_v^{P,\omega},
+&&\forall\{u,v\}\in E,\omega,\\
+h_{uv}^\omega&\ge
+y_u^{P,\omega}+y_v^{P,\omega}-1,
+&&\forall\{u,v\}\in E,\omega,\\
+m_{uv}^\omega&=
+y_u^{P,\omega}+y_v^{P,\omega}-2h_{uv}^\omega,
+&&\forall\{u,v\}\in E,\omega,\\
+x_{u,k}^{\omega}&=x_{u,k}^{\omega'},
+&&\substack{
+\forall u\in\mathcal U_\tau^W,\ k,\\
+\omega,\omega'\in G_g,\ G_g\in\mathcal G_\tau,}\\
+x_{u,k}^\omega,y_u^{0,\omega},
+y_u^{O,\omega},y_u^{P,\omega}
+&\in\{0,1\},
+&&\forall u,k,\omega,\\
+h_{uv}^\omega,m_{uv}^\omega&\in\{0,1\},
+&&\forall\{u,v\}\in E,\omega.
+\end{aligned}
+\]
+
+其中 \(Z^\omega\) 由上一节的情景价值公式给出。
+由于所有加工时间、剩余比例、情景概率、设备状态和裂缝损失均在求解前给定，
+目标函数和约束保持线性，因此该扩展仍是混合整数线性规划模型。
+\end{description}
+
+\section{滚动求解流程}
+
+\begin{description}[leftmargin=2em,labelsep=0.5em,itemsep=0.8em]
+  \item[\textbf{执行步骤：}]
+完整运行过程如下：
+
+\begin{enumerate}
+  \item 根据固定等大网格、已观测裂缝和设备参数生成基础数据；
+  \item 求解确定性基础模型，得到初始设备分配与加工方式；
+  \item 为每台设备生成串行加工队列并开始执行；
+  \item 在设备故障、性能明显下降、发现隐藏裂缝或到达定期检查点时，
+        于当前时刻 \(\tau\) 触发滚动重调度；
+  \item 根据执行日志形成
+        \(\mathcal U_\tau^D,\mathcal U_\tau^S,\mathcal U_\tau^W\)；
+  \item 固定已完成木块，锁定正在加工木块的原设备；
+  \item 根据当前已知信息生成条件情景及其概率；
+  \item 求解期望--最坏情景联合模型，仅更新未开始木块的安排；
+  \item 执行新方案，后续若再次获得新信息则重复上述滚动过程。
+\end{enumerate}
+
+  \item[\textbf{流程概括：}]
+该流程可概括为
+\[
+\boxed{
+\begin{gathered}
+\text{固定等大分块与初始观测数据}\\
+\Downarrow\\
+\text{确定性初始分配}\\
+\Downarrow\\
+\text{并行设备上的串行执行}\\
+\Downarrow\\
+\text{故障、性能下降或隐藏裂缝信息更新}\\
+\Downarrow\\
+\text{完成块固定、在制块锁定、等待块重分配}\\
+\Downarrow\\
+\text{期望收益与最坏情景联合优化}\\
+\Downarrow\\
+\text{继续执行并在新信息到达时再次滚动}
+\end{gathered}
+}
+\]
+\end{description}
+
+\section{实验设计与评价指标}
+
+\subsection{确定性基础实验}
+
+\begin{description}[leftmargin=2em,labelsep=0.5em,itemsep=0.6em]
+  \item[\textbf{比较方法：}]
+基础实验应至少比较以下三种方法：
+
+\begin{enumerate}
+  \item 本文确定性混合整数规划方法；
+  \item 单块加工增值最高优先策略；
+  \item 单位预计加工时间增值最高优先策略。
+\end{enumerate}
+
+  \item[\textbf{控制变量：}]
+在固定其他因素时，分别改变：
+
+\begin{itemize}
+  \item 木板规模：网格行数、列数及木块数量；
+  \item 裂缝分布：稀疏、均匀、局部聚集、跨块裂缝较多；
+  \item 设备性能：设备数量、普通/精密设备比例、同类设备速度差异；
+  \item 时间限制：宽松、一般、紧张。
+\end{itemize}
+\end{description}
+
+\subsection{不确定性扩展实验}
+
+\begin{description}[leftmargin=2em,labelsep=0.5em,itemsep=0.6em]
+  \item[\textbf{扩展变量：}]
+扩展实验进一步改变：
+
+\begin{itemize}
+  \item 故障概率、故障设备比例及恢复时间；
+  \item 性能保持系数 \(\eta_k^\omega\)；
+  \item 隐藏裂缝概率、严重程度及跨块概率；
+  \item 滚动触发时刻 \(\tau\)；
+  \item 风险权重 \(\lambda\)；
+  \item 情景数量及信息揭示程度。
+\end{itemize}
+
+  \item[\textbf{评价指标：}]
+评价指标包括：
+
+\begin{itemize}
+  \item 平均情景总价值；
+  \item 最坏情景总价值；
+  \item 相对于无故障、完全信息方案的价值损失；
+  \item 各算法相对精确模型的最优性差距；
+  \item 在截止时间前完成加工的木块数量；
+  \item 普通设备和精密设备利用率；
+  \item 被重新分配的未开始木块数量；
+  \item 发生重调度后仍留在原设备的在制木块比例，该值应为100\%；
+  \item 求解时间与滚动重调度响应时间。
+\end{itemize}
+\end{description}
+
+\section{模型性质与注意事项}
+
+\subsection{复杂性来源}
+
+\begin{description}[leftmargin=2em,labelsep=0.5em,itemsep=0.6em]
+  \item[\textbf{组合复杂性：}]
+即使不考虑不确定性，基础问题也同时包含：
+
+\begin{itemize}
+  \item 每个木块的三状态选择；
+  \item 异构设备分配与多背包容量约束；
+  \item 相邻木块之间的二元耦合收益。
+\end{itemize}
+
+因此它可视为带图相邻收益的异构广义分配问题，
+已经具有组合优化复杂性。
+加入多情景、设备状态和非预见性约束后，
+变量与约束规模大致随情景数线性增长。
+\end{description}
+
+\subsection{避免使用未来信息}
+
+\begin{description}[leftmargin=2em,labelsep=0.5em,itemsep=0.6em]
+  \item[\textbf{信息边界：}]
+初始方案只能使用 \(C_u\) 等当前已知数据，
+不能直接使用 \(C_u^\omega\)。
+滚动时刻也只能使用当时已经揭示的信息。
+若程序允许每个情景随意采用不同的未开始木块分配，
+却没有说明情景在当时已经可区分，
+将产生“预知未来”的不合理结果。
+因此实现中必须显式维护信息组并检查非预见性约束。
+\end{description}
+
+\subsection{正在加工木块的处理}
+
+\begin{description}[leftmargin=2em,labelsep=0.5em,itemsep=0.6em]
+  \item[\textbf{不可转移原则：}]
+发生设备故障后，正在加工的木块不能转移。
+若原设备可以在期限前恢复，则该木块可在原设备继续完成；
+若无法恢复，则该木块可不计加工增值，但仍不能转移。
+程序不应把所有未完成木块都直接放回待分配池。
+\end{description}
+
+\subsection{固定裂缝损失与决策相关影响}
+
+\begin{description}[leftmargin=2em,labelsep=0.5em,itemsep=0.6em]
+  \item[\textbf{固定价值项：}]
+在给定情景下，
+\[
+\sum_{u\in\mathcal U}v_u^\omega
+\quad\text{和}\quad
+\sum_{\{u,v\}\in E}L_{uv}^{\omega}
+\]
+是该情景的固定价值项。
+它们影响最终报告价值和不同情景的好坏，
+但对同一情景中的设备分配不产生直接边际收益。
+裂缝仍会通过加工时间 \(t_{u,k}^\omega\)
+改变设备容量和加工选择。
+在题目没有说明裂缝损失随加工方式改变时，
+不应擅自将精密加工解释为裂缝修复。
+\end{description}
+
+\subsection{模型适用范围}
+
+\begin{description}[leftmargin=2em,labelsep=0.5em,itemsep=0.6em]
+  \item[\textbf{适用条件：}]
+该模型适用于：
+
+\begin{itemize}
+  \item 木块已经按固定等大网格划分；
+  \item 全部木块在同一时刻可加工；
+  \item 不考虑设备切换时间和复杂工艺先后关系；
+  \item 每个滚动时刻每台设备至多有一个在制木块；
+  \item 不确定因素可以通过有限情景近似。
+\end{itemize}
+
+若未来需要研究加工工序链、刀具切换、设备维护决策或模型主动检测裂缝，
+则需建立新的扩展模型；这些内容不属于本文当前题意范围。
+\end{description}
+
+\section{结论}
+
+\begin{description}[leftmargin=2em,labelsep=0.5em,itemsep=0.6em]
+  \item[\textbf{模型扩展：}]
+本文在原确定性设备分配模型基础上，
+加入了设备故障与性能下降、隐藏裂缝、
+仅针对未开始木块的滚动重调度，
+以及期望收益与最坏情景联合优化。
+扩展模型没有改变固定等大分块、三种加工状态、
+原位置重新组合及开工后不可转移等题干核心设定。
+
+  \item[\textbf{求解逻辑：}]
+确定性模型用于生成正常条件下的初始加工方案；
+滚动随机模型在新信息到达后固定已完成结果、
+锁定正在加工木块，并重新优化等待队列。
+通过风险权重 \(\lambda\)，
+模型可以在平均加工价值和极端场景稳定性之间进行可解释的权衡。
+\end{description}
+
+\end{document}
+
