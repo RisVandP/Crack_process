@@ -1,49 +1,59 @@
 {
   "random_seed": 20260724,
   "board": {
-    "width": 20.0,
-    "height": 12.0,
-    "m": 5,
-    "n": 4,
+    "width": 32.0,
+    "height": 18.0,
+    "m": 8,
+    "n": 6,
     "base_value": 110.0
   },
-  "deadline": 8.0,
+  "deadline": 5.2,
   "devices": [
-    {"id": "O1", "type": "ordinary", "speed": 16.0},
-    {"id": "O2", "type": "ordinary", "speed": 12.0},
-    {"id": "O3", "type": "ordinary", "speed": 8.0},
-    {"id": "P1", "type": "precision", "speed": 8.0},
-    {"id": "P2", "type": "precision", "speed": 6.0},
-    {"id": "P3", "type": "precision", "speed": 4.5}
+    {"id": "O1", "type": "ordinary", "speed": 18.0},
+    {"id": "O2", "type": "ordinary", "speed": 15.0},
+    {"id": "O3", "type": "ordinary", "speed": 12.0},
+    {"id": "O4", "type": "ordinary", "speed": 9.0},
+    {"id": "P1", "type": "precision", "speed": 10.0},
+    {"id": "P2", "type": "precision", "speed": 7.0}
   ],
   "values": {
-    "r_ordinary": 1.1,
-    "r_precision": 2.5,
-    "default_same_precision_reward": 9.0,
-    "default_precision_mismatch_penalty": 5.0,
-    "default_cross_crack_loss": 3.5,
-    "alpha": 0.6
+    "r_ordinary": 1.2,
+    "r_precision": 2.6,
+    "default_same_precision_reward": 10.0,
+    "default_precision_mismatch_penalty": 7.0,
+    "default_cross_crack_loss": 4.0,
+    "alpha": 0.75
   },
   "cracks": {
     "mode": "geometry",
-    "epsilon": 0.001,
-    "R_max": 5.0,
-    "lambda_b": 3.5,
+    "epsilon": 0.6,
+    "R_max": 3.2,
+    "lambda_b": 4.0,
     "items": [
       {
         "id": "C1",
-        "width": 0.42,
-        "polyline": [[1.0, 1.0], [5.0, 3.0], [8.2, 7.8], [10.5, 11.0]]
+        "width": 0.48,
+        "polyline": [[1.3, 16.2], [3.7, 15.0], [5.9, 13.5], [8.6, 12.9], [10.8, 11.5], [13.6, 10.8]]
       },
       {
         "id": "C2",
-        "width": 0.28,
-        "polyline": [[7.5, 0.8], [12.5, 2.4], [18.2, 4.5]]
+        "width": 0.36,
+        "polyline": [[1.4, 2.2], [3.8, 2.9], [6.4, 3.8], [9.1, 3.5], [11.5, 4.6], [14.2, 5.3], [16.9, 5.0]]
       },
       {
         "id": "C3",
-        "width": 0.36,
-        "polyline": [[3.5, 10.8], [9.0, 8.0], [14.5, 8.5], [19.0, 10.5]]
+        "width": 0.55,
+        "polyline": [[15.0, 4.1], [15.8, 5.8], [15.3, 7.6], [16.5, 9.4], [16.1, 11.2], [17.0, 13.0], [16.6, 14.4]]
+      },
+      {
+        "id": "C4",
+        "width": 0.62,
+        "polyline": [[24.6, 15.8], [25.8, 16.7], [27.4, 16.0], [28.6, 14.7], [30.0, 14.2], [30.7, 15.4]]
+      },
+      {
+        "id": "C5",
+        "width": 0.44,
+        "polyline": [[21.0, 2.3], [22.4, 3.1], [24.2, 2.6], [25.9, 4.0], [27.5, 3.7], [28.8, 5.0]]
       }
     ]
   }

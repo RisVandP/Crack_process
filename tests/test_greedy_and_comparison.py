@@ -137,12 +137,14 @@ def test_invalid_speed_and_deadline_are_rejected():
 
 def test_cli_all_generates_expected_files(tmp_path):
     output_dir = tmp_path / "cli_outputs"
+    config_path = tmp_path / "small_cli_config.json"
+    config_path.write_text(json.dumps(comparison_raw_instance(), ensure_ascii=False), encoding="utf-8")
     cmd = [
         sys.executable,
         "-m",
         "src.main",
         "--config",
-        "configs/deterministic_example.json",
+        str(config_path),
         "--output",
         str(output_dir),
         "--method",
@@ -163,7 +165,34 @@ def test_source_and_requirements_do_not_reference_package_solvers():
 
 
 def test_scn_eval_outputs(tmp_path):
-    summaries = run_scn_eval("configs/scn_grid.json", tmp_path, method="all")
+    base_path = tmp_path / "small_scn_base.json"
+    base_path.write_text(json.dumps(comparison_raw_instance(), ensure_ascii=False), encoding="utf-8")
+    scn_cfg = {
+        "base_config": str(base_path),
+        "scenarios": [
+            {
+                "id": "normal",
+                "level": "S0-基准",
+                "description": "基准",
+                "removed_devices": [],
+                "speed_multiplier": {},
+                "crack_updates": {},
+                "edge_loss_updates": {},
+            },
+            {
+                "id": "stress",
+                "level": "S1-扰动",
+                "description": "设备变慢和裂缝加重",
+                "removed_devices": [],
+                "speed_multiplier": {"P_slow": 0.8},
+                "crack_updates": {"B_2_1": {"C": 1, "CS": 0.4}},
+                "edge_loss_updates": {"B_1_1|B_2_1": 1.0},
+            },
+        ],
+    }
+    scn_path = tmp_path / "small_scn.json"
+    scn_path.write_text(json.dumps(scn_cfg, ensure_ascii=False), encoding="utf-8")
+    summaries = run_scn_eval(scn_path, tmp_path, method="all")
     assert {row["method"] for row in summaries} == {"VF", "VDF", "MG", "CNAG-LS"}
     for row in summaries:
         assert "average_scenario_value" in row
