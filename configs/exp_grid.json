@@ -1,0 +1,39 @@
+{
+  "random_seed": 20260724,
+  "reps": 2,
+  "max_cases": 12,
+  "boards": {
+    "S_sparse": {"width": 10.0, "height": 6.0, "m": 3, "n": 2, "base_value": 80.0},
+    "M_regular": {"width": 16.0, "height": 10.0, "m": 5, "n": 3, "base_value": 100.0},
+    "L_dense": {"width": 24.0, "height": 16.0, "m": 8, "n": 5, "base_value": 125.0}
+  },
+  "time": {
+    "tight": 0.42,
+    "normal": 0.65,
+    "loose": 0.95
+  },
+  "cracks": {
+    "few_light": {"rate": 0.10, "max_cs": 0.25, "pattern": "random"},
+    "cluster_mid": {"rate": 0.28, "max_cs": 0.55, "pattern": "cluster"},
+    "cross_heavy": {"rate": 0.45, "max_cs": 0.80, "pattern": "band"}
+  },
+  "adj": {
+    "weak": {"same": 2.0, "diff": 1.0, "cross": 0.8},
+    "mid": {"same": 6.0, "diff": 3.0, "cross": 2.5},
+    "strong": {"same": 12.0, "diff": 8.0, "cross": 5.0}
+  },
+  "devs": {
+    "balanced": {
+      "ordinary": [14.0, 13.0, 12.0],
+      "precision": [8.0, 7.5]
+    },
+    "precision_scarce": {
+      "ordinary": [16.0, 13.5, 11.0, 9.0],
+      "precision": [6.5]
+    },
+    "hetero_old": {
+      "ordinary": [18.0, 10.0, 6.5],
+      "precision": [9.0, 4.5]
+    }
+  }
+}

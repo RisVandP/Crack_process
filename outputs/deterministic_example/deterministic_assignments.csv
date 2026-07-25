@@ -1,7 +1,0 @@
-﻿block_id,i,j,crack_present,crack_severity,processing_status,assigned_device,estimated_processing_time,processing_increment
-B_1_1,1,1,1,0.5079972681912728,ordinary,O1,1.6719981787941818,19.2
-B_1_2,1,2,0,0.0,ordinary,O2,1.6,19.2
-B_2_1,2,1,1,0.4976394578998032,ordinary,O2,1.9981115663198428,19.2
-B_2_2,2,2,1,0.4271578665730114,ordinary,O1,1.6181052443820074,19.2
-B_3_1,3,1,1,0.2944667288638702,precision,P2,3.0592889718184932,35.2
-B_3_2,3,2,0,0.0,precision,P1,2.2857142857142856,35.2

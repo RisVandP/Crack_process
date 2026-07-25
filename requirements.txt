@@ -1,3 +1,2 @@
-pulp>=2.8
 matplotlib>=3.8
 pytest>=8.0

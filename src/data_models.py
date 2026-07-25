@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
-from typing import Dict, List, Tuple
+from dataclasses import dataclass, field
+from typing import Any, Dict, List, Tuple
 
 
 BlockId = str
@@ -70,7 +70,7 @@ class ValueParams:
 
 @dataclass
 class ProblemData:
-    """确定性BILP所需的完整输入数据。"""
+    """裂纹板材确定性问题所需的完整输入数据。"""
 
     board: Board
     deadline: float
@@ -108,7 +108,7 @@ class ProblemData:
 
 @dataclass
 class Solution:
-    """求解器返回方案以及由方案派生的汇总信息。"""
+    """算法返回方案以及由方案派生的汇总信息。"""
 
     status: str
     objective_value: float
@@ -120,6 +120,7 @@ class Solution:
     h: Dict[EdgeKey, int]
     m: Dict[EdgeKey, int]
     solver_name: str
+    metadata: Dict[str, Any] = field(default_factory=dict)
 
 
 def block_id(i: int, j: int) -> BlockId:

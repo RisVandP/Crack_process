@@ -122,9 +122,9 @@ def _read_cracks(raw: Dict[str, Any], board: Board, edges: list[EdgeKey]) -> tup
 
 def _validate_devices(devices: Iterable[Device]) -> None:
     seen = set()
-    has_ordinary = False
-    has_precision = False
+    count = 0
     for device in devices:
+        count += 1
         if device.id in seen:
             raise ValueError(f"设备编号重复：{device.id}")
         seen.add(device.id)
@@ -132,10 +132,8 @@ def _validate_devices(devices: Iterable[Device]) -> None:
             raise ValueError(f"设备 {device.id} 的type必须是 ordinary 或 precision。")
         if device.speed <= 0:
             raise ValueError(f"设备 {device.id} 的speed必须为正数。")
-        has_ordinary = has_ordinary or device.is_ordinary
-        has_precision = has_precision or device.is_precision
-    if not has_ordinary or not has_precision:
-        raise ValueError("示例和模型至少需要一台普通设备和一台精密设备。")
+    if count == 0:
+        raise ValueError("至少需要提供一台设备。")
 
 
 def _build_blocks(board: Board, crack_by_block: Dict[str, Dict[str, Any]]) -> list[Block]:

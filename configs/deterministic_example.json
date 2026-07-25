@@ -1,42 +1,49 @@
 {
   "random_seed": 20260724,
   "board": {
-    "width": 12.0,
-    "height": 8.0,
-    "m": 3,
-    "n": 2,
-    "base_value": 100.0
+    "width": 20.0,
+    "height": 12.0,
+    "m": 5,
+    "n": 4,
+    "base_value": 110.0
   },
-  "deadline": 3.8,
+  "deadline": 8.0,
   "devices": [
-    {"id": "O1", "type": "ordinary", "speed": 12.0},
-    {"id": "O2", "type": "ordinary", "speed": 10.0},
-    {"id": "P1", "type": "precision", "speed": 7.0},
-    {"id": "P2", "type": "precision", "speed": 6.0}
+    {"id": "O1", "type": "ordinary", "speed": 16.0},
+    {"id": "O2", "type": "ordinary", "speed": 12.0},
+    {"id": "O3", "type": "ordinary", "speed": 8.0},
+    {"id": "P1", "type": "precision", "speed": 8.0},
+    {"id": "P2", "type": "precision", "speed": 6.0},
+    {"id": "P3", "type": "precision", "speed": 4.5}
   ],
   "values": {
-    "r_ordinary": 1.2,
-    "r_precision": 2.2,
-    "default_same_precision_reward": 8.0,
-    "default_precision_mismatch_penalty": 4.0,
-    "default_cross_crack_loss": 3.0,
-    "alpha": 0.5
+    "r_ordinary": 1.1,
+    "r_precision": 2.5,
+    "default_same_precision_reward": 9.0,
+    "default_precision_mismatch_penalty": 5.0,
+    "default_cross_crack_loss": 3.5,
+    "alpha": 0.6
   },
   "cracks": {
     "mode": "geometry",
     "epsilon": 0.001,
-    "R_max": 3.0,
-    "lambda_b": 3.0,
+    "R_max": 5.0,
+    "lambda_b": 3.5,
     "items": [
       {
         "id": "C1",
-        "width": 0.45,
-        "polyline": [[1.0, 1.0], [5.2, 3.2], [7.0, 6.5]]
+        "width": 0.42,
+        "polyline": [[1.0, 1.0], [5.0, 3.0], [8.2, 7.8], [10.5, 11.0]]
       },
       {
         "id": "C2",
-        "width": 0.30,
-        "polyline": [[6.5, 0.8], [10.8, 2.2]]
+        "width": 0.28,
+        "polyline": [[7.5, 0.8], [12.5, 2.4], [18.2, 4.5]]
+      },
+      {
+        "id": "C3",
+        "width": 0.36,
+        "polyline": [[3.5, 10.8], [9.0, 8.0], [14.5, 8.5], [19.0, 10.5]]
       }
     ]
   }

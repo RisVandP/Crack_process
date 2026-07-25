@@ -1,0 +1,209 @@
+from __future__ import annotations
+
+import json
+import subprocess
+import sys
+from pathlib import Path
+
+import pytest
+
+from src.cnag_ls import solve_cnag_ls
+from src.data_loader import parse_problem
+from src.deterministic_model import processing_time
+from src.feasibility_checker import check_solution
+from src.greedy_baselines import solve_value_density_first, solve_value_first
+from src.marginal_greedy import solve_marginal_greedy
+from src.method_comparison import run_method_comparison
+from src.exp_grid import run_grid_exp
+from src.solution_evaluator import objective_breakdown
+from src.scn_eval import load_scn_cfg, run_scn_eval
+
+
+def comparison_raw_instance():
+    return {
+        "random_seed": 20260724,
+        "board": {"width": 6.0, "height": 4.0, "m": 3, "n": 1, "base_value": 80.0},
+        "deadline": 2.7,
+        "devices": [
+            {"id": "O_fast", "type": "ordinary", "speed": 8.0},
+            {"id": "P_slow", "type": "precision", "speed": 3.0},
+        ],
+        "values": {
+            "r_ordinary": 1.0,
+            "r_precision": 2.0,
+            "default_same_precision_reward": 2.0,
+            "default_precision_mismatch_penalty": 1.0,
+            "default_cross_crack_loss": 0.0,
+            "alpha": 0.5,
+        },
+        "cracks": {
+            "mode": "direct",
+            "blocks": {
+                "B_1_1": {"C": 1, "CS": 0.6},
+                "B_2_1": {"C": 0, "CS": 0.0},
+                "B_3_1": {"C": 0, "CS": 0.0},
+            },
+        },
+    }
+
+
+def test_four_heuristics_are_feasible():
+    data = parse_problem(comparison_raw_instance())
+    for solve in [solve_value_first, solve_value_density_first, solve_marginal_greedy, solve_cnag_ls]:
+        solution = solve(data)
+        check = check_solution(data, solution)
+        assert check.feasible, check.messages
+
+
+def test_greedy_repeated_runs_are_deterministic():
+    data = parse_problem(comparison_raw_instance())
+    first = solve_value_density_first(data)
+    second = solve_value_density_first(data)
+    assert first.x == second.x
+    assert first.y_ordinary == second.y_ordinary
+    assert first.y_precision == second.y_precision
+
+
+def test_missing_precision_device_keeps_precision_assignments_zero():
+    raw = comparison_raw_instance()
+    raw["devices"] = [{"id": "O_only", "type": "ordinary", "speed": 8.0}]
+    data = parse_problem(raw)
+    solution = solve_value_first(data)
+    assert all(value == 0 for value in solution.y_precision.values())
+    assert check_solution(data, solution).feasible
+
+
+def test_crack_severity_increases_processing_time():
+    data = parse_problem(comparison_raw_instance())
+    cracked_time = processing_time(data, "B_1_1", "O_fast")
+    normal_time = processing_time(data, "B_2_1", "O_fast")
+    assert cracked_time > normal_time
+
+
+def test_cnag_ls_not_below_construction_value():
+    data = parse_problem(comparison_raw_instance())
+    solution = solve_cnag_ls(data)
+    assert solution.objective_value + 1e-6 >= float(solution.metadata["construction_objective"])
+
+
+def test_cnag_ls_not_below_marginal_greedy():
+    data = parse_problem(comparison_raw_instance())
+    cnag = solve_cnag_ls(data)
+    marginal = solve_marginal_greedy(data)
+    assert cnag.objective_value + 1e-6 >= marginal.objective_value
+
+
+def test_all_methods_use_unified_objective_recalculation():
+    data = parse_problem(comparison_raw_instance())
+    for solution in [solve_value_first(data), solve_value_density_first(data), solve_marginal_greedy(data), solve_cnag_ls(data)]:
+        breakdown = objective_breakdown(data, solution)
+        assert abs(breakdown["total_objective"] - solution.objective_value) < 1e-5
+
+
+def test_method_comparison_outputs_complete_files(tmp_path):
+    data = parse_problem(comparison_raw_instance())
+    rows = run_method_comparison(data, tmp_path)
+    assert {row["method"] for row in rows} == {"VF", "VDF", "MG", "CNAG-LS"}
+    for name in ["method_comparison.csv", "method_comparison.json", "method_comparison.png"]:
+        assert (tmp_path / name).exists()
+    with (tmp_path / "method_comparison.json").open("r", encoding="utf-8") as f:
+        loaded = json.load(f)
+    required = {
+        "method",
+        "feasible",
+        "status",
+        "objective_value",
+        "difference_to_cnag_ls_percent",
+        "processed_count",
+        "average_utilization",
+        "max_utilization",
+        "run_seconds",
+        "intrinsic_block_value",
+        "cross_crack_loss",
+    }
+    assert required.issubset(loaded[0].keys())
+
+
+def test_invalid_speed_and_deadline_are_rejected():
+    raw = comparison_raw_instance()
+    raw["devices"][0]["speed"] = 0
+    with pytest.raises(ValueError):
+        parse_problem(raw)
+    raw = comparison_raw_instance()
+    raw["deadline"] = 0
+    with pytest.raises(ValueError):
+        parse_problem(raw)
+
+
+def test_cli_all_generates_expected_files(tmp_path):
+    output_dir = tmp_path / "cli_outputs"
+    cmd = [
+        sys.executable,
+        "-m",
+        "src.main",
+        "--config",
+        "configs/deterministic_example.json",
+        "--output",
+        str(output_dir),
+        "--method",
+        "all",
+    ]
+    completed = subprocess.run(cmd, check=True, capture_output=True, text=True)
+    assert "CNAG-LS" in completed.stdout
+    assert (output_dir / "method_comparison.csv").exists()
+    assert (output_dir / "cnag_ls" / "assignments.csv").exists()
+
+
+def test_source_and_requirements_do_not_reference_package_solvers():
+    banned = ["pulp", "cbc", "gurobi", "cplex", "scip", "glpk", "ortools", "cvxpy"]
+    paths = list(Path("src").glob("*.py")) + [Path("requirements.txt")]
+    text = "\n".join(path.read_text(encoding="utf-8").lower() for path in paths)
+    for token in banned:
+        assert token not in text
+
+
+def test_scn_eval_outputs(tmp_path):
+    summaries = run_scn_eval("configs/scn_grid.json", tmp_path, method="all")
+    assert {row["method"] for row in summaries} == {"VF", "VDF", "MG", "CNAG-LS"}
+    for row in summaries:
+        assert "average_scenario_value" in row
+        assert "worst_value" in row
+        assert "value_range" in row
+    assert (tmp_path / "scn_rows.csv").exists()
+    assert (tmp_path / "scn_sum.json").exists()
+
+
+def test_scn_config_uses_gradient_levels_not_probabilities():
+    _, scenarios = load_scn_cfg("configs/scn_grid.json")
+    assert [s.level for s in scenarios] == ["S0-基准", "S1-轻度扰动", "S2-中度扰动", "S3-重度扰动"]
+
+
+def test_grid_experiment_config_has_clear_gradients(tmp_path):
+    cfg = {
+        "random_seed": 20260724,
+        "reps": 1,
+        "boards": {
+            "S_sparse": {"width": 8.0, "height": 6.0, "m": 2, "n": 2, "base_value": 80.0},
+            "M_regular": {"width": 10.0, "height": 6.0, "m": 3, "n": 2, "base_value": 90.0},
+        },
+        "time": {"tight": 0.45, "loose": 0.90},
+        "cracks": {
+            "few_light": {"rate": 0.10, "max_cs": 0.25, "pattern": "random"},
+            "cross_heavy": {"rate": 0.45, "max_cs": 0.75, "pattern": "band"},
+        },
+        "adj": {"weak": {"same": 2.0, "diff": 1.0, "cross": 0.5}},
+        "devs": {
+            "balanced": {"ordinary": [12.0, 10.0], "precision": [7.0]},
+            "hetero_old": {"ordinary": [15.0, 6.0], "precision": [8.0, 4.0]},
+        },
+    }
+    cfg_path = tmp_path / "mini_grid.json"
+    cfg_path.write_text(json.dumps(cfg, ensure_ascii=False), encoding="utf-8")
+    rows, summary = run_grid_exp(cfg_path, tmp_path)
+    assert rows
+    assert summary
+    assert {row["board"] for row in rows} == {"S_sparse", "M_regular"}
+    assert {row["time"] for row in rows} == {"tight", "loose"}
+    assert {row["crack"] for row in rows} == {"few_light", "cross_heavy"}
+    assert (tmp_path / "grid_rows.csv").exists()
+    assert (tmp_path / "grid_sum.json").exists()

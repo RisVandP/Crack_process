@@ -1,16 +1,16 @@
 from __future__ import annotations
 
 from src.data_loader import load_problem
-from src.deterministic_model import solve_deterministic
 from src.feasibility_checker import check_solution
+from src.cnag_ls import solve_cnag_ls
 from src.solution_evaluator import objective_breakdown
 
 
 def test_example_solution_is_feasible():
     data = load_problem("configs/deterministic_example.json")
-    solution = solve_deterministic(data, msg=False)
+    solution = solve_cnag_ls(data)
     check = check_solution(data, solution)
-    assert solution.status == "Optimal"
+    assert solution.status == "Feasible"
     assert check.feasible, check.messages
 
 
@@ -24,7 +24,7 @@ def test_edges_have_no_duplicates_or_diagonals():
 
 def test_objective_recalculation_matches_solver():
     data = load_problem("configs/deterministic_example.json")
-    solution = solve_deterministic(data, msg=False)
+    solution = solve_cnag_ls(data)
     breakdown = objective_breakdown(data, solution)
     assert abs(breakdown["total_objective"] - solution.objective_value) < 1e-5
 

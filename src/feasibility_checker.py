@@ -15,7 +15,7 @@ class CheckResult:
 
 
 def check_solution(data: ProblemData, solution: Solution, tolerance: float = 1e-6) -> CheckResult:
-    """独立检查方案是否满足确定性BILP的主要约束。"""
+    """独立检查方案是否满足确定性问题的主要约束。"""
 
     messages: List[str] = []
     K = data.device_ids
