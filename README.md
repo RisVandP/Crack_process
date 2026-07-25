@@ -91,15 +91,43 @@ python -m src.main --config configs/deterministic_example.json --output outputs/
 
 若规模超过限制，会返回 `not_run` 或 `limit_reached`，不会声称得到全局最优。
 
-## 适用场景实验
+## 正式两阶段综合实验
 
-正式实验数据梯度设计写在：
+正式实验唯一数据入口是：
 
 ```text
-configs/exp_design.json
+configs/example.json
 ```
 
-该文件按 E0-E5 组织：小规模精确验证、基准实例、单因素梯度、裂纹空间分布、多因素综合工况、故障与隐藏裂纹压力测试。所有梯度最终都映射为确定性模型输入，例如 `board`、`devices.speed`、`deadline`、`values.alpha`、`r_ordinary/r_precision`、`b_uv/p_uv`、`C_u/CS_u/L_uv`，不包含情景概率、风险权重或随机规划变量。
+它显式写出 12 个确定性现实组合，每个组合内部并列写出 8 个不确定压力情景。正式实验不使用随机裂纹生成、参数笛卡尔积、模板覆盖或情景概率。
+
+运行入口：
+
+```bash
+python -m src.experiment --config configs/example.json --output outputs/experiment
+```
+
+程序分两阶段：
+
+1. 阶段一：每个确定性组合分别运行 `VF/VDF/MG/CNAG-LS`，保存固定方案和目标分解。
+2. 阶段二：同一个固定方案进入该组合的 8 个压力情景，只评价稳定性，不重新求解或重新分配。
+
+输出包括：
+
+- `stage1_deterministic_rows.csv/json`
+- `solutions/<case_id>/<method>.json`
+- `stage2_scenario_rows.csv/json`
+- `method_summary.csv/json`
+- `final_ranking.csv/json`
+- `deterministic_by_case.png`
+- `scenario_heatmap.png`
+- `feasibility_comparison.png`
+- `final_score_comparison.png`
+- `EXPERIMENT_ANALYSIS.md`
+
+综合得分权重从 `configs/example.json` 的 `evaluation_weights` 读取，不写死在 Python 中。
+
+## 辅助实验入口
 
 当前的快速调试入口仍是：
 
@@ -117,10 +145,9 @@ python -m src.exp_grid --config configs/exp_grid.json --output outputs/grid_exp
 - `gap_by_alg.png`
 - `GRID_ANALYSIS.md`
 
-`configs/exp_grid.json` 按木板规模、工期紧张度、裂缝分布、相邻耦合强度和设备配置构造多维参数网格，用来分析输入条件变化对算法结果的影响。
-配置中保留完整梯度组合，但默认通过 `max_cases=12` 均匀抽取部分案例，避免一次运行过慢；需要扩展实验时可增大 `max_cases` 或使用 `--limit` 指定案例数。
+`configs/exp_grid.json` 仅用于快速调试旧的网格实验，不作为正式实验设计入口。
 
-## 不确定情景评价
+## 单实例压力评价
 
 确定性算法先基于当前观测参数生成方案；随后用多组梯度场景评价同一方案在不同参数扰动下的表现。这里的场景不带发生概率，作用是分析算法在什么条件下表现较好或较差，并探索算法适用范围：
 
@@ -129,6 +156,8 @@ python -m src.scn_eval --config configs/scn_grid.json --output outputs/scn_eval 
 ```
 
 压力测试配置文件中，每个等级只描述对已有确定性输入的修改，例如移除某台设备、降低设备速度、更新隐藏裂纹严重程度和跨块裂纹损失。示例配置采用 `S0-基准`、`S1-轻度扰动`、`S2-中度扰动`、`S3-重度扰动` 的梯度设计，确定性求解逻辑不因压力评价而改变。
+
+`configs/scn_grid.json` 和 `src.scn_eval` 是单实例兼容入口；正式 12 组合 × 8 情景实验请使用 `configs/example.json` 和 `src.experiment`。
 
 输出包括：
 
