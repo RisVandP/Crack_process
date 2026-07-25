@@ -23,7 +23,6 @@ def processing_increment(data: ProblemData, solution: Solution, block_id: BlockI
 def objective_breakdown(data: ProblemData, solution: Solution) -> Dict[str, float]:
     """独立重算目标函数各组成部分。"""
 
-    block_map = data.block_by_id()
     intrinsic_value = sum(data.board.base_value * block.intrinsic_value_factor for block in data.blocks)
     ordinary_increment = sum(data.board.area_per_block * data.values.r_ordinary * solution.y_ordinary[u] for u in data.block_ids)
     precision_increment = sum(data.board.area_per_block * data.values.r_precision * solution.y_precision[u] for u in data.block_ids)
@@ -46,7 +45,6 @@ def objective_breakdown(data: ProblemData, solution: Solution) -> Dict[str, floa
         "precision_mismatch_penalty": precision_mismatch_penalty,
         "cross_crack_loss": cross_crack_loss,
         "total_objective": total,
-        "_block_count": float(len(block_map)),
     }
 
 

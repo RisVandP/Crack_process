@@ -12,14 +12,14 @@ from src.data_loader import parse_problem
 from src.deterministic_model import processing_time
 from src.feasibility_checker import check_solution
 from src.greedy_baselines import solve_value_density_first, solve_value_first
-from src.marginal_greedy import solve_marginal_greedy
+from src.marginal_greedy import _incident_edges, _single_move_delta, solve_marginal_greedy
 from src.method_comparison import run_method_comparison
 from src.solution_evaluator import objective_breakdown
+from src.solution_utils import apply_task_copy, empty_solution
 
 
 def comparison_raw_instance():
     return {
-        "random_seed": 20260724,
         "board": {"width": 6.0, "height": 4.0, "m": 3, "n": 1, "base_value": 80.0},
         "deadline": 2.7,
         "devices": [
@@ -98,6 +98,21 @@ def test_all_methods_use_unified_objective_recalculation():
         assert abs(breakdown["total_objective"] - solution.objective_value) < 1e-5
 
 
+def test_marginal_greedy_single_move_delta_matches_full_recalculation():
+    data = parse_problem(comparison_raw_instance())
+    solution = empty_solution(data, "MG")
+    incident = _incident_edges(data)
+    old_value = objective_breakdown(data, solution)["total_objective"]
+    for block_id, process_type, device_id in [
+        ("B_1_1", "ordinary", "O_fast"),
+        ("B_1_1", "precision", "P_slow"),
+    ]:
+        candidate = apply_task_copy(data, solution, block_id, process_type, device_id)
+        full_delta = objective_breakdown(data, candidate)["total_objective"] - old_value
+        analytic_delta = _single_move_delta(data, solution, block_id, process_type, incident[block_id])
+        assert abs(full_delta - analytic_delta) < 1e-6
+
+
 def test_method_comparison_outputs_complete_files(tmp_path):
     data = parse_problem(comparison_raw_instance())
     rows = run_method_comparison(data, tmp_path)
@@ -160,4 +175,3 @@ def test_source_and_requirements_do_not_reference_package_solvers():
     text = "\n".join(path.read_text(encoding="utf-8").lower() for path in paths)
     for token in banned:
         assert token not in text
-

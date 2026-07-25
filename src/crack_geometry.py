@@ -1,27 +1,12 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
 from math import hypot
 from typing import Dict, Iterable, List, Tuple
 
-from .data_models import Board, EdgeKey, block_id
+from .data_models import Board, Crack, EdgeKey, Point, block_id
 
 
-Point = Tuple[float, float]
 Rect = Tuple[float, float, float, float]
-
-
-@dataclass(frozen=True)
-class Crack:
-    """全局裂缝对象。
-
-    polyline表示裂缝在木板全局坐标系中的折线位置。
-    width表示裂缝宽度或等价破坏强度；若后续题目改用深度，也可把该字段理解为D_c。
-    """
-
-    id: str
-    polyline: List[Point]
-    width: float
 
 
 def block_rect(board: Board, i: int, j: int) -> Rect:

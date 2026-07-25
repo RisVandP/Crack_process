@@ -4,13 +4,17 @@ import argparse
 import csv
 import hashlib
 import json
+import os
+import tempfile
 from dataclasses import replace
 from pathlib import Path
 from typing import Any, Callable, Dict, Iterable, List
 
 from .cnag_ls import solve_cnag_ls
-from .data_loader import parse_edge_key, parse_problem
-from .data_models import Block, EdgeKey, ProblemData, Solution
+from .crack_geometry import compute_crack_effects
+from .data_loader import parse_problem, parse_crack_items
+from .data_models import Block, ProblemData, Solution
+from .deterministic_model import processing_time
 from .feasibility_checker import check_solution
 from .greedy_baselines import solve_value_density_first, solve_value_first
 from .marginal_greedy import solve_marginal_greedy
@@ -231,10 +235,19 @@ def _solution_payload(case: dict, method: str, solution: Solution, solution_hash
 def _scenario_data(data: ProblemData, scenario: dict) -> ProblemData:
     speed_map = {item["id"]: float(item["speed"]) for item in scenario.get("device_states", [])}
     devices = [replace(device, speed=speed_map.get(device.id, device.speed)) for device in data.devices]
-    crack_updates = scenario.get("crack_updates", {})
+    hidden = parse_crack_items(scenario.get("hidden_cracks", {}).get("items", []), data.board)
+    all_cracks = tuple(data.cracks) + tuple(hidden)
+    crack_by_block, edge_loss = compute_crack_effects(
+        data.board,
+        data.edges,
+        all_cracks,
+        data.crack_epsilon,
+        data.crack_r_max,
+        data.crack_lambda_b,
+    )
     blocks = []
     for block in data.blocks:
-        update = crack_updates.get(block.id, {})
+        update = crack_by_block.get(block.id, {})
         blocks.append(
             Block(
                 id=block.id,
@@ -244,20 +257,12 @@ def _scenario_data(data: ProblemData, scenario: dict) -> ProblemData:
                 crack_severity=float(update.get("CS", block.crack_severity)),
             )
         )
-    edge_loss = dict(data.cross_crack_loss)
-    for raw_key, value in scenario.get("edge_loss_updates", {}).items():
-        edge_loss[parse_edge_key(raw_key)] = float(value)
-    return ProblemData(
-        board=data.board,
-        deadline=data.deadline,
+    return replace(
+        data,
         devices=devices,
         blocks=blocks,
-        edges=data.edges,
-        values=data.values,
-        same_precision_reward=data.same_precision_reward,
-        precision_mismatch_penalty=data.precision_mismatch_penalty,
         cross_crack_loss=edge_loss,
-        random_seed=data.random_seed,
+        cracks=all_cracks,
     )
 
 
@@ -270,8 +275,6 @@ def _scenario_usage(original_data: ProblemData, scenario_data: ProblemData, solu
         if device.id in removed:
             load = 0.0
         else:
-            from .deterministic_model import processing_time
-
             load = sum(processing_time(scenario_data, u, device.id) for u in assigned)
         overtime = max(0.0, load - original_data.deadline)
         usage[device.id] = {
@@ -349,35 +352,46 @@ def _validate_experiment_config(cfg: dict) -> None:
     weight_sum = sum(float(v) for v in cfg["evaluation_weights"].values())
     if abs(weight_sum - 1.0) > 1e-9:
         raise ValueError("evaluation_weights之和必须为1。")
+    case_ids = [case["id"] for case in cfg["cases"]]
+    if len(case_ids) != len(set(case_ids)):
+        raise ValueError("正式实验案例ID不能重复。")
     for case in cfg["cases"]:
+        if "random_seed" in case["deterministic_input"]:
+            raise ValueError(f"{case['id']} 的正式实验输入不允许使用random_seed。")
         data = parse_problem(case["deterministic_input"])
         scenarios = case.get("uncertainty_scenarios", [])
         if len(scenarios) != 8:
             raise ValueError(f"{case['id']} 必须包含8个不确定情景。")
-        block_ids = set(data.block_ids)
-        edge_keys = {f"{u}|{v}" for u, v in data.edges}
+        scenario_ids = [scenario["id"] for scenario in scenarios]
+        if len(scenario_ids) != len(set(scenario_ids)):
+            raise ValueError(f"{case['id']} 的情景ID不能重复。")
         device_ids = set(data.device_ids)
         for scenario in scenarios:
             for device_id in scenario.get("removed_devices", []):
                 if device_id not in device_ids:
                     raise ValueError(f"{case['id']} {scenario['id']} 的设备 {device_id} 不存在。")
+            state_ids = [state["id"] for state in scenario.get("device_states", [])]
+            if len(state_ids) != len(set(state_ids)):
+                raise ValueError(f"{case['id']} {scenario['id']} 重复描述同一设备。")
             for state in scenario.get("device_states", []):
                 if state["id"] not in device_ids:
                     raise ValueError(f"{case['id']} {scenario['id']} 的设备 {state['id']} 不存在。")
                 if float(state["speed"]) <= 0:
                     raise ValueError(f"{case['id']} {scenario['id']} 的设备速度必须为正。")
-            for block_id, update in scenario.get("crack_updates", {}).items():
-                if block_id not in block_ids:
-                    raise ValueError(f"{case['id']} {scenario['id']} 的木块 {block_id} 不存在。")
-                if int(update.get("C", 0)) not in {0, 1}:
-                    raise ValueError(f"{case['id']} {scenario['id']} 的C必须为0或1。")
-                if not 0.0 <= float(update.get("CS", 0.0)) <= 1.0:
-                    raise ValueError(f"{case['id']} {scenario['id']} 的CS必须位于[0,1]。")
-            for edge_key in scenario.get("edge_loss_updates", {}):
-                edge = parse_edge_key(edge_key)
-                if f"{edge[0]}|{edge[1]}" not in edge_keys:
-                    raise ValueError(f"{case['id']} {scenario['id']} 的边 {edge_key} 不是合法相邻边。")
+            if "crack_updates" in scenario or "edge_loss_updates" in scenario:
+                raise ValueError(f"{case['id']} {scenario['id']} 不允许使用crack_updates或edge_loss_updates。")
+            if "hidden_cracks" not in scenario:
+                raise ValueError(f"{case['id']} {scenario['id']} 必须包含hidden_cracks。")
+            hidden = parse_crack_items(scenario["hidden_cracks"].get("items", []), data.board)
+            observed_ids = {crack.id for crack in data.cracks}
+            for crack in hidden:
+                if crack.id in observed_ids:
+                    raise ValueError(f"{case['id']} {scenario['id']} 的隐藏裂纹ID与观测裂纹重复：{crack.id}")
         cracks = case["deterministic_input"].get("cracks", {})
+        if cracks.get("mode") != "geometry":
+            raise ValueError(f"{case['id']} 正式实验必须使用geometry裂纹模式。")
+        if not cracks.get("items"):
+            raise ValueError(f"{case['id']} 至少需要一条观测裂纹。")
         for item in cracks.get("items", []):
             for x, y in item["polyline"]:
                 if not 0.0 <= float(x) <= data.board.width or not 0.0 <= float(y) <= data.board.height:
@@ -398,6 +412,7 @@ def _write_json(payload: Any, path: Path) -> None:
 
 
 def _plot_outputs(stage1_rows: list[dict], stage2_rows: list[dict], ranking: list[dict], out: Path) -> None:
+    os.environ.setdefault("MPLCONFIGDIR", str(Path(tempfile.gettempdir()) / "crack_process_mpl"))
     import matplotlib
 
     matplotlib.use("Agg")
@@ -408,7 +423,7 @@ def _plot_outputs(stage1_rows: list[dict], stage2_rows: list[dict], ranking: lis
     methods = sorted({row["method"] for row in stage1_rows})
     fig, ax = plt.subplots(figsize=(10, 4))
     ax.bar(methods, [_mean(float(row["objective_value"]) for row in stage1_rows if row["method"] == method) for method in methods])
-    ax.set_title("确定性阶段平均目标值")
+    ax.set_title("Mean deterministic objective")
     fig.tight_layout()
     fig.savefig(out / "deterministic_by_case.png", dpi=180)
     plt.close(fig)
@@ -419,7 +434,7 @@ def _plot_outputs(stage1_rows: list[dict], stage2_rows: list[dict], ranking: lis
     im = ax.imshow(heat, aspect="auto", cmap="YlGnBu")
     ax.set_xticks(range(len(methods)), methods)
     ax.set_yticks(range(len(cases)), cases)
-    ax.set_title("情景目标热力图")
+    ax.set_title("Mean scenario objective by case")
     fig.colorbar(im, ax=ax)
     fig.tight_layout()
     fig.savefig(out / "scenario_heatmap.png", dpi=180)
@@ -428,7 +443,7 @@ def _plot_outputs(stage1_rows: list[dict], stage2_rows: list[dict], ranking: lis
     fig, ax = plt.subplots(figsize=(8, 4))
     ax.bar(methods, [_mean(1.0 if row["feasible_under_scenario"] else 0.0 for row in stage2_rows if row["method"] == method) for method in methods])
     ax.set_ylim(0, 1.05)
-    ax.set_title("情景可行率比较")
+    ax.set_title("Scenario feasibility rate")
     fig.tight_layout()
     fig.savefig(out / "feasibility_comparison.png", dpi=180)
     plt.close(fig)
@@ -436,7 +451,7 @@ def _plot_outputs(stage1_rows: list[dict], stage2_rows: list[dict], ranking: lis
     fig, ax = plt.subplots(figsize=(8, 4))
     ax.bar([row["method"] for row in ranking], [row["final_score"] for row in ranking])
     ax.set_ylim(0, 1.05)
-    ax.set_title("综合得分比较")
+    ax.set_title("Final score comparison")
     fig.tight_layout()
     fig.savefig(out / "final_score_comparison.png", dpi=180)
     plt.close(fig)
@@ -462,6 +477,23 @@ def _write_analysis(cfg: dict, stage1_rows: list[dict], stage2_rows: list[dict],
     lines.extend(["", "## 综合排名"])
     for row in ranking:
         lines.append(f"- 第{row['rank']}名：{row['method']}，final_score={row['final_score']:.4f}，可行率={row['scenario_feasibility_score']:.4f}")
+    lines.extend(
+        [
+            "",
+            "## 方法综合表现",
+            "",
+            "| method | deterministic_quality | average_robustness | worst_case | scenario_feasibility | runtime_efficiency | mean_runtime_s |",
+            "|---|---:|---:|---:|---:|---:|---:|",
+        ]
+    )
+    for row in ranking:
+        method = row["method"]
+        mean_runtime = _mean(float(item["run_seconds"]) for item in stage1_rows if item["method"] == method)
+        lines.append(
+            f"| {method} | {row['deterministic_quality_score']:.4f} | {row['average_robustness_score']:.4f} | "
+            f"{row['worst_case_score']:.4f} | {row['scenario_feasibility_score']:.4f} | "
+            f"{row['runtime_efficiency_score']:.4f} | {mean_runtime:.4f} |"
+        )
     lines.extend(
         [
             "",

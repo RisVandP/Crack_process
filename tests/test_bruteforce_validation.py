@@ -7,7 +7,6 @@ from src.greedy_baselines import solve_value_first
 
 def small_raw_instance():
     return {
-        "random_seed": 20260724,
         "board": {"width": 4.0, "height": 4.0, "m": 2, "n": 2, "base_value": 50.0},
         "deadline": 3.0,
         "devices": [

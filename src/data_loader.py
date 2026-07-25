@@ -13,8 +13,9 @@ from .data_models import (
     ValueParams,
     block_id,
     normalize_edge,
+    Crack,
 )
-from .crack_geometry import Crack, compute_crack_effects
+from .crack_geometry import compute_crack_effects
 
 
 def load_problem(path: str | Path) -> ProblemData:
@@ -61,7 +62,7 @@ def parse_problem(raw: Dict[str, Any]) -> ProblemData:
     _validate_devices(devices)
 
     edges = _build_edges(board)
-    crack_by_block, geometry_cross_loss = _read_cracks(raw, board, edges)
+    crack_by_block, geometry_cross_loss, cracks, crack_epsilon, crack_r_max, crack_lambda_b = _read_cracks(raw, board, edges)
     blocks = _build_blocks(board, crack_by_block)
 
     same_reward = _edge_values(edges, values.default_same_precision_reward, value_raw.get("same_precision_reward", {}))
@@ -85,11 +86,14 @@ def parse_problem(raw: Dict[str, Any]) -> ProblemData:
         same_precision_reward=same_reward,
         precision_mismatch_penalty=mismatch_penalty,
         cross_crack_loss=cross_loss,
-        random_seed=int(raw.get("random_seed", 20260724)),
+        cracks=tuple(cracks),
+        crack_epsilon=crack_epsilon,
+        crack_r_max=crack_r_max,
+        crack_lambda_b=crack_lambda_b,
     )
 
 
-def _read_cracks(raw: Dict[str, Any], board: Board, edges: list[EdgeKey]) -> tuple[Dict[str, Dict[str, Any]], Dict[EdgeKey, float] | None]:
+def _read_cracks(raw: Dict[str, Any], board: Board, edges: list[EdgeKey]) -> tuple[Dict[str, Dict[str, Any]], Dict[EdgeKey, float] | None, list[Crack], float, float | None, float]:
     """读取裂缝信息。
 
     支持两种模式：
@@ -100,7 +104,7 @@ def _read_cracks(raw: Dict[str, Any], board: Board, edges: list[EdgeKey]) -> tup
     cracks_raw = raw.get("cracks", {})
     mode = cracks_raw.get("mode", "direct")
     if mode == "direct":
-        return cracks_raw.get("blocks", {}), None
+        return cracks_raw.get("blocks", {}), None, [], 1e-6, None, 0.0
     if mode != "geometry":
         raise ValueError("cracks.mode必须为 direct 或 geometry。")
 
@@ -108,16 +112,38 @@ def _read_cracks(raw: Dict[str, Any], board: Board, edges: list[EdgeKey]) -> tup
     r_max_raw = cracks_raw.get("R_max")
     r_max = None if r_max_raw is None else float(r_max_raw)
     lambda_b = float(cracks_raw.get("lambda_b", raw["values"].get("default_cross_crack_loss", 0.0)))
-    crack_items = []
-    for item in cracks_raw.get("items", []):
-        polyline = [(float(point[0]), float(point[1])) for point in item["polyline"]]
-        if len(polyline) < 2:
-            raise ValueError(f"裂缝 {item.get('id', '')} 至少需要两个点。")
+    crack_items = parse_crack_items(cracks_raw.get("items", []), board)
+    block_cracks, edge_loss = compute_crack_effects(board, edges, crack_items, epsilon, r_max, lambda_b)
+    return block_cracks, edge_loss, crack_items, epsilon, r_max, lambda_b
+
+
+def parse_crack_items(items, board: Board) -> list[Crack]:
+    """解析并校验几何裂纹折线。"""
+
+    cracks: list[Crack] = []
+    seen: set[str] = set()
+    for index, item in enumerate(items, start=1):
+        crack_id = str(item.get("id", f"C{index}"))
+        if crack_id in seen:
+            raise ValueError(f"裂缝ID重复：{crack_id}")
+        seen.add(crack_id)
         width = float(item["width"])
-        if width < 0:
-            raise ValueError(f"裂缝 {item.get('id', '')} 的width必须非负。")
-        crack_items.append(Crack(id=str(item.get("id", len(crack_items) + 1)), polyline=polyline, width=width))
-    return compute_crack_effects(board, edges, crack_items, epsilon, r_max, lambda_b)
+        if width <= 0:
+            raise ValueError(f"裂缝 {crack_id} 的width必须大于0。")
+        polyline = []
+        for raw_point in item["polyline"]:
+            if len(raw_point) != 2:
+                raise ValueError(f"裂缝 {crack_id} 的坐标点格式必须为[x,y]。")
+            x, y = float(raw_point[0]), float(raw_point[1])
+            if not 0.0 <= x <= board.width or not 0.0 <= y <= board.height:
+                raise ValueError(f"裂缝 {crack_id} 的坐标({x},{y})超出板材范围。")
+            if polyline and polyline[-1] == (x, y):
+                raise ValueError(f"裂缝 {crack_id} 存在连续重复点。")
+            polyline.append((x, y))
+        if len(polyline) < 2:
+            raise ValueError(f"裂缝 {crack_id} 至少需要两个点。")
+        cracks.append(Crack(id=crack_id, polyline=tuple(polyline), width=width))
+    return cracks
 
 
 def _validate_devices(devices: Iterable[Device]) -> None:

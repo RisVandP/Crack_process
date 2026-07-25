@@ -26,7 +26,9 @@ TOL = 1e-9
 class CNAGConfig:
     max_construction_iterations: int = 10_000
     max_local_iterations: int = 80
-    max_pair_release: int = 2
+    max_pair_release: int = 1
+    pair_construction_block_limit: int = 30
+    pair_release_block_limit: int = 24
 
 
 @dataclass(frozen=True)
@@ -80,7 +82,7 @@ def _construct_with_single_and_pair(data: ProblemData, cfg: CNAGConfig) -> tuple
     iterations = 0
     while iterations < cfg.max_construction_iterations:
         single = best_marginal_single_move(data, solution)
-        pair = _best_pair_move(data, solution)
+        pair = _best_pair_move(data, solution, cfg)
         best_kind = None
         if single is not None and single.delta > TOL:
             best_kind = "single"
@@ -104,7 +106,9 @@ def _construct_with_single_and_pair(data: ProblemData, cfg: CNAGConfig) -> tuple
     return finalize_solution(data, solution), iterations, pair_accepts
 
 
-def _best_pair_move(data: ProblemData, solution: Solution) -> Optional[PairMove]:
+def _best_pair_move(data: ProblemData, solution: Solution, cfg: CNAGConfig) -> Optional[PairMove]:
+    if len(data.blocks) > cfg.pair_construction_block_limit:
+        return None
     current = solution.objective_value
     best: Optional[PairMove] = None
     for edge in data.edges:
@@ -165,18 +169,26 @@ def _local_search(data: ProblemData, solution: Solution, cfg: CNAGConfig) -> tup
 
 
 def _best_neighbor(data: ProblemData, solution: Solution, cfg: CNAGConfig) -> Optional[Solution]:
-    candidates = []
-    candidates.extend(_neighbors_add(data, solution))
-    candidates.extend(_neighbors_drop(data, solution))
-    candidates.extend(_neighbors_mode_change(data, solution))
-    candidates.extend(_neighbors_relocate(data, solution))
-    candidates.extend(_neighbors_swap(data, solution))
-    candidates.extend(_neighbors_pair_insert(data, solution, cfg))
-    feasible = [cand for cand in candidates if check_solution(data, cand).feasible and cand.objective_value > solution.objective_value + TOL]
-    if not feasible:
-        return None
-    feasible.sort(key=lambda cand: (-cand.objective_value, str(cand.metadata.get("tie_key", ""))))
-    return feasible[0]
+    best: Optional[Solution] = None
+    for neighbors in [
+        _neighbors_add(data, solution),
+        _neighbors_drop(data, solution),
+        _neighbors_mode_change(data, solution),
+        _neighbors_relocate(data, solution),
+        _neighbors_swap(data, solution),
+        _neighbors_pair_insert(data, solution, cfg),
+    ]:
+        for cand in neighbors:
+            if cand.objective_value <= solution.objective_value + TOL:
+                continue
+            if not check_solution(data, cand).feasible:
+                continue
+            if best is None or (-cand.objective_value, str(cand.metadata.get("tie_key", ""))) < (
+                -best.objective_value,
+                str(best.metadata.get("tie_key", "")),
+            ):
+                best = cand
+    return best
 
 
 def _tag(solution: Solution, move_type: str, tie_key: str) -> Solution:
@@ -240,11 +252,12 @@ def _neighbors_swap(data: ProblemData, solution: Solution):
 def _neighbors_pair_insert(data: ProblemData, solution: Solution, cfg: CNAGConfig):
     processed = [u for u in data.block_ids if is_block_processed(solution, u)]
     release_sets = [()]
-    release_sets.extend((u,) for u in processed)
-    if cfg.max_pair_release >= 2:
-        for i, u in enumerate(processed):
-            for v in processed[i + 1 :]:
-                release_sets.append((u, v))
+    if len(data.blocks) <= cfg.pair_release_block_limit:
+        release_sets.extend((u,) for u in processed)
+        if cfg.max_pair_release >= 2:
+            for i, u in enumerate(processed):
+                for v in processed[i + 1 :]:
+                    release_sets.append((u, v))
     for releases in release_sets:
         base = clone_solution(solution)
         for u in releases:

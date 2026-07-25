@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import copy
-from typing import Optional
 
 from .data_models import BlockId, DeviceId, ProblemData, Solution
 from .deterministic_model import processing_time
@@ -29,13 +28,6 @@ def empty_solution(data: ProblemData, method: str, status: str = "Feasible") -> 
 
 def clone_solution(solution: Solution) -> Solution:
     return copy.deepcopy(solution)
-
-
-def assigned_device(solution: Solution, block_id: BlockId, device_ids: list[DeviceId]) -> Optional[DeviceId]:
-    for device_id in device_ids:
-        if solution.x[(block_id, device_id)] == 1:
-            return device_id
-    return None
 
 
 def device_loads(data: ProblemData, solution: Solution) -> dict[DeviceId, float]:

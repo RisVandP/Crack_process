@@ -7,6 +7,16 @@ from typing import Any, Dict, List, Tuple
 BlockId = str
 DeviceId = str
 EdgeKey = Tuple[BlockId, BlockId]
+Point = Tuple[float, float]
+
+
+@dataclass(frozen=True)
+class Crack:
+    """板材全局坐标系下的折线裂纹。"""
+
+    id: str
+    polyline: Tuple[Point, ...]
+    width: float
 
 
 @dataclass(frozen=True)
@@ -81,7 +91,10 @@ class ProblemData:
     same_precision_reward: Dict[EdgeKey, float]
     precision_mismatch_penalty: Dict[EdgeKey, float]
     cross_crack_loss: Dict[EdgeKey, float]
-    random_seed: int = 20260724
+    cracks: Tuple[Crack, ...] = ()
+    crack_epsilon: float = 1e-6
+    crack_r_max: float | None = None
+    crack_lambda_b: float = 0.0
 
     @property
     def block_ids(self) -> List[BlockId]:

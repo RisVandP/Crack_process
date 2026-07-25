@@ -1,44 +1,34 @@
 # 裂纹板材加工自研启发式求解
 
-本项目面向“裂纹板材加工问题”，目标是在共同工期内决定每个木块不加工、普通加工或精密加工，并分配到对应设备，使重组后的完整价值尽可能高。
+本项目面向“裂纹板材加工问题”。程序在共同工期 `T` 内决定每个木块不加工、普通加工或精密加工，并把加工木块分配给对应设备，使重组后的总价值尽可能高。
 
-项目不再调用 CBC、Gurobi、PuLP、OR-Tools 等包求解器。原 0-1 线性模型仅作为问题形式化和目标函数依据；实际求解由自研确定性启发式算法完成。
+项目不调用 CBC、Gurobi、PuLP、OR-Tools 等包求解器。0-1 数学模型只作为目标函数、约束和算法评价口径；实际选择由自研启发式算法完成。
 
-## 数学目标
+## 数学口径
 
-加工时间统一为：
-
-```text
-hat_t[u,k] = A / s_k * (1 + alpha * C_u * CS_u)
-```
-
-完整目标函数为：
+加工时间：
 
 ```text
-F = 固有价值
-  + 普通加工增值
-  + 精密加工增值
-  + 相邻双精加工奖励
-  - 精密状态不一致损失
-  - 跨块裂纹损失
+t_hat[u,k] = A / s_k * (1 + alpha * C_u * CS_u)
 ```
 
-其中 `v_u = base_value * (1 - CS_u)`，无论木块是否加工都计入最终目标值；`L_uv` 在给定裂纹信息后是常数，也保留在目标分解中。
+目标函数：
 
-## 四种方法
+```text
+F = 木块固有价值 + 普通加工增值 + 精密加工增值 + 相邻双精加工奖励
+  - 精度不一致损失 - 跨块裂纹损失
+```
 
-- `VF`：单块价值优先基线，排序分数为 `v_u + A*r_q`。
-- `VDF`：单位加工时间价值优先基线，排序分数为 `(v_u + A*r_q) / hat_t[u,k]`。
-- `MG`：动态边际收益贪心，每轮重算 `Delta F(a|S) / hat_t[u,k]`。
-- `CNAG-LS`：Crack-and-Neighborhood-Aware Greedy Local Search，裂纹-邻域感知的自适应贪心局部搜索算法。
+其中 `v_u = base_value * (1 - CS_u)`。在几何裂纹输入下，`C_u`、`CS_u` 和 `L_uv` 都由裂纹折线自动计算，不在正式实验 JSON 中手写。
 
-`CNAG-LS` 包含：
+## 四种算法
 
-1. 动态边际收益构造；
-2. 相邻成对精加工候选；
-3. 多邻域局部搜索，包括 `Add`、`Drop`、`ModeChange`、`Relocate`、`Swap`、`PairInsert`。
+- `VF`：单块价值优先基线。
+- `VDF`：单位加工时间价值优先基线。
+- `MG`：动态边际收益贪心，每轮按 `Delta F / t_hat[u,k]` 选择。
+- `CNAG-LS`：Crack-and-Neighborhood-Aware Greedy Local Search，包含相邻成对精加工构造、局部搜索和规模保护。
 
-所有方法返回同一种 `Solution`，并共用加工时间、目标函数重算、可行性检查、CSV/JSON/图片输出。
+所有方法返回统一的 `Solution`，并共享加工时间、目标函数重算、可行性检查和 CSV/JSON/图片输出。
 
 ## 安装
 
@@ -46,71 +36,42 @@ F = 固有价值
 pip install -r requirements.txt
 ```
 
-## 运行单个方法
+## 单实例运行
 
-```bash
-python -m src.main --config configs/deterministic_example.json --output outputs/cnag_single --method cnag
-```
-
-其他方法：
-
-```bash
-python -m src.main --config configs/deterministic_example.json --output outputs/vf --method vf
-python -m src.main --config configs/deterministic_example.json --output outputs/vdf --method vdf
-python -m src.main --config configs/deterministic_example.json --output outputs/mg --method mg
-```
-
-## 运行全部启发式比较
+`configs/deterministic_example.json` 是一个中等复杂度确定性标准基准。
 
 ```bash
 python -m src.main --config configs/deterministic_example.json --output outputs/comparison --method all
 ```
 
-输出结构：
-
-```text
-outputs/comparison/
-├── vf/
-├── vdf/
-├── mg/
-├── cnag_ls/
-├── method_comparison.csv
-├── method_comparison.json
-└── method_comparison.png
-```
-
-比较表中的 `difference_to_cnag_ls_percent` 表示相对 CNAG-LS 的目标差异。
-
-## 小规模精确验证
-
-项目提供自编 DFS 回溯验证器，仅用于极小规模实例，不调用包求解器：
+也可以单独运行：
 
 ```bash
-python -m src.main --config configs/deterministic_example.json --output outputs/exact --method exact
+python -m src.main --config configs/deterministic_example.json --output outputs/vf --method vf
+python -m src.main --config configs/deterministic_example.json --output outputs/vdf --method vdf
+python -m src.main --config configs/deterministic_example.json --output outputs/mg --method mg
+python -m src.main --config configs/deterministic_example.json --output outputs/cnag_single --method cnag
 ```
 
-若规模超过限制，会返回 `not_run` 或 `limit_reached`，不会声称得到全局最优。
+## 正式两阶段实验
 
-## 正式两阶段综合实验
-
-正式实验唯一数据入口是：
+正式实验入口只有：
 
 ```text
 configs/example.json
 ```
 
-它显式写出 12 个确定性现实组合，每个组合内部并列写出 8 个不确定压力情景。正式实验不使用随机裂纹生成、参数笛卡尔积、模板覆盖或情景概率。
+该文件显式写出 12 个确定性案例，每个案例包含 8 个压力情景。案例在木板规模、裂纹分布、设备结构、处理速度和工期要求上形成梯度差异。正式实验不使用随机种子、模板覆盖、情景概率、`crack_updates` 或 `edge_loss_updates`。
 
-运行入口：
+运行：
 
 ```bash
 python -m src.experiment --config configs/example.json --output outputs/experiment
 ```
 
-程序分两阶段：
+阶段一：每个确定性案例分别运行 `VF/VDF/MG/CNAG-LS`，保存固定方案。
 
-1. 阶段一：每个确定性组合分别运行 `VF/VDF/MG/CNAG-LS`，保存固定方案和目标分解。
-2. 阶段二：同一个固定方案进入该组合的 8 个压力情景，只评价稳定性，不重新求解或重新分配。
+阶段二：把阶段一的固定方案放入 8 个情景中评价。情景只改变设备状态和隐藏裂纹几何；程序用 `dataclasses.replace` 生成情景数据，并重新从“观测裂纹 + 隐藏裂纹”的几何折线推导 `C_u`、`CS_u`、`L_uv`。阶段二不重新求解、不重新分配。
 
 输出包括：
 
@@ -125,19 +86,31 @@ python -m src.experiment --config configs/example.json --output outputs/experime
 - `final_score_comparison.png`
 - `EXPERIMENT_ANALYSIS.md`
 
-综合得分权重从 `configs/example.json` 的 `evaluation_weights` 读取，不写死在 Python 中。
+## 裂纹输入
 
-## JSON 输入
+正式配置使用几何裂纹：
 
-核心字段：
+```json
+{
+  "cracks": {
+    "mode": "geometry",
+    "epsilon": 0.08,
+    "R_max": 3.2,
+    "lambda_b": 1.5,
+    "items": [
+      {
+        "id": "OC1",
+        "width": 0.36,
+        "polyline": [[2.0, 12.0], [5.0, 10.8], [8.5, 9.6]]
+      }
+    ]
+  }
+}
+```
 
-- `board`：木板宽度、长度、分块数、基准价值；
-- `deadline`：共同工期；
-- `devices`：设备编号、类型、速度；
-- `values`：加工增值、相邻奖励、精度不一致损失、裂纹时间影响系数；
-- `cracks`：裂纹信息，支持几何折线输入和直接输入。
+每条裂纹按相邻点依次组成多段折线：`p1->p2`、`p2->p3`、`p3->p4`……。程序会校验点数、坐标范围、宽度、重复 ID、连续重复点和零长度风险。
 
-示例配置在 `configs/deterministic_example.json`。
+`direct` 裂纹模式仍保留给小规模测试和向后兼容，不用于正式 `configs/example.json`。
 
 ## 测试
 
@@ -145,20 +118,11 @@ python -m src.experiment --config configs/example.json --output outputs/experime
 python -m pytest -q
 ```
 
-测试覆盖：
-
-- 四种启发式可行性；
-- 统一目标函数重算；
-- 加工时间裂纹修正；
-- `h_uv` 与 `m_uv` 逻辑；
-- 小规模精确回溯；
-- CLI 端到端输出；
-- 源码和依赖中不存在包求解器调用。
+测试覆盖四算法可行性、统一目标函数、裂纹几何推导、两阶段实验结构、阶段二不重新求解、MG 解析边际增量、CLI 输出和禁止包求解器引用。
 
 ## 当前限制
 
-- CNAG-LS 是启发式局部搜索，不保证全局最优；
-- 精确回溯只用于极小规模验证；
-- 裂纹几何当前支持折线与规则网格；
-- 未实现滚动调度；
-- 大规模场景可进一步加入增量缓存、候选剪枝和并行边际收益计算。
+- `CNAG-LS` 是启发式局部搜索，不保证全局最优。
+- 精确回溯验证器只用于极小规模实例。
+- 目前只支持规则网格木块和折线裂纹几何。
+- 未实现滚动调度；阶段二用于固定方案压力评估。

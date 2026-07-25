@@ -1,369 +1,3894 @@
 {
   "schema_version": "2.0",
-  "algorithms": ["VF", "VDF", "MG", "CNAG-LS"],
+  "algorithms": [
+    "VF",
+    "VDF",
+    "MG",
+    "CNAG-LS"
+  ],
   "evaluation_weights": {
-    "deterministic_quality": 0.30,
+    "deterministic_quality": 0.3,
     "average_robustness": 0.25,
-    "worst_case": 0.20,
+    "worst_case": 0.2,
     "scenario_feasibility": 0.15,
-    "runtime_efficiency": 0.10
+    "runtime_efficiency": 0.1
   },
   "cases": [
     {
       "id": "C01",
-      "name": "标准生产工况",
-      "description": "中等规模、一般裂纹、设备性能均衡、工期正常",
+      "name": "Baseline medium board",
+      "description": "Standard 6x5 board with moderate crack density and balanced devices.",
       "difficulty": "standard",
       "deterministic_input": {
-        "random_seed": 20260725,
-        "board": {"width": 24.0, "height": 15.0, "m": 6, "n": 5, "base_value": 100.0},
+        "board": {
+          "width": 24,
+          "height": 15,
+          "m": 6,
+          "n": 5,
+          "base_value": 100
+        },
         "deadline": 5.0,
         "devices": [
-          {"id": "O1", "type": "ordinary", "speed": 14.0},
-          {"id": "O2", "type": "ordinary", "speed": 12.0},
-          {"id": "O3", "type": "ordinary", "speed": 10.0},
-          {"id": "P1", "type": "precision", "speed": 8.0},
-          {"id": "P2", "type": "precision", "speed": 6.5}
+          {
+            "id": "O1",
+            "type": "ordinary",
+            "speed": 14
+          },
+          {
+            "id": "O2",
+            "type": "ordinary",
+            "speed": 12
+          },
+          {
+            "id": "O3",
+            "type": "ordinary",
+            "speed": 10
+          },
+          {
+            "id": "P1",
+            "type": "precision",
+            "speed": 8
+          },
+          {
+            "id": "P2",
+            "type": "precision",
+            "speed": 6.5
+          }
         ],
-        "values": {"r_ordinary": 1.1, "r_precision": 2.0, "default_same_precision_reward": 5.0, "default_precision_mismatch_penalty": 3.0, "default_cross_crack_loss": 1.5, "alpha": 0.7},
-        "cracks": {"mode": "direct", "blocks": {"B_2_2": {"C": 1, "CS": 0.30}, "B_3_2": {"C": 1, "CS": 0.42}, "B_4_3": {"C": 1, "CS": 0.55}, "B_5_4": {"C": 1, "CS": 0.36}, "B_2_5": {"C": 1, "CS": 0.48}, "B_6_2": {"C": 1, "CS": 0.25}}}
+        "values": {
+          "r_ordinary": 1.1,
+          "r_precision": 2.0,
+          "default_same_precision_reward": 5,
+          "default_precision_mismatch_penalty": 3,
+          "default_cross_crack_loss": 1.5,
+          "alpha": 0.7
+        },
+        "cracks": {
+          "mode": "geometry",
+          "epsilon": 0.08,
+          "R_max": 3.2,
+          "lambda_b": 1.5,
+          "items": [
+            {
+              "id": "OC1",
+              "width": 0.36,
+              "polyline": [
+                [
+                  2.88,
+                  12.0
+                ],
+                [
+                  5.76,
+                  10.8
+                ],
+                [
+                  9.12,
+                  9.9
+                ],
+                [
+                  10.874,
+                  9.507
+                ],
+                [
+                  12.48,
+                  8.7
+                ]
+              ]
+            },
+            {
+              "id": "OC2",
+              "width": 0.34,
+              "polyline": [
+                [
+                  3.36,
+                  3.0
+                ],
+                [
+                  7.2,
+                  4.2
+                ],
+                [
+                  11.52,
+                  4.8
+                ],
+                [
+                  15.84,
+                  6.0
+                ],
+                [
+                  19.68,
+                  7.2
+                ]
+              ]
+            }
+          ]
+        }
       },
       "uncertainty_scenarios": [
-        {"id": "U0", "name": "无扰动基准", "description": "保持确定性输入", "removed_devices": [], "device_states": [], "crack_updates": {}, "edge_loss_updates": {}},
-        {"id": "U1", "name": "设备轻度整体降速", "description": "多台设备小幅降速", "removed_devices": [], "device_states": [{"id": "O1", "speed": 13.0}, {"id": "O2", "speed": 11.0}, {"id": "P1", "speed": 7.4}], "crack_updates": {}, "edge_loss_updates": {}},
-        {"id": "U2", "name": "精密设备性能下降", "description": "精密设备速度明显下降", "removed_devices": [], "device_states": [{"id": "P1", "speed": 6.0}, {"id": "P2", "speed": 4.8}], "crack_updates": {}, "edge_loss_updates": {}},
-        {"id": "U3", "name": "普通设备性能下降", "description": "普通设备速度明显下降", "removed_devices": [], "device_states": [{"id": "O1", "speed": 10.5}, {"id": "O2", "speed": 9.0}, {"id": "O3", "speed": 7.5}], "crack_updates": {}, "edge_loss_updates": {}},
-        {"id": "U4", "name": "普通设备故障", "description": "一台普通设备不可用", "removed_devices": ["O3"], "device_states": [], "crack_updates": {}, "edge_loss_updates": {}},
-        {"id": "U5", "name": "精密设备故障", "description": "一台精密设备不可用", "removed_devices": ["P2"], "device_states": [], "crack_updates": {}, "edge_loss_updates": {}},
-        {"id": "U6", "name": "新增隐藏裂纹", "description": "新增块内裂纹与边损失", "removed_devices": [], "device_states": [], "crack_updates": {"B_3_3": {"C": 1, "CS": 0.62}, "B_4_4": {"C": 1, "CS": 0.58}}, "edge_loss_updates": {"B_3_3|B_4_3": 3.0, "B_4_4|B_5_4": 3.0}},
-        {"id": "U7", "name": "综合严重扰动", "description": "设备故障、降速和隐藏裂纹同时出现", "removed_devices": ["O3"], "device_states": [{"id": "O1", "speed": 11.0}, {"id": "P1", "speed": 6.2}], "crack_updates": {"B_3_3": {"C": 1, "CS": 0.70}, "B_4_4": {"C": 1, "CS": 0.66}, "B_5_3": {"C": 1, "CS": 0.52}}, "edge_loss_updates": {"B_3_3|B_4_3": 4.0, "B_4_4|B_5_4": 4.0, "B_5_3|B_5_4": 3.0}}
+        {
+          "id": "U0",
+          "name": "Base scenario",
+          "description": "No hidden cracks and no equipment change.",
+          "removed_devices": [],
+          "device_states": [],
+          "hidden_cracks": {
+            "items": []
+          }
+        },
+        {
+          "id": "U1",
+          "name": "Ordinary slowdown",
+          "description": "Ordinary devices slow down under processing pressure.",
+          "removed_devices": [],
+          "device_states": [
+            {
+              "id": "O1",
+              "speed": 12.6
+            },
+            {
+              "id": "O2",
+              "speed": 10.8
+            },
+            {
+              "id": "O3",
+              "speed": 9.0
+            }
+          ],
+          "hidden_cracks": {
+            "items": []
+          }
+        },
+        {
+          "id": "U2",
+          "name": "Precision slowdown",
+          "description": "Precision devices slow down under higher precision difficulty.",
+          "removed_devices": [],
+          "device_states": [
+            {
+              "id": "P1",
+              "speed": 5.6
+            },
+            {
+              "id": "P2",
+              "speed": 4.55
+            }
+          ],
+          "hidden_cracks": {
+            "items": []
+          }
+        },
+        {
+          "id": "U3",
+          "name": "Mixed slowdown",
+          "description": "Both ordinary and precision devices become slower.",
+          "removed_devices": [],
+          "device_states": [
+            {
+              "id": "O1",
+              "speed": 10.08
+            },
+            {
+              "id": "O2",
+              "speed": 8.64
+            },
+            {
+              "id": "O3",
+              "speed": 7.2
+            }
+          ],
+          "hidden_cracks": {
+            "items": []
+          }
+        },
+        {
+          "id": "U4",
+          "name": "One ordinary failure",
+          "description": "One ordinary device is unavailable.",
+          "removed_devices": [
+            "O3"
+          ],
+          "device_states": [],
+          "hidden_cracks": {
+            "items": []
+          }
+        },
+        {
+          "id": "U5",
+          "name": "One precision failure",
+          "description": "One precision device is unavailable if present.",
+          "removed_devices": [
+            "P2"
+          ],
+          "device_states": [],
+          "hidden_cracks": {
+            "items": []
+          }
+        },
+        {
+          "id": "U6",
+          "name": "Hidden local crack",
+          "description": "A hidden local crack is added and all crack effects are recomputed from geometry.",
+          "removed_devices": [],
+          "device_states": [],
+          "hidden_cracks": {
+            "items": [
+              {
+                "id": "HC1",
+                "width": 0.34,
+                "polyline": [
+                  [
+                    13.92,
+                    4.5
+                  ],
+                  [
+                    14.973,
+                    4.751
+                  ],
+                  [
+                    15.84,
+                    5.4
+                  ],
+                  [
+                    16.766,
+                    5.033
+                  ],
+                  [
+                    17.76,
+                    5.1
+                  ]
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "id": "U7",
+          "name": "Hidden cross crack",
+          "description": "A hidden longer crack is added and all crack effects are recomputed from geometry.",
+          "removed_devices": [
+            "O3"
+          ],
+          "device_states": [
+            {
+              "id": "O1",
+              "speed": 10.5
+            },
+            {
+              "id": "P1",
+              "speed": 6.0
+            }
+          ],
+          "hidden_cracks": {
+            "items": [
+              {
+                "id": "HC2",
+                "width": 0.48,
+                "polyline": [
+                  [
+                    14.88,
+                    4.8
+                  ],
+                  [
+                    16.8,
+                    6.0
+                  ],
+                  [
+                    18.72,
+                    5.7
+                  ],
+                  [
+                    19.545,
+                    6.623
+                  ],
+                  [
+                    20.64,
+                    7.2
+                  ]
+                ]
+              }
+            ]
+          }
+        }
       ]
     },
     {
       "id": "C02",
-      "name": "小规模轻载工况",
-      "description": "木块数量较少、裂纹少且轻、设备充足、工期宽松",
+      "name": "Small loose schedule",
+      "description": "Small 4x3 board with fewer cracks and a more relaxed deadline.",
       "difficulty": "easy",
       "deterministic_input": {
-        "random_seed": 20260725,
-        "board": {"width": 16.0, "height": 9.0, "m": 4, "n": 3, "base_value": 90.0},
+        "board": {
+          "width": 16,
+          "height": 9,
+          "m": 4,
+          "n": 3,
+          "base_value": 90
+        },
         "deadline": 6.0,
         "devices": [
-          {"id": "O1", "type": "ordinary", "speed": 14.0},
-          {"id": "O2", "type": "ordinary", "speed": 12.0},
-          {"id": "P1", "type": "precision", "speed": 8.0},
-          {"id": "P2", "type": "precision", "speed": 7.0}
+          {
+            "id": "O1",
+            "type": "ordinary",
+            "speed": 14
+          },
+          {
+            "id": "O2",
+            "type": "ordinary",
+            "speed": 12
+          },
+          {
+            "id": "P1",
+            "type": "precision",
+            "speed": 8
+          },
+          {
+            "id": "P2",
+            "type": "precision",
+            "speed": 7
+          }
         ],
-        "values": {"r_ordinary": 1.0, "r_precision": 1.8, "default_same_precision_reward": 2.5, "default_precision_mismatch_penalty": 1.0, "default_cross_crack_loss": 0.5, "alpha": 0.35},
-        "cracks": {"mode": "direct", "blocks": {"B_2_2": {"C": 1, "CS": 0.18}, "B_4_1": {"C": 1, "CS": 0.22}}}
+        "values": {
+          "r_ordinary": 1.0,
+          "r_precision": 1.8,
+          "default_same_precision_reward": 2.5,
+          "default_precision_mismatch_penalty": 1.0,
+          "default_cross_crack_loss": 0.5,
+          "alpha": 0.35
+        },
+        "cracks": {
+          "mode": "geometry",
+          "epsilon": 0.08,
+          "R_max": 3.2,
+          "lambda_b": 0.5,
+          "items": [
+            {
+              "id": "OC1",
+              "width": 0.24,
+              "polyline": [
+                [
+                  3.2,
+                  6.48
+                ],
+                [
+                  5.44,
+                  5.94
+                ],
+                [
+                  7.68,
+                  6.12
+                ],
+                [
+                  8.86,
+                  6.017
+                ],
+                [
+                  9.92,
+                  5.49
+                ]
+              ]
+            }
+          ]
+        }
       },
       "uncertainty_scenarios": [
-        {"id": "U0", "name": "无扰动基准", "description": "保持确定性输入", "removed_devices": [], "device_states": [], "crack_updates": {}, "edge_loss_updates": {}},
-        {"id": "U1", "name": "设备轻度整体降速", "description": "多台设备小幅降速", "removed_devices": [], "device_states": [{"id": "O1", "speed": 13.0}, {"id": "P1", "speed": 7.2}], "crack_updates": {}, "edge_loss_updates": {}},
-        {"id": "U2", "name": "精密设备性能下降", "description": "精密设备速度明显下降", "removed_devices": [], "device_states": [{"id": "P1", "speed": 5.8}, {"id": "P2", "speed": 5.0}], "crack_updates": {}, "edge_loss_updates": {}},
-        {"id": "U3", "name": "普通设备性能下降", "description": "普通设备速度明显下降", "removed_devices": [], "device_states": [{"id": "O1", "speed": 10.0}, {"id": "O2", "speed": 8.5}], "crack_updates": {}, "edge_loss_updates": {}},
-        {"id": "U4", "name": "普通设备故障", "description": "一台普通设备不可用", "removed_devices": ["O2"], "device_states": [], "crack_updates": {}, "edge_loss_updates": {}},
-        {"id": "U5", "name": "精密设备故障", "description": "一台精密设备不可用", "removed_devices": ["P2"], "device_states": [], "crack_updates": {}, "edge_loss_updates": {}},
-        {"id": "U6", "name": "新增隐藏裂纹", "description": "新增轻中度隐藏裂纹", "removed_devices": [], "device_states": [], "crack_updates": {"B_3_2": {"C": 1, "CS": 0.40}}, "edge_loss_updates": {"B_2_2|B_3_2": 1.5}},
-        {"id": "U7", "name": "综合严重扰动", "description": "故障、降速和隐藏裂纹叠加", "removed_devices": ["O2"], "device_states": [{"id": "P1", "speed": 6.2}], "crack_updates": {"B_3_2": {"C": 1, "CS": 0.45}, "B_4_2": {"C": 1, "CS": 0.38}}, "edge_loss_updates": {"B_2_2|B_3_2": 2.0, "B_4_1|B_4_2": 1.5}}
+        {
+          "id": "U0",
+          "name": "Base scenario",
+          "description": "No hidden cracks and no equipment change.",
+          "removed_devices": [],
+          "device_states": [],
+          "hidden_cracks": {
+            "items": []
+          }
+        },
+        {
+          "id": "U1",
+          "name": "Ordinary slowdown",
+          "description": "Ordinary devices slow down under processing pressure.",
+          "removed_devices": [],
+          "device_states": [
+            {
+              "id": "O1",
+              "speed": 12.6
+            },
+            {
+              "id": "O2",
+              "speed": 10.8
+            },
+            {
+              "id": "P1",
+              "speed": 7.2
+            }
+          ],
+          "hidden_cracks": {
+            "items": []
+          }
+        },
+        {
+          "id": "U2",
+          "name": "Precision slowdown",
+          "description": "Precision devices slow down under higher precision difficulty.",
+          "removed_devices": [],
+          "device_states": [
+            {
+              "id": "P1",
+              "speed": 5.6
+            },
+            {
+              "id": "P2",
+              "speed": 4.9
+            }
+          ],
+          "hidden_cracks": {
+            "items": []
+          }
+        },
+        {
+          "id": "U3",
+          "name": "Mixed slowdown",
+          "description": "Both ordinary and precision devices become slower.",
+          "removed_devices": [],
+          "device_states": [
+            {
+              "id": "O1",
+              "speed": 10.08
+            },
+            {
+              "id": "O2",
+              "speed": 8.64
+            }
+          ],
+          "hidden_cracks": {
+            "items": []
+          }
+        },
+        {
+          "id": "U4",
+          "name": "One ordinary failure",
+          "description": "One ordinary device is unavailable.",
+          "removed_devices": [
+            "O2"
+          ],
+          "device_states": [],
+          "hidden_cracks": {
+            "items": []
+          }
+        },
+        {
+          "id": "U5",
+          "name": "One precision failure",
+          "description": "One precision device is unavailable if present.",
+          "removed_devices": [
+            "P2"
+          ],
+          "device_states": [],
+          "hidden_cracks": {
+            "items": []
+          }
+        },
+        {
+          "id": "U6",
+          "name": "Hidden local crack",
+          "description": "A hidden local crack is added and all crack effects are recomputed from geometry.",
+          "removed_devices": [],
+          "device_states": [],
+          "hidden_cracks": {
+            "items": [
+              {
+                "id": "HC1",
+                "width": 0.34,
+                "polyline": [
+                  [
+                    9.28,
+                    2.7
+                  ],
+                  [
+                    10.006,
+                    2.767
+                  ],
+                  [
+                    10.56,
+                    3.24
+                  ],
+                  [
+                    11.169,
+                    2.932
+                  ],
+                  [
+                    11.84,
+                    3.06
+                  ]
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "id": "U7",
+          "name": "Hidden cross crack",
+          "description": "A hidden longer crack is added and all crack effects are recomputed from geometry.",
+          "removed_devices": [
+            "O2"
+          ],
+          "device_states": [
+            {
+              "id": "O1",
+              "speed": 10.5
+            },
+            {
+              "id": "P1",
+              "speed": 6.0
+            }
+          ],
+          "hidden_cracks": {
+            "items": [
+              {
+                "id": "HC2",
+                "width": 0.48,
+                "polyline": [
+                  [
+                    9.92,
+                    2.88
+                  ],
+                  [
+                    11.2,
+                    3.6
+                  ],
+                  [
+                    12.48,
+                    3.42
+                  ],
+                  [
+                    12.993,
+                    4.05
+                  ],
+                  [
+                    13.76,
+                    4.32
+                  ]
+                ]
+              }
+            ]
+          }
+        }
       ]
     },
     {
       "id": "C03",
-      "name": "大规模常规生产",
-      "description": "木块数量较多、裂纹中等、设备正常、工期正常",
+      "name": "Large high capacity",
+      "description": "Large 8x6 board with more devices and a visible but limited precision capacity.",
       "difficulty": "standard_large",
       "deterministic_input": {
-        "random_seed": 20260725,
-        "board": {"width": 32.0, "height": 18.0, "m": 8, "n": 6, "base_value": 110.0},
+        "board": {
+          "width": 32,
+          "height": 18,
+          "m": 8,
+          "n": 6,
+          "base_value": 110
+        },
         "deadline": 5.2,
         "devices": [
-          {"id": "O1", "type": "ordinary", "speed": 18.0},
-          {"id": "O2", "type": "ordinary", "speed": 15.0},
-          {"id": "O3", "type": "ordinary", "speed": 12.0},
-          {"id": "O4", "type": "ordinary", "speed": 9.0},
-          {"id": "P1", "type": "precision", "speed": 10.0},
-          {"id": "P2", "type": "precision", "speed": 7.0}
+          {
+            "id": "O1",
+            "type": "ordinary",
+            "speed": 18
+          },
+          {
+            "id": "O2",
+            "type": "ordinary",
+            "speed": 16
+          },
+          {
+            "id": "O3",
+            "type": "ordinary",
+            "speed": 14
+          },
+          {
+            "id": "O4",
+            "type": "ordinary",
+            "speed": 12
+          },
+          {
+            "id": "O5",
+            "type": "ordinary",
+            "speed": 10
+          },
+          {
+            "id": "P1",
+            "type": "precision",
+            "speed": 10
+          },
+          {
+            "id": "P2",
+            "type": "precision",
+            "speed": 8
+          },
+          {
+            "id": "P3",
+            "type": "precision",
+            "speed": 6.5
+          }
         ],
-        "values": {"r_ordinary": 1.2, "r_precision": 2.6, "default_same_precision_reward": 10.0, "default_precision_mismatch_penalty": 7.0, "default_cross_crack_loss": 4.0, "alpha": 0.75},
-        "cracks": {"mode": "direct", "blocks": {"B_2_2": {"C": 1, "CS": 0.30}, "B_3_2": {"C": 1, "CS": 0.42}, "B_4_3": {"C": 1, "CS": 0.55}, "B_5_4": {"C": 1, "CS": 0.36}, "B_2_5": {"C": 1, "CS": 0.48}, "B_6_2": {"C": 1, "CS": 0.25}, "B_7_5": {"C": 1, "CS": 0.40}}}
+        "values": {
+          "r_ordinary": 1.2,
+          "r_precision": 2.6,
+          "default_same_precision_reward": 8,
+          "default_precision_mismatch_penalty": 5,
+          "default_cross_crack_loss": 3,
+          "alpha": 0.75
+        },
+        "cracks": {
+          "mode": "geometry",
+          "epsilon": 0.08,
+          "R_max": 3.2,
+          "lambda_b": 3,
+          "items": [
+            {
+              "id": "OC1",
+              "width": 0.36,
+              "polyline": [
+                [
+                  3.84,
+                  14.4
+                ],
+                [
+                  7.68,
+                  12.96
+                ],
+                [
+                  12.16,
+                  11.88
+                ],
+                [
+                  14.467,
+                  11.369
+                ],
+                [
+                  16.64,
+                  10.44
+                ]
+              ]
+            },
+            {
+              "id": "OC2",
+              "width": 0.34,
+              "polyline": [
+                [
+                  4.48,
+                  3.6
+                ],
+                [
+                  9.6,
+                  5.04
+                ],
+                [
+                  15.36,
+                  5.76
+                ],
+                [
+                  21.12,
+                  7.2
+                ],
+                [
+                  26.24,
+                  8.64
+                ]
+              ]
+            },
+            {
+              "id": "OC3",
+              "width": 0.38,
+              "polyline": [
+                [
+                  16.64,
+                  3.24
+                ],
+                [
+                  16.0,
+                  6.12
+                ],
+                [
+                  17.28,
+                  9.0
+                ],
+                [
+                  16.32,
+                  11.88
+                ],
+                [
+                  17.6,
+                  14.76
+                ]
+              ]
+            }
+          ]
+        }
       },
       "uncertainty_scenarios": [
-        {"id": "U0", "name": "无扰动基准", "description": "保持确定性输入", "removed_devices": [], "device_states": [], "crack_updates": {}, "edge_loss_updates": {}},
-        {"id": "U1", "name": "设备轻度整体降速", "description": "多台设备小幅降速", "removed_devices": [], "device_states": [{"id": "O1", "speed": 16.5}, {"id": "O2", "speed": 14.0}, {"id": "P1", "speed": 9.0}], "crack_updates": {}, "edge_loss_updates": {}},
-        {"id": "U2", "name": "精密设备性能下降", "description": "精密设备速度明显下降", "removed_devices": [], "device_states": [{"id": "P1", "speed": 7.0}, {"id": "P2", "speed": 5.0}], "crack_updates": {}, "edge_loss_updates": {}},
-        {"id": "U3", "name": "普通设备性能下降", "description": "普通设备速度明显下降", "removed_devices": [], "device_states": [{"id": "O1", "speed": 13.5}, {"id": "O2", "speed": 11.0}, {"id": "O3", "speed": 9.0}, {"id": "O4", "speed": 7.0}], "crack_updates": {}, "edge_loss_updates": {}},
-        {"id": "U4", "name": "普通设备故障", "description": "一台普通设备不可用", "removed_devices": ["O4"], "device_states": [], "crack_updates": {}, "edge_loss_updates": {}},
-        {"id": "U5", "name": "精密设备故障", "description": "一台关键精密设备不可用", "removed_devices": ["P2"], "device_states": [], "crack_updates": {}, "edge_loss_updates": {}},
-        {"id": "U6", "name": "新增隐藏裂纹", "description": "新增隐藏裂纹", "removed_devices": [], "device_states": [], "crack_updates": {"B_4_4": {"C": 1, "CS": 0.62}, "B_6_5": {"C": 1, "CS": 0.58}}, "edge_loss_updates": {"B_4_3|B_4_4": 5.0, "B_6_5|B_7_5": 4.0}},
-        {"id": "U7", "name": "综合严重扰动", "description": "设备故障、降速和隐藏裂纹同时出现", "removed_devices": ["O4"], "device_states": [{"id": "O1", "speed": 14.0}, {"id": "P1", "speed": 7.5}], "crack_updates": {"B_4_4": {"C": 1, "CS": 0.70}, "B_6_5": {"C": 1, "CS": 0.66}, "B_7_4": {"C": 1, "CS": 0.60}}, "edge_loss_updates": {"B_4_3|B_4_4": 6.0, "B_6_5|B_7_5": 5.0, "B_7_4|B_7_5": 4.0}}
+        {
+          "id": "U0",
+          "name": "Base scenario",
+          "description": "No hidden cracks and no equipment change.",
+          "removed_devices": [],
+          "device_states": [],
+          "hidden_cracks": {
+            "items": []
+          }
+        },
+        {
+          "id": "U1",
+          "name": "Ordinary slowdown",
+          "description": "Ordinary devices slow down under processing pressure.",
+          "removed_devices": [],
+          "device_states": [
+            {
+              "id": "O1",
+              "speed": 16.2
+            },
+            {
+              "id": "O2",
+              "speed": 14.4
+            },
+            {
+              "id": "O3",
+              "speed": 12.6
+            }
+          ],
+          "hidden_cracks": {
+            "items": []
+          }
+        },
+        {
+          "id": "U2",
+          "name": "Precision slowdown",
+          "description": "Precision devices slow down under higher precision difficulty.",
+          "removed_devices": [],
+          "device_states": [
+            {
+              "id": "P1",
+              "speed": 7.0
+            },
+            {
+              "id": "P2",
+              "speed": 5.6
+            },
+            {
+              "id": "P3",
+              "speed": 4.55
+            }
+          ],
+          "hidden_cracks": {
+            "items": []
+          }
+        },
+        {
+          "id": "U3",
+          "name": "Mixed slowdown",
+          "description": "Both ordinary and precision devices become slower.",
+          "removed_devices": [],
+          "device_states": [
+            {
+              "id": "O1",
+              "speed": 12.96
+            },
+            {
+              "id": "O2",
+              "speed": 11.52
+            },
+            {
+              "id": "O3",
+              "speed": 10.08
+            },
+            {
+              "id": "O4",
+              "speed": 8.64
+            },
+            {
+              "id": "O5",
+              "speed": 7.2
+            }
+          ],
+          "hidden_cracks": {
+            "items": []
+          }
+        },
+        {
+          "id": "U4",
+          "name": "One ordinary failure",
+          "description": "One ordinary device is unavailable.",
+          "removed_devices": [
+            "O5"
+          ],
+          "device_states": [],
+          "hidden_cracks": {
+            "items": []
+          }
+        },
+        {
+          "id": "U5",
+          "name": "One precision failure",
+          "description": "One precision device is unavailable if present.",
+          "removed_devices": [
+            "P3"
+          ],
+          "device_states": [],
+          "hidden_cracks": {
+            "items": []
+          }
+        },
+        {
+          "id": "U6",
+          "name": "Hidden local crack",
+          "description": "A hidden local crack is added and all crack effects are recomputed from geometry.",
+          "removed_devices": [],
+          "device_states": [],
+          "hidden_cracks": {
+            "items": [
+              {
+                "id": "HC1",
+                "width": 0.34,
+                "polyline": [
+                  [
+                    18.56,
+                    5.4
+                  ],
+                  [
+                    19.926,
+                    5.737
+                  ],
+                  [
+                    21.12,
+                    6.48
+                  ],
+                  [
+                    22.369,
+                    6.082
+                  ],
+                  [
+                    23.68,
+                    6.12
+                  ]
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "id": "U7",
+          "name": "Hidden cross crack",
+          "description": "A hidden longer crack is added and all crack effects are recomputed from geometry.",
+          "removed_devices": [
+            "O5"
+          ],
+          "device_states": [
+            {
+              "id": "O1",
+              "speed": 13.5
+            },
+            {
+              "id": "P1",
+              "speed": 7.5
+            }
+          ],
+          "hidden_cracks": {
+            "items": [
+              {
+                "id": "HC2",
+                "width": 0.48,
+                "polyline": [
+                  [
+                    19.84,
+                    5.76
+                  ],
+                  [
+                    22.4,
+                    7.2
+                  ],
+                  [
+                    24.96,
+                    6.84
+                  ],
+                  [
+                    26.113,
+                    7.92
+                  ],
+                  [
+                    27.52,
+                    8.64
+                  ]
+                ]
+              }
+            ]
+          }
+        }
       ]
     },
     {
       "id": "C04",
-      "name": "大规模紧急订单",
-      "description": "大规模板材、中等裂纹、正常设备、工期紧张",
+      "name": "Large tight schedule",
+      "description": "Large 8x6 board with fewer devices and a tight deadline.",
       "difficulty": "tight_large",
       "deterministic_input": {
-        "random_seed": 20260725,
-        "board": {"width": 32.0, "height": 18.0, "m": 8, "n": 6, "base_value": 110.0},
+        "board": {
+          "width": 32,
+          "height": 18,
+          "m": 8,
+          "n": 6,
+          "base_value": 110
+        },
         "deadline": 4.1,
         "devices": [
-          {"id": "O1", "type": "ordinary", "speed": 18.0},
-          {"id": "O2", "type": "ordinary", "speed": 15.0},
-          {"id": "O3", "type": "ordinary", "speed": 12.0},
-          {"id": "P1", "type": "precision", "speed": 10.0},
-          {"id": "P2", "type": "precision", "speed": 7.0}
+          {
+            "id": "O1",
+            "type": "ordinary",
+            "speed": 18
+          },
+          {
+            "id": "O2",
+            "type": "ordinary",
+            "speed": 15
+          },
+          {
+            "id": "O3",
+            "type": "ordinary",
+            "speed": 12
+          },
+          {
+            "id": "O4",
+            "type": "ordinary",
+            "speed": 10
+          },
+          {
+            "id": "P1",
+            "type": "precision",
+            "speed": 10
+          },
+          {
+            "id": "P2",
+            "type": "precision",
+            "speed": 7
+          }
         ],
-        "values": {"r_ordinary": 1.2, "r_precision": 2.4, "default_same_precision_reward": 8.0, "default_precision_mismatch_penalty": 5.5, "default_cross_crack_loss": 3.0, "alpha": 0.7},
-        "cracks": {"mode": "direct", "blocks": {"B_2_2": {"C": 1, "CS": 0.34}, "B_4_3": {"C": 1, "CS": 0.50}, "B_5_4": {"C": 1, "CS": 0.45}, "B_7_5": {"C": 1, "CS": 0.52}, "B_3_5": {"C": 1, "CS": 0.38}}}
+        "values": {
+          "r_ordinary": 1.2,
+          "r_precision": 2.4,
+          "default_same_precision_reward": 8,
+          "default_precision_mismatch_penalty": 5.5,
+          "default_cross_crack_loss": 3,
+          "alpha": 0.7
+        },
+        "cracks": {
+          "mode": "geometry",
+          "epsilon": 0.08,
+          "R_max": 3.2,
+          "lambda_b": 3,
+          "items": [
+            {
+              "id": "OC1",
+              "width": 0.36,
+              "polyline": [
+                [
+                  3.84,
+                  14.4
+                ],
+                [
+                  7.68,
+                  12.96
+                ],
+                [
+                  12.16,
+                  11.88
+                ],
+                [
+                  14.467,
+                  11.369
+                ],
+                [
+                  16.64,
+                  10.44
+                ]
+              ]
+            },
+            {
+              "id": "OC2",
+              "width": 0.34,
+              "polyline": [
+                [
+                  4.48,
+                  3.6
+                ],
+                [
+                  9.6,
+                  5.04
+                ],
+                [
+                  15.36,
+                  5.76
+                ],
+                [
+                  21.12,
+                  7.2
+                ],
+                [
+                  26.24,
+                  8.64
+                ]
+              ]
+            },
+            {
+              "id": "OC3",
+              "width": 0.38,
+              "polyline": [
+                [
+                  16.64,
+                  3.24
+                ],
+                [
+                  16.0,
+                  6.12
+                ],
+                [
+                  17.28,
+                  9.0
+                ],
+                [
+                  16.32,
+                  11.88
+                ],
+                [
+                  17.6,
+                  14.76
+                ]
+              ]
+            }
+          ]
+        }
       },
       "uncertainty_scenarios": [
-        {"id": "U0", "name": "无扰动基准", "description": "保持确定性输入", "removed_devices": [], "device_states": [], "crack_updates": {}, "edge_loss_updates": {}},
-        {"id": "U1", "name": "设备轻度整体降速", "description": "多台设备小幅降速", "removed_devices": [], "device_states": [{"id": "O1", "speed": 16.0}, {"id": "O2", "speed": 13.5}, {"id": "P1", "speed": 9.0}], "crack_updates": {}, "edge_loss_updates": {}},
-        {"id": "U2", "name": "精密设备性能下降", "description": "精密设备速度明显下降", "removed_devices": [], "device_states": [{"id": "P1", "speed": 7.0}, {"id": "P2", "speed": 4.8}], "crack_updates": {}, "edge_loss_updates": {}},
-        {"id": "U3", "name": "普通设备性能下降", "description": "普通设备速度明显下降", "removed_devices": [], "device_states": [{"id": "O1", "speed": 13.0}, {"id": "O2", "speed": 11.0}, {"id": "O3", "speed": 8.5}], "crack_updates": {}, "edge_loss_updates": {}},
-        {"id": "U4", "name": "普通设备故障", "description": "一台普通设备不可用", "removed_devices": ["O3"], "device_states": [], "crack_updates": {}, "edge_loss_updates": {}},
-        {"id": "U5", "name": "精密设备故障", "description": "一台精密设备不可用", "removed_devices": ["P2"], "device_states": [], "crack_updates": {}, "edge_loss_updates": {}},
-        {"id": "U6", "name": "新增隐藏裂纹", "description": "新增隐藏裂纹", "removed_devices": [], "device_states": [], "crack_updates": {"B_6_4": {"C": 1, "CS": 0.60}, "B_8_5": {"C": 1, "CS": 0.55}}, "edge_loss_updates": {"B_5_4|B_6_4": 4.0, "B_7_5|B_8_5": 4.0}},
-        {"id": "U7", "name": "综合严重扰动", "description": "紧急订单下的复合扰动", "removed_devices": ["O3"], "device_states": [{"id": "O1", "speed": 14.0}, {"id": "P1", "speed": 7.4}], "crack_updates": {"B_6_4": {"C": 1, "CS": 0.70}, "B_8_5": {"C": 1, "CS": 0.62}}, "edge_loss_updates": {"B_5_4|B_6_4": 5.0, "B_7_5|B_8_5": 5.0}}
+        {
+          "id": "U0",
+          "name": "Base scenario",
+          "description": "No hidden cracks and no equipment change.",
+          "removed_devices": [],
+          "device_states": [],
+          "hidden_cracks": {
+            "items": []
+          }
+        },
+        {
+          "id": "U1",
+          "name": "Ordinary slowdown",
+          "description": "Ordinary devices slow down under processing pressure.",
+          "removed_devices": [],
+          "device_states": [
+            {
+              "id": "O1",
+              "speed": 16.2
+            },
+            {
+              "id": "O2",
+              "speed": 13.5
+            },
+            {
+              "id": "O3",
+              "speed": 10.8
+            }
+          ],
+          "hidden_cracks": {
+            "items": []
+          }
+        },
+        {
+          "id": "U2",
+          "name": "Precision slowdown",
+          "description": "Precision devices slow down under higher precision difficulty.",
+          "removed_devices": [],
+          "device_states": [
+            {
+              "id": "P1",
+              "speed": 7.0
+            },
+            {
+              "id": "P2",
+              "speed": 4.9
+            }
+          ],
+          "hidden_cracks": {
+            "items": []
+          }
+        },
+        {
+          "id": "U3",
+          "name": "Mixed slowdown",
+          "description": "Both ordinary and precision devices become slower.",
+          "removed_devices": [],
+          "device_states": [
+            {
+              "id": "O1",
+              "speed": 12.96
+            },
+            {
+              "id": "O2",
+              "speed": 10.8
+            },
+            {
+              "id": "O3",
+              "speed": 8.64
+            },
+            {
+              "id": "O4",
+              "speed": 7.2
+            }
+          ],
+          "hidden_cracks": {
+            "items": []
+          }
+        },
+        {
+          "id": "U4",
+          "name": "One ordinary failure",
+          "description": "One ordinary device is unavailable.",
+          "removed_devices": [
+            "O4"
+          ],
+          "device_states": [],
+          "hidden_cracks": {
+            "items": []
+          }
+        },
+        {
+          "id": "U5",
+          "name": "One precision failure",
+          "description": "One precision device is unavailable if present.",
+          "removed_devices": [
+            "P2"
+          ],
+          "device_states": [],
+          "hidden_cracks": {
+            "items": []
+          }
+        },
+        {
+          "id": "U6",
+          "name": "Hidden local crack",
+          "description": "A hidden local crack is added and all crack effects are recomputed from geometry.",
+          "removed_devices": [],
+          "device_states": [],
+          "hidden_cracks": {
+            "items": [
+              {
+                "id": "HC1",
+                "width": 0.34,
+                "polyline": [
+                  [
+                    18.56,
+                    5.4
+                  ],
+                  [
+                    19.926,
+                    5.737
+                  ],
+                  [
+                    21.12,
+                    6.48
+                  ],
+                  [
+                    22.369,
+                    6.082
+                  ],
+                  [
+                    23.68,
+                    6.12
+                  ]
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "id": "U7",
+          "name": "Hidden cross crack",
+          "description": "A hidden longer crack is added and all crack effects are recomputed from geometry.",
+          "removed_devices": [
+            "O4"
+          ],
+          "device_states": [
+            {
+              "id": "O1",
+              "speed": 13.5
+            },
+            {
+              "id": "P1",
+              "speed": 7.5
+            }
+          ],
+          "hidden_cracks": {
+            "items": [
+              {
+                "id": "HC2",
+                "width": 0.48,
+                "polyline": [
+                  [
+                    19.84,
+                    5.76
+                  ],
+                  [
+                    22.4,
+                    7.2
+                  ],
+                  [
+                    24.96,
+                    6.84
+                  ],
+                  [
+                    26.113,
+                    7.92
+                  ],
+                  [
+                    27.52,
+                    8.64
+                  ]
+                ]
+              }
+            ]
+          }
+        }
       ]
     },
     {
       "id": "C05",
-      "name": "原材料严重受损",
-      "description": "中等规模、大量重度裂纹、设备正常、工期正常",
-      "difficulty": "damaged_material",
+      "name": "Dense cracks",
+      "description": "Medium board with four observed cracks and stronger crack influence.",
+      "difficulty": "damaged",
       "deterministic_input": {
-        "random_seed": 20260725,
-        "board": {"width": 24.0, "height": 15.0, "m": 6, "n": 5, "base_value": 95.0},
+        "board": {
+          "width": 24,
+          "height": 15,
+          "m": 6,
+          "n": 5,
+          "base_value": 95
+        },
         "deadline": 5.4,
         "devices": [
-          {"id": "O1", "type": "ordinary", "speed": 15.0},
-          {"id": "O2", "type": "ordinary", "speed": 12.0},
-          {"id": "O3", "type": "ordinary", "speed": 10.0},
-          {"id": "P1", "type": "precision", "speed": 8.0},
-          {"id": "P2", "type": "precision", "speed": 6.0}
+          {
+            "id": "O1",
+            "type": "ordinary",
+            "speed": 15
+          },
+          {
+            "id": "O2",
+            "type": "ordinary",
+            "speed": 12
+          },
+          {
+            "id": "O3",
+            "type": "ordinary",
+            "speed": 10
+          },
+          {
+            "id": "P1",
+            "type": "precision",
+            "speed": 8
+          },
+          {
+            "id": "P2",
+            "type": "precision",
+            "speed": 6
+          }
         ],
-        "values": {"r_ordinary": 1.2, "r_precision": 2.2, "default_same_precision_reward": 6.0, "default_precision_mismatch_penalty": 4.0, "default_cross_crack_loss": 3.0, "alpha": 1.2},
-        "cracks": {"mode": "direct", "blocks": {"B_1_2": {"C": 1, "CS": 0.62}, "B_2_2": {"C": 1, "CS": 0.78}, "B_3_2": {"C": 1, "CS": 0.70}, "B_3_3": {"C": 1, "CS": 0.82}, "B_4_3": {"C": 1, "CS": 0.74}, "B_5_4": {"C": 1, "CS": 0.68}, "B_6_4": {"C": 1, "CS": 0.76}, "B_2_5": {"C": 1, "CS": 0.58}}}
+        "values": {
+          "r_ordinary": 1.2,
+          "r_precision": 2.2,
+          "default_same_precision_reward": 6,
+          "default_precision_mismatch_penalty": 4,
+          "default_cross_crack_loss": 3,
+          "alpha": 1.2
+        },
+        "cracks": {
+          "mode": "geometry",
+          "epsilon": 0.08,
+          "R_max": 4.5,
+          "lambda_b": 3,
+          "items": [
+            {
+              "id": "OC1",
+              "width": 0.6,
+              "polyline": [
+                [
+                  3.6,
+                  3.0
+                ],
+                [
+                  6.24,
+                  4.5
+                ],
+                [
+                  9.12,
+                  5.25
+                ],
+                [
+                  10.451,
+                  6.266
+                ],
+                [
+                  12.0,
+                  6.9
+                ]
+              ]
+            },
+            {
+              "id": "OC2",
+              "width": 0.58,
+              "polyline": [
+                [
+                  7.2,
+                  10.8
+                ],
+                [
+                  9.6,
+                  9.6
+                ],
+                [
+                  11.382,
+                  9.969
+                ],
+                [
+                  13.2,
+                  9.9
+                ],
+                [
+                  16.32,
+                  8.7
+                ]
+              ]
+            },
+            {
+              "id": "OC3",
+              "width": 0.52,
+              "polyline": [
+                [
+                  14.88,
+                  3.3
+                ],
+                [
+                  15.975,
+                  3.877
+                ],
+                [
+                  16.8,
+                  4.8
+                ],
+                [
+                  17.697,
+                  5.644
+                ],
+                [
+                  18.24,
+                  6.75
+                ]
+              ]
+            },
+            {
+              "id": "OC4",
+              "width": 0.48,
+              "polyline": [
+                [
+                  10.8,
+                  3.0
+                ],
+                [
+                  12.0,
+                  5.4
+                ],
+                [
+                  11.52,
+                  7.8
+                ],
+                [
+                  12.046,
+                  9.254
+                ],
+                [
+                  12.96,
+                  10.5
+                ]
+              ]
+            }
+          ]
+        }
       },
       "uncertainty_scenarios": [
-        {"id": "U0", "name": "无扰动基准", "description": "保持确定性输入", "removed_devices": [], "device_states": [], "crack_updates": {}, "edge_loss_updates": {}},
-        {"id": "U1", "name": "设备轻度整体降速", "description": "多台设备小幅降速", "removed_devices": [], "device_states": [{"id": "O1", "speed": 14.0}, {"id": "P1", "speed": 7.2}], "crack_updates": {}, "edge_loss_updates": {}},
-        {"id": "U2", "name": "精密设备性能下降", "description": "精密设备速度明显下降", "removed_devices": [], "device_states": [{"id": "P1", "speed": 5.6}, {"id": "P2", "speed": 4.5}], "crack_updates": {}, "edge_loss_updates": {}},
-        {"id": "U3", "name": "普通设备性能下降", "description": "普通设备速度明显下降", "removed_devices": [], "device_states": [{"id": "O1", "speed": 11.0}, {"id": "O2", "speed": 9.0}, {"id": "O3", "speed": 7.5}], "crack_updates": {}, "edge_loss_updates": {}},
-        {"id": "U4", "name": "普通设备故障", "description": "一台普通设备不可用", "removed_devices": ["O3"], "device_states": [], "crack_updates": {}, "edge_loss_updates": {}},
-        {"id": "U5", "name": "精密设备故障", "description": "一台精密设备不可用", "removed_devices": ["P2"], "device_states": [], "crack_updates": {}, "edge_loss_updates": {}},
-        {"id": "U6", "name": "新增隐藏裂纹", "description": "损伤继续暴露", "removed_devices": [], "device_states": [], "crack_updates": {"B_4_4": {"C": 1, "CS": 0.72}, "B_5_3": {"C": 1, "CS": 0.66}}, "edge_loss_updates": {"B_4_3|B_4_4": 4.0, "B_5_3|B_5_4": 4.0}},
-        {"id": "U7", "name": "综合严重扰动", "description": "严重受损材料叠加设备扰动", "removed_devices": ["O3"], "device_states": [{"id": "O1", "speed": 12.0}, {"id": "P1", "speed": 6.0}], "crack_updates": {"B_4_4": {"C": 1, "CS": 0.80}, "B_5_3": {"C": 1, "CS": 0.74}}, "edge_loss_updates": {"B_4_3|B_4_4": 5.0, "B_5_3|B_5_4": 5.0}}
+        {
+          "id": "U0",
+          "name": "Base scenario",
+          "description": "No hidden cracks and no equipment change.",
+          "removed_devices": [],
+          "device_states": [],
+          "hidden_cracks": {
+            "items": []
+          }
+        },
+        {
+          "id": "U1",
+          "name": "Ordinary slowdown",
+          "description": "Ordinary devices slow down under processing pressure.",
+          "removed_devices": [],
+          "device_states": [
+            {
+              "id": "O1",
+              "speed": 13.5
+            },
+            {
+              "id": "O2",
+              "speed": 10.8
+            },
+            {
+              "id": "O3",
+              "speed": 9.0
+            }
+          ],
+          "hidden_cracks": {
+            "items": []
+          }
+        },
+        {
+          "id": "U2",
+          "name": "Precision slowdown",
+          "description": "Precision devices slow down under higher precision difficulty.",
+          "removed_devices": [],
+          "device_states": [
+            {
+              "id": "P1",
+              "speed": 5.6
+            },
+            {
+              "id": "P2",
+              "speed": 4.2
+            }
+          ],
+          "hidden_cracks": {
+            "items": []
+          }
+        },
+        {
+          "id": "U3",
+          "name": "Mixed slowdown",
+          "description": "Both ordinary and precision devices become slower.",
+          "removed_devices": [],
+          "device_states": [
+            {
+              "id": "O1",
+              "speed": 10.8
+            },
+            {
+              "id": "O2",
+              "speed": 8.64
+            },
+            {
+              "id": "O3",
+              "speed": 7.2
+            }
+          ],
+          "hidden_cracks": {
+            "items": []
+          }
+        },
+        {
+          "id": "U4",
+          "name": "One ordinary failure",
+          "description": "One ordinary device is unavailable.",
+          "removed_devices": [
+            "O3"
+          ],
+          "device_states": [],
+          "hidden_cracks": {
+            "items": []
+          }
+        },
+        {
+          "id": "U5",
+          "name": "One precision failure",
+          "description": "One precision device is unavailable if present.",
+          "removed_devices": [
+            "P2"
+          ],
+          "device_states": [],
+          "hidden_cracks": {
+            "items": []
+          }
+        },
+        {
+          "id": "U6",
+          "name": "Hidden local crack",
+          "description": "A hidden local crack is added and all crack effects are recomputed from geometry.",
+          "removed_devices": [],
+          "device_states": [],
+          "hidden_cracks": {
+            "items": [
+              {
+                "id": "HC1",
+                "width": 0.34,
+                "polyline": [
+                  [
+                    13.92,
+                    4.5
+                  ],
+                  [
+                    14.973,
+                    4.751
+                  ],
+                  [
+                    15.84,
+                    5.4
+                  ],
+                  [
+                    16.766,
+                    5.033
+                  ],
+                  [
+                    17.76,
+                    5.1
+                  ]
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "id": "U7",
+          "name": "Hidden cross crack",
+          "description": "A hidden longer crack is added and all crack effects are recomputed from geometry.",
+          "removed_devices": [
+            "O3"
+          ],
+          "device_states": [
+            {
+              "id": "O1",
+              "speed": 11.25
+            },
+            {
+              "id": "P1",
+              "speed": 6.0
+            }
+          ],
+          "hidden_cracks": {
+            "items": [
+              {
+                "id": "HC2",
+                "width": 0.48,
+                "polyline": [
+                  [
+                    14.88,
+                    4.8
+                  ],
+                  [
+                    16.8,
+                    6.0
+                  ],
+                  [
+                    18.72,
+                    5.7
+                  ],
+                  [
+                    19.545,
+                    6.623
+                  ],
+                  [
+                    20.64,
+                    7.2
+                  ]
+                ]
+              }
+            ]
+          }
+        }
       ]
     },
     {
       "id": "C06",
-      "name": "局部聚集裂纹",
-      "description": "裂纹集中在局部区域，相邻木块耦合明显",
-      "difficulty": "clustered_cracks",
+      "name": "Severe cracks",
+      "description": "Medium board with severe observed cracks and slightly tight time.",
+      "difficulty": "clustered",
       "deterministic_input": {
-        "random_seed": 20260725,
-        "board": {"width": 24.0, "height": 15.0, "m": 6, "n": 5, "base_value": 100.0},
+        "board": {
+          "width": 24,
+          "height": 15,
+          "m": 6,
+          "n": 5,
+          "base_value": 100
+        },
         "deadline": 5.1,
         "devices": [
-          {"id": "O1", "type": "ordinary", "speed": 15.0},
-          {"id": "O2", "type": "ordinary", "speed": 12.0},
-          {"id": "O3", "type": "ordinary", "speed": 9.0},
-          {"id": "P1", "type": "precision", "speed": 8.0},
-          {"id": "P2", "type": "precision", "speed": 6.5}
+          {
+            "id": "O1",
+            "type": "ordinary",
+            "speed": 15
+          },
+          {
+            "id": "O2",
+            "type": "ordinary",
+            "speed": 12
+          },
+          {
+            "id": "O3",
+            "type": "ordinary",
+            "speed": 9
+          },
+          {
+            "id": "P1",
+            "type": "precision",
+            "speed": 8
+          },
+          {
+            "id": "P2",
+            "type": "precision",
+            "speed": 6.5
+          }
         ],
-        "values": {"r_ordinary": 1.1, "r_precision": 2.1, "default_same_precision_reward": 8.0, "default_precision_mismatch_penalty": 5.0, "default_cross_crack_loss": 2.0, "alpha": 0.85},
-        "cracks": {"mode": "direct", "blocks": {"B_3_2": {"C": 1, "CS": 0.55}, "B_3_3": {"C": 1, "CS": 0.72}, "B_4_2": {"C": 1, "CS": 0.60}, "B_4_3": {"C": 1, "CS": 0.78}, "B_4_4": {"C": 1, "CS": 0.66}, "B_5_3": {"C": 1, "CS": 0.58}}}
+        "values": {
+          "r_ordinary": 1.1,
+          "r_precision": 2.1,
+          "default_same_precision_reward": 8,
+          "default_precision_mismatch_penalty": 5,
+          "default_cross_crack_loss": 2,
+          "alpha": 0.85
+        },
+        "cracks": {
+          "mode": "geometry",
+          "epsilon": 0.08,
+          "R_max": 3.2,
+          "lambda_b": 2,
+          "items": [
+            {
+              "id": "OC1",
+              "width": 0.48,
+              "polyline": [
+                [
+                  9.12,
+                  6.3
+                ],
+                [
+                  9.856,
+                  6.944
+                ],
+                [
+                  10.8,
+                  7.2
+                ],
+                [
+                  12.48,
+                  6.75
+                ],
+                [
+                  13.92,
+                  7.95
+                ]
+              ]
+            },
+            {
+              "id": "OC2",
+              "width": 0.52,
+              "polyline": [
+                [
+                  10.08,
+                  5.25
+                ],
+                [
+                  11.01,
+                  5.424
+                ],
+                [
+                  11.76,
+                  6.0
+                ],
+                [
+                  12.435,
+                  5.635
+                ],
+                [
+                  13.2,
+                  5.7
+                ]
+              ]
+            },
+            {
+              "id": "OC3",
+              "width": 0.44,
+              "polyline": [
+                [
+                  8.64,
+                  8.25
+                ],
+                [
+                  9.65,
+                  8.261
+                ],
+                [
+                  10.56,
+                  8.7
+                ],
+                [
+                  11.343,
+                  8.262
+                ],
+                [
+                  12.24,
+                  8.25
+                ]
+              ]
+            },
+            {
+              "id": "OC4",
+              "width": 0.4,
+              "polyline": [
+                [
+                  12.0,
+                  4.5
+                ],
+                [
+                  13.04,
+                  4.67
+                ],
+                [
+                  13.92,
+                  5.25
+                ],
+                [
+                  14.665,
+                  5.609
+                ],
+                [
+                  15.12,
+                  6.3
+                ]
+              ]
+            }
+          ]
+        }
       },
       "uncertainty_scenarios": [
-        {"id": "U0", "name": "无扰动基准", "description": "保持确定性输入", "removed_devices": [], "device_states": [], "crack_updates": {}, "edge_loss_updates": {}},
-        {"id": "U1", "name": "设备轻度整体降速", "description": "多台设备小幅降速", "removed_devices": [], "device_states": [{"id": "O1", "speed": 14.0}, {"id": "O2", "speed": 11.0}, {"id": "P1", "speed": 7.3}], "crack_updates": {}, "edge_loss_updates": {}},
-        {"id": "U2", "name": "精密设备性能下降", "description": "精密设备速度明显下降", "removed_devices": [], "device_states": [{"id": "P1", "speed": 5.8}, {"id": "P2", "speed": 4.8}], "crack_updates": {}, "edge_loss_updates": {}},
-        {"id": "U3", "name": "普通设备性能下降", "description": "普通设备速度明显下降", "removed_devices": [], "device_states": [{"id": "O1", "speed": 11.0}, {"id": "O2", "speed": 9.0}, {"id": "O3", "speed": 6.8}], "crack_updates": {}, "edge_loss_updates": {}},
-        {"id": "U4", "name": "普通设备故障", "description": "一台普通设备不可用", "removed_devices": ["O3"], "device_states": [], "crack_updates": {}, "edge_loss_updates": {}},
-        {"id": "U5", "name": "精密设备故障", "description": "一台精密设备不可用", "removed_devices": ["P2"], "device_states": [], "crack_updates": {}, "edge_loss_updates": {}},
-        {"id": "U6", "name": "新增隐藏裂纹", "description": "聚集区扩大", "removed_devices": [], "device_states": [], "crack_updates": {"B_5_4": {"C": 1, "CS": 0.64}, "B_2_3": {"C": 1, "CS": 0.56}}, "edge_loss_updates": {"B_4_4|B_5_4": 4.0, "B_2_3|B_3_3": 4.0}},
-        {"id": "U7", "name": "综合严重扰动", "description": "局部裂纹加重并叠加设备扰动", "removed_devices": ["O3"], "device_states": [{"id": "O1", "speed": 12.0}, {"id": "P1", "speed": 6.2}], "crack_updates": {"B_5_4": {"C": 1, "CS": 0.72}, "B_2_3": {"C": 1, "CS": 0.64}}, "edge_loss_updates": {"B_4_4|B_5_4": 5.0, "B_2_3|B_3_3": 5.0}}
+        {
+          "id": "U0",
+          "name": "Base scenario",
+          "description": "No hidden cracks and no equipment change.",
+          "removed_devices": [],
+          "device_states": [],
+          "hidden_cracks": {
+            "items": []
+          }
+        },
+        {
+          "id": "U1",
+          "name": "Ordinary slowdown",
+          "description": "Ordinary devices slow down under processing pressure.",
+          "removed_devices": [],
+          "device_states": [
+            {
+              "id": "O1",
+              "speed": 13.5
+            },
+            {
+              "id": "O2",
+              "speed": 10.8
+            },
+            {
+              "id": "O3",
+              "speed": 8.1
+            }
+          ],
+          "hidden_cracks": {
+            "items": []
+          }
+        },
+        {
+          "id": "U2",
+          "name": "Precision slowdown",
+          "description": "Precision devices slow down under higher precision difficulty.",
+          "removed_devices": [],
+          "device_states": [
+            {
+              "id": "P1",
+              "speed": 5.6
+            },
+            {
+              "id": "P2",
+              "speed": 4.55
+            }
+          ],
+          "hidden_cracks": {
+            "items": []
+          }
+        },
+        {
+          "id": "U3",
+          "name": "Mixed slowdown",
+          "description": "Both ordinary and precision devices become slower.",
+          "removed_devices": [],
+          "device_states": [
+            {
+              "id": "O1",
+              "speed": 10.8
+            },
+            {
+              "id": "O2",
+              "speed": 8.64
+            },
+            {
+              "id": "O3",
+              "speed": 6.48
+            }
+          ],
+          "hidden_cracks": {
+            "items": []
+          }
+        },
+        {
+          "id": "U4",
+          "name": "One ordinary failure",
+          "description": "One ordinary device is unavailable.",
+          "removed_devices": [
+            "O3"
+          ],
+          "device_states": [],
+          "hidden_cracks": {
+            "items": []
+          }
+        },
+        {
+          "id": "U5",
+          "name": "One precision failure",
+          "description": "One precision device is unavailable if present.",
+          "removed_devices": [
+            "P2"
+          ],
+          "device_states": [],
+          "hidden_cracks": {
+            "items": []
+          }
+        },
+        {
+          "id": "U6",
+          "name": "Hidden local crack",
+          "description": "A hidden local crack is added and all crack effects are recomputed from geometry.",
+          "removed_devices": [],
+          "device_states": [],
+          "hidden_cracks": {
+            "items": [
+              {
+                "id": "HC1",
+                "width": 0.34,
+                "polyline": [
+                  [
+                    13.92,
+                    4.5
+                  ],
+                  [
+                    14.973,
+                    4.751
+                  ],
+                  [
+                    15.84,
+                    5.4
+                  ],
+                  [
+                    16.766,
+                    5.033
+                  ],
+                  [
+                    17.76,
+                    5.1
+                  ]
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "id": "U7",
+          "name": "Hidden cross crack",
+          "description": "A hidden longer crack is added and all crack effects are recomputed from geometry.",
+          "removed_devices": [
+            "O3"
+          ],
+          "device_states": [
+            {
+              "id": "O1",
+              "speed": 11.25
+            },
+            {
+              "id": "P1",
+              "speed": 6.0
+            }
+          ],
+          "hidden_cracks": {
+            "items": [
+              {
+                "id": "HC2",
+                "width": 0.48,
+                "polyline": [
+                  [
+                    14.88,
+                    4.8
+                  ],
+                  [
+                    16.8,
+                    6.0
+                  ],
+                  [
+                    18.72,
+                    5.7
+                  ],
+                  [
+                    19.545,
+                    6.623
+                  ],
+                  [
+                    20.64,
+                    7.2
+                  ]
+                ]
+              }
+            ]
+          }
+        }
       ]
     },
     {
       "id": "C07",
-      "name": "跨区域裂纹",
-      "description": "多条跨越木块边界的裂纹形成较多跨块损失",
-      "difficulty": "cross_region_cracks",
+      "name": "Wide board",
+      "description": "7x5 board to test scale and horizontal crack distribution.",
+      "difficulty": "cross_region",
       "deterministic_input": {
-        "random_seed": 20260725,
-        "board": {"width": 28.0, "height": 15.0, "m": 7, "n": 5, "base_value": 105.0},
+        "board": {
+          "width": 28,
+          "height": 15,
+          "m": 7,
+          "n": 5,
+          "base_value": 105
+        },
         "deadline": 5.0,
         "devices": [
-          {"id": "O1", "type": "ordinary", "speed": 16.0},
-          {"id": "O2", "type": "ordinary", "speed": 13.0},
-          {"id": "O3", "type": "ordinary", "speed": 10.0},
-          {"id": "P1", "type": "precision", "speed": 8.5},
-          {"id": "P2", "type": "precision", "speed": 6.5}
+          {
+            "id": "O1",
+            "type": "ordinary",
+            "speed": 16
+          },
+          {
+            "id": "O2",
+            "type": "ordinary",
+            "speed": 14
+          },
+          {
+            "id": "O3",
+            "type": "ordinary",
+            "speed": 12
+          },
+          {
+            "id": "O4",
+            "type": "ordinary",
+            "speed": 10
+          },
+          {
+            "id": "P1",
+            "type": "precision",
+            "speed": 8.5
+          },
+          {
+            "id": "P2",
+            "type": "precision",
+            "speed": 6.5
+          }
         ],
-        "values": {"r_ordinary": 1.15, "r_precision": 2.2, "default_same_precision_reward": 7.0, "default_precision_mismatch_penalty": 5.0, "default_cross_crack_loss": 5.0, "alpha": 0.8, "cross_crack_loss": {"B_2_2|B_3_2": 5.0, "B_3_2|B_4_2": 5.0, "B_4_3|B_5_3": 5.0, "B_5_3|B_6_3": 5.0, "B_6_4|B_7_4": 5.0}},
-        "cracks": {"mode": "direct", "blocks": {"B_2_2": {"C": 1, "CS": 0.38}, "B_3_2": {"C": 1, "CS": 0.45}, "B_4_2": {"C": 1, "CS": 0.52}, "B_4_3": {"C": 1, "CS": 0.42}, "B_5_3": {"C": 1, "CS": 0.56}, "B_6_3": {"C": 1, "CS": 0.48}, "B_6_4": {"C": 1, "CS": 0.50}, "B_7_4": {"C": 1, "CS": 0.44}}}
+        "values": {
+          "r_ordinary": 1.15,
+          "r_precision": 2.2,
+          "default_same_precision_reward": 7,
+          "default_precision_mismatch_penalty": 5,
+          "default_cross_crack_loss": 5,
+          "alpha": 0.8
+        },
+        "cracks": {
+          "mode": "geometry",
+          "epsilon": 0.08,
+          "R_max": 3.2,
+          "lambda_b": 5,
+          "items": [
+            {
+              "id": "OC1",
+              "width": 0.42,
+              "polyline": [
+                [
+                  2.24,
+                  2.7
+                ],
+                [
+                  6.16,
+                  4.35
+                ],
+                [
+                  10.36,
+                  5.25
+                ],
+                [
+                  14.56,
+                  7.05
+                ],
+                [
+                  19.6,
+                  8.25
+                ],
+                [
+                  25.2,
+                  10.5
+                ]
+              ]
+            },
+            {
+              "id": "OC2",
+              "width": 0.38,
+              "polyline": [
+                [
+                  4.2,
+                  12.3
+                ],
+                [
+                  8.4,
+                  10.5
+                ],
+                [
+                  14.0,
+                  10.05
+                ],
+                [
+                  19.6,
+                  8.7
+                ],
+                [
+                  24.08,
+                  6.75
+                ]
+              ]
+            },
+            {
+              "id": "OC3",
+              "width": 0.36,
+              "polyline": [
+                [
+                  13.44,
+                  1.2
+                ],
+                [
+                  14.0,
+                  3.6
+                ],
+                [
+                  13.16,
+                  6.0
+                ],
+                [
+                  14.56,
+                  8.4
+                ],
+                [
+                  13.72,
+                  10.8
+                ],
+                [
+                  15.12,
+                  13.5
+                ]
+              ]
+            }
+          ]
+        }
       },
       "uncertainty_scenarios": [
-        {"id": "U0", "name": "无扰动基准", "description": "保持确定性输入", "removed_devices": [], "device_states": [], "crack_updates": {}, "edge_loss_updates": {}},
-        {"id": "U1", "name": "设备轻度整体降速", "description": "多台设备小幅降速", "removed_devices": [], "device_states": [{"id": "O1", "speed": 15.0}, {"id": "P1", "speed": 7.8}], "crack_updates": {}, "edge_loss_updates": {}},
-        {"id": "U2", "name": "精密设备性能下降", "description": "精密设备速度明显下降", "removed_devices": [], "device_states": [{"id": "P1", "speed": 6.0}, {"id": "P2", "speed": 4.8}], "crack_updates": {}, "edge_loss_updates": {}},
-        {"id": "U3", "name": "普通设备性能下降", "description": "普通设备速度明显下降", "removed_devices": [], "device_states": [{"id": "O1", "speed": 12.0}, {"id": "O2", "speed": 9.5}, {"id": "O3", "speed": 7.5}], "crack_updates": {}, "edge_loss_updates": {}},
-        {"id": "U4", "name": "普通设备故障", "description": "一台普通设备不可用", "removed_devices": ["O3"], "device_states": [], "crack_updates": {}, "edge_loss_updates": {}},
-        {"id": "U5", "name": "精密设备故障", "description": "一台精密设备不可用", "removed_devices": ["P2"], "device_states": [], "crack_updates": {}, "edge_loss_updates": {}},
-        {"id": "U6", "name": "新增隐藏裂纹", "description": "新增跨区裂纹", "removed_devices": [], "device_states": [], "crack_updates": {"B_3_3": {"C": 1, "CS": 0.62}, "B_5_4": {"C": 1, "CS": 0.58}}, "edge_loss_updates": {"B_3_2|B_3_3": 6.0, "B_5_3|B_5_4": 6.0}},
-        {"id": "U7", "name": "综合严重扰动", "description": "跨区裂纹和设备扰动叠加", "removed_devices": ["O3"], "device_states": [{"id": "O1", "speed": 12.5}, {"id": "P1", "speed": 6.4}], "crack_updates": {"B_3_3": {"C": 1, "CS": 0.70}, "B_5_4": {"C": 1, "CS": 0.66}}, "edge_loss_updates": {"B_3_2|B_3_3": 7.0, "B_5_3|B_5_4": 7.0}}
+        {
+          "id": "U0",
+          "name": "Base scenario",
+          "description": "No hidden cracks and no equipment change.",
+          "removed_devices": [],
+          "device_states": [],
+          "hidden_cracks": {
+            "items": []
+          }
+        },
+        {
+          "id": "U1",
+          "name": "Ordinary slowdown",
+          "description": "Ordinary devices slow down under processing pressure.",
+          "removed_devices": [],
+          "device_states": [
+            {
+              "id": "O1",
+              "speed": 14.4
+            },
+            {
+              "id": "O2",
+              "speed": 12.6
+            },
+            {
+              "id": "O3",
+              "speed": 10.8
+            }
+          ],
+          "hidden_cracks": {
+            "items": []
+          }
+        },
+        {
+          "id": "U2",
+          "name": "Precision slowdown",
+          "description": "Precision devices slow down under higher precision difficulty.",
+          "removed_devices": [],
+          "device_states": [
+            {
+              "id": "P1",
+              "speed": 5.95
+            },
+            {
+              "id": "P2",
+              "speed": 4.55
+            }
+          ],
+          "hidden_cracks": {
+            "items": []
+          }
+        },
+        {
+          "id": "U3",
+          "name": "Mixed slowdown",
+          "description": "Both ordinary and precision devices become slower.",
+          "removed_devices": [],
+          "device_states": [
+            {
+              "id": "O1",
+              "speed": 11.52
+            },
+            {
+              "id": "O2",
+              "speed": 10.08
+            },
+            {
+              "id": "O3",
+              "speed": 8.64
+            },
+            {
+              "id": "O4",
+              "speed": 7.2
+            }
+          ],
+          "hidden_cracks": {
+            "items": []
+          }
+        },
+        {
+          "id": "U4",
+          "name": "One ordinary failure",
+          "description": "One ordinary device is unavailable.",
+          "removed_devices": [
+            "O4"
+          ],
+          "device_states": [],
+          "hidden_cracks": {
+            "items": []
+          }
+        },
+        {
+          "id": "U5",
+          "name": "One precision failure",
+          "description": "One precision device is unavailable if present.",
+          "removed_devices": [
+            "P2"
+          ],
+          "device_states": [],
+          "hidden_cracks": {
+            "items": []
+          }
+        },
+        {
+          "id": "U6",
+          "name": "Hidden local crack",
+          "description": "A hidden local crack is added and all crack effects are recomputed from geometry.",
+          "removed_devices": [],
+          "device_states": [],
+          "hidden_cracks": {
+            "items": [
+              {
+                "id": "HC1",
+                "width": 0.34,
+                "polyline": [
+                  [
+                    16.24,
+                    4.5
+                  ],
+                  [
+                    17.442,
+                    4.746
+                  ],
+                  [
+                    18.48,
+                    5.4
+                  ],
+                  [
+                    19.571,
+                    5.032
+                  ],
+                  [
+                    20.72,
+                    5.1
+                  ]
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "id": "U7",
+          "name": "Hidden cross crack",
+          "description": "A hidden longer crack is added and all crack effects are recomputed from geometry.",
+          "removed_devices": [
+            "O4"
+          ],
+          "device_states": [
+            {
+              "id": "O1",
+              "speed": 12.0
+            },
+            {
+              "id": "P1",
+              "speed": 6.375
+            }
+          ],
+          "hidden_cracks": {
+            "items": [
+              {
+                "id": "HC2",
+                "width": 0.48,
+                "polyline": [
+                  [
+                    17.36,
+                    4.8
+                  ],
+                  [
+                    19.6,
+                    6.0
+                  ],
+                  [
+                    21.84,
+                    5.7
+                  ],
+                  [
+                    22.838,
+                    6.633
+                  ],
+                  [
+                    24.08,
+                    7.2
+                  ]
+                ]
+              }
+            ]
+          }
+        }
       ]
     },
     {
       "id": "C08",
-      "name": "精密设备资源紧张",
-      "description": "精密加工收益较高，但精密设备数量少且速度较低",
+      "name": "Precision bottleneck",
+      "description": "Medium board with many ordinary devices but only one precision device.",
       "difficulty": "precision_scarce",
       "deterministic_input": {
-        "random_seed": 20260725,
-        "board": {"width": 24.0, "height": 15.0, "m": 6, "n": 5, "base_value": 100.0},
+        "board": {
+          "width": 24,
+          "height": 15,
+          "m": 6,
+          "n": 5,
+          "base_value": 100
+        },
         "deadline": 5.0,
         "devices": [
-          {"id": "O1", "type": "ordinary", "speed": 16.0},
-          {"id": "O2", "type": "ordinary", "speed": 13.0},
-          {"id": "O3", "type": "ordinary", "speed": 11.0},
-          {"id": "P1", "type": "precision", "speed": 5.5}
+          {
+            "id": "O1",
+            "type": "ordinary",
+            "speed": 16
+          },
+          {
+            "id": "O2",
+            "type": "ordinary",
+            "speed": 14
+          },
+          {
+            "id": "O3",
+            "type": "ordinary",
+            "speed": 12
+          },
+          {
+            "id": "O4",
+            "type": "ordinary",
+            "speed": 10
+          },
+          {
+            "id": "O5",
+            "type": "ordinary",
+            "speed": 8
+          },
+          {
+            "id": "P1",
+            "type": "precision",
+            "speed": 5.5
+          }
         ],
-        "values": {"r_ordinary": 1.1, "r_precision": 3.0, "default_same_precision_reward": 6.0, "default_precision_mismatch_penalty": 4.0, "default_cross_crack_loss": 2.0, "alpha": 0.7},
-        "cracks": {"mode": "direct", "blocks": {"B_2_2": {"C": 1, "CS": 0.34}, "B_3_3": {"C": 1, "CS": 0.48}, "B_4_3": {"C": 1, "CS": 0.52}, "B_5_4": {"C": 1, "CS": 0.40}, "B_6_2": {"C": 1, "CS": 0.36}}}
+        "values": {
+          "r_ordinary": 1.1,
+          "r_precision": 3.0,
+          "default_same_precision_reward": 6,
+          "default_precision_mismatch_penalty": 4,
+          "default_cross_crack_loss": 2,
+          "alpha": 0.7
+        },
+        "cracks": {
+          "mode": "geometry",
+          "epsilon": 0.08,
+          "R_max": 3.2,
+          "lambda_b": 2,
+          "items": [
+            {
+              "id": "OC1",
+              "width": 0.36,
+              "polyline": [
+                [
+                  2.88,
+                  12.0
+                ],
+                [
+                  5.76,
+                  10.8
+                ],
+                [
+                  9.12,
+                  9.9
+                ],
+                [
+                  10.874,
+                  9.507
+                ],
+                [
+                  12.48,
+                  8.7
+                ]
+              ]
+            },
+            {
+              "id": "OC2",
+              "width": 0.34,
+              "polyline": [
+                [
+                  3.36,
+                  3.0
+                ],
+                [
+                  7.2,
+                  4.2
+                ],
+                [
+                  11.52,
+                  4.8
+                ],
+                [
+                  15.84,
+                  6.0
+                ],
+                [
+                  19.68,
+                  7.2
+                ]
+              ]
+            }
+          ]
+        }
       },
       "uncertainty_scenarios": [
-        {"id": "U0", "name": "无扰动基准", "description": "保持确定性输入", "removed_devices": [], "device_states": [], "crack_updates": {}, "edge_loss_updates": {}},
-        {"id": "U1", "name": "设备轻度整体降速", "description": "多台设备小幅降速", "removed_devices": [], "device_states": [{"id": "O1", "speed": 15.0}, {"id": "O2", "speed": 12.0}, {"id": "P1", "speed": 5.0}], "crack_updates": {}, "edge_loss_updates": {}},
-        {"id": "U2", "name": "精密设备性能下降", "description": "唯一精密设备速度明显下降", "removed_devices": [], "device_states": [{"id": "P1", "speed": 3.8}], "crack_updates": {}, "edge_loss_updates": {}},
-        {"id": "U3", "name": "普通设备性能下降", "description": "普通设备速度明显下降", "removed_devices": [], "device_states": [{"id": "O1", "speed": 12.0}, {"id": "O2", "speed": 9.5}, {"id": "O3", "speed": 8.0}], "crack_updates": {}, "edge_loss_updates": {}},
-        {"id": "U4", "name": "普通设备故障", "description": "一台普通设备不可用", "removed_devices": ["O3"], "device_states": [], "crack_updates": {}, "edge_loss_updates": {}},
-        {"id": "U5", "name": "精密设备故障", "description": "唯一精密设备不可用", "removed_devices": ["P1"], "device_states": [], "crack_updates": {}, "edge_loss_updates": {}},
-        {"id": "U6", "name": "新增隐藏裂纹", "description": "新增隐藏裂纹", "removed_devices": [], "device_states": [], "crack_updates": {"B_4_4": {"C": 1, "CS": 0.64}, "B_5_3": {"C": 1, "CS": 0.56}}, "edge_loss_updates": {"B_4_3|B_4_4": 4.0, "B_5_3|B_5_4": 4.0}},
-        {"id": "U7", "name": "综合严重扰动", "description": "精密资源紧张下复合扰动", "removed_devices": ["O3"], "device_states": [{"id": "O1", "speed": 12.5}, {"id": "P1", "speed": 4.0}], "crack_updates": {"B_4_4": {"C": 1, "CS": 0.70}, "B_5_3": {"C": 1, "CS": 0.62}}, "edge_loss_updates": {"B_4_3|B_4_4": 5.0, "B_5_3|B_5_4": 5.0}}
+        {
+          "id": "U0",
+          "name": "Base scenario",
+          "description": "No hidden cracks and no equipment change.",
+          "removed_devices": [],
+          "device_states": [],
+          "hidden_cracks": {
+            "items": []
+          }
+        },
+        {
+          "id": "U1",
+          "name": "Ordinary slowdown",
+          "description": "Ordinary devices slow down under processing pressure.",
+          "removed_devices": [],
+          "device_states": [
+            {
+              "id": "O1",
+              "speed": 14.4
+            },
+            {
+              "id": "O2",
+              "speed": 12.6
+            },
+            {
+              "id": "O3",
+              "speed": 10.8
+            }
+          ],
+          "hidden_cracks": {
+            "items": []
+          }
+        },
+        {
+          "id": "U2",
+          "name": "Precision slowdown",
+          "description": "Precision devices slow down under higher precision difficulty.",
+          "removed_devices": [],
+          "device_states": [
+            {
+              "id": "P1",
+              "speed": 3.85
+            }
+          ],
+          "hidden_cracks": {
+            "items": []
+          }
+        },
+        {
+          "id": "U3",
+          "name": "Mixed slowdown",
+          "description": "Both ordinary and precision devices become slower.",
+          "removed_devices": [],
+          "device_states": [
+            {
+              "id": "O1",
+              "speed": 11.52
+            },
+            {
+              "id": "O2",
+              "speed": 10.08
+            },
+            {
+              "id": "O3",
+              "speed": 8.64
+            },
+            {
+              "id": "O4",
+              "speed": 7.2
+            },
+            {
+              "id": "O5",
+              "speed": 5.76
+            }
+          ],
+          "hidden_cracks": {
+            "items": []
+          }
+        },
+        {
+          "id": "U4",
+          "name": "One ordinary failure",
+          "description": "One ordinary device is unavailable.",
+          "removed_devices": [
+            "O5"
+          ],
+          "device_states": [],
+          "hidden_cracks": {
+            "items": []
+          }
+        },
+        {
+          "id": "U5",
+          "name": "One precision failure",
+          "description": "One precision device is unavailable if present.",
+          "removed_devices": [
+            "P1"
+          ],
+          "device_states": [],
+          "hidden_cracks": {
+            "items": []
+          }
+        },
+        {
+          "id": "U6",
+          "name": "Hidden local crack",
+          "description": "A hidden local crack is added and all crack effects are recomputed from geometry.",
+          "removed_devices": [],
+          "device_states": [],
+          "hidden_cracks": {
+            "items": [
+              {
+                "id": "HC1",
+                "width": 0.34,
+                "polyline": [
+                  [
+                    13.92,
+                    4.5
+                  ],
+                  [
+                    14.973,
+                    4.751
+                  ],
+                  [
+                    15.84,
+                    5.4
+                  ],
+                  [
+                    16.766,
+                    5.033
+                  ],
+                  [
+                    17.76,
+                    5.1
+                  ]
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "id": "U7",
+          "name": "Hidden cross crack",
+          "description": "A hidden longer crack is added and all crack effects are recomputed from geometry.",
+          "removed_devices": [
+            "O5"
+          ],
+          "device_states": [
+            {
+              "id": "O1",
+              "speed": 12.0
+            },
+            {
+              "id": "P1",
+              "speed": 4.125
+            }
+          ],
+          "hidden_cracks": {
+            "items": [
+              {
+                "id": "HC2",
+                "width": 0.48,
+                "polyline": [
+                  [
+                    14.88,
+                    4.8
+                  ],
+                  [
+                    16.8,
+                    6.0
+                  ],
+                  [
+                    18.72,
+                    5.7
+                  ],
+                  [
+                    19.545,
+                    6.623
+                  ],
+                  [
+                    20.64,
+                    7.2
+                  ]
+                ]
+              }
+            ]
+          }
+        }
       ]
     },
     {
       "id": "C09",
-      "name": "老旧异构产线",
-      "description": "同类设备速度差异明显，新旧设备混用",
-      "difficulty": "heterogeneous_line",
+      "name": "Fast ordinary devices",
+      "description": "Medium board with stronger ordinary capacity and moderate precision resources.",
+      "difficulty": "heterogeneous",
       "deterministic_input": {
-        "random_seed": 20260725,
-        "board": {"width": 24.0, "height": 15.0, "m": 6, "n": 5, "base_value": 100.0},
+        "board": {
+          "width": 24,
+          "height": 15,
+          "m": 6,
+          "n": 5,
+          "base_value": 100
+        },
         "deadline": 5.2,
         "devices": [
-          {"id": "O1", "type": "ordinary", "speed": 20.0},
-          {"id": "O2", "type": "ordinary", "speed": 12.0},
-          {"id": "O3", "type": "ordinary", "speed": 6.5},
-          {"id": "P1", "type": "precision", "speed": 10.0},
-          {"id": "P2", "type": "precision", "speed": 4.5}
+          {
+            "id": "O1",
+            "type": "ordinary",
+            "speed": 20
+          },
+          {
+            "id": "O2",
+            "type": "ordinary",
+            "speed": 14
+          },
+          {
+            "id": "O3",
+            "type": "ordinary",
+            "speed": 9
+          },
+          {
+            "id": "O4",
+            "type": "ordinary",
+            "speed": 5.5
+          },
+          {
+            "id": "P1",
+            "type": "precision",
+            "speed": 10
+          },
+          {
+            "id": "P2",
+            "type": "precision",
+            "speed": 4.5
+          }
         ],
-        "values": {"r_ordinary": 1.1, "r_precision": 2.2, "default_same_precision_reward": 6.0, "default_precision_mismatch_penalty": 4.0, "default_cross_crack_loss": 2.0, "alpha": 0.75},
-        "cracks": {"mode": "direct", "blocks": {"B_1_4": {"C": 1, "CS": 0.30}, "B_2_2": {"C": 1, "CS": 0.38}, "B_3_3": {"C": 1, "CS": 0.46}, "B_4_4": {"C": 1, "CS": 0.54}, "B_6_2": {"C": 1, "CS": 0.42}}}
+        "values": {
+          "r_ordinary": 1.1,
+          "r_precision": 2.2,
+          "default_same_precision_reward": 6,
+          "default_precision_mismatch_penalty": 4,
+          "default_cross_crack_loss": 2,
+          "alpha": 0.75
+        },
+        "cracks": {
+          "mode": "geometry",
+          "epsilon": 0.08,
+          "R_max": 3.2,
+          "lambda_b": 2,
+          "items": [
+            {
+              "id": "OC1",
+              "width": 0.36,
+              "polyline": [
+                [
+                  2.88,
+                  12.0
+                ],
+                [
+                  5.76,
+                  10.8
+                ],
+                [
+                  9.12,
+                  9.9
+                ],
+                [
+                  10.874,
+                  9.507
+                ],
+                [
+                  12.48,
+                  8.7
+                ]
+              ]
+            },
+            {
+              "id": "OC2",
+              "width": 0.34,
+              "polyline": [
+                [
+                  3.36,
+                  3.0
+                ],
+                [
+                  7.2,
+                  4.2
+                ],
+                [
+                  11.52,
+                  4.8
+                ],
+                [
+                  15.84,
+                  6.0
+                ],
+                [
+                  19.68,
+                  7.2
+                ]
+              ]
+            }
+          ]
+        }
       },
       "uncertainty_scenarios": [
-        {"id": "U0", "name": "无扰动基准", "description": "保持确定性输入", "removed_devices": [], "device_states": [], "crack_updates": {}, "edge_loss_updates": {}},
-        {"id": "U1", "name": "设备轻度整体降速", "description": "多台设备小幅降速", "removed_devices": [], "device_states": [{"id": "O1", "speed": 18.0}, {"id": "O2", "speed": 11.0}, {"id": "P1", "speed": 9.0}], "crack_updates": {}, "edge_loss_updates": {}},
-        {"id": "U2", "name": "精密设备性能下降", "description": "精密设备速度明显下降", "removed_devices": [], "device_states": [{"id": "P1", "speed": 7.0}, {"id": "P2", "speed": 3.5}], "crack_updates": {}, "edge_loss_updates": {}},
-        {"id": "U3", "name": "普通设备性能下降", "description": "普通设备速度明显下降", "removed_devices": [], "device_states": [{"id": "O1", "speed": 14.0}, {"id": "O2", "speed": 8.5}, {"id": "O3", "speed": 5.0}], "crack_updates": {}, "edge_loss_updates": {}},
-        {"id": "U4", "name": "普通设备故障", "description": "低速普通设备不可用", "removed_devices": ["O3"], "device_states": [], "crack_updates": {}, "edge_loss_updates": {}},
-        {"id": "U5", "name": "精密设备故障", "description": "低速精密设备不可用", "removed_devices": ["P2"], "device_states": [], "crack_updates": {}, "edge_loss_updates": {}},
-        {"id": "U6", "name": "新增隐藏裂纹", "description": "新增隐藏裂纹", "removed_devices": [], "device_states": [], "crack_updates": {"B_3_4": {"C": 1, "CS": 0.60}, "B_5_2": {"C": 1, "CS": 0.52}}, "edge_loss_updates": {"B_3_3|B_3_4": 3.0, "B_5_2|B_6_2": 3.0}},
-        {"id": "U7", "name": "综合严重扰动", "description": "老旧产线复合扰动", "removed_devices": ["O3"], "device_states": [{"id": "O1", "speed": 15.0}, {"id": "P1", "speed": 7.5}], "crack_updates": {"B_3_4": {"C": 1, "CS": 0.68}, "B_5_2": {"C": 1, "CS": 0.60}}, "edge_loss_updates": {"B_3_3|B_3_4": 4.0, "B_5_2|B_6_2": 4.0}}
+        {
+          "id": "U0",
+          "name": "Base scenario",
+          "description": "No hidden cracks and no equipment change.",
+          "removed_devices": [],
+          "device_states": [],
+          "hidden_cracks": {
+            "items": []
+          }
+        },
+        {
+          "id": "U1",
+          "name": "Ordinary slowdown",
+          "description": "Ordinary devices slow down under processing pressure.",
+          "removed_devices": [],
+          "device_states": [
+            {
+              "id": "O1",
+              "speed": 18.0
+            },
+            {
+              "id": "O2",
+              "speed": 12.6
+            },
+            {
+              "id": "O3",
+              "speed": 8.1
+            }
+          ],
+          "hidden_cracks": {
+            "items": []
+          }
+        },
+        {
+          "id": "U2",
+          "name": "Precision slowdown",
+          "description": "Precision devices slow down under higher precision difficulty.",
+          "removed_devices": [],
+          "device_states": [
+            {
+              "id": "P1",
+              "speed": 7.0
+            },
+            {
+              "id": "P2",
+              "speed": 3.15
+            }
+          ],
+          "hidden_cracks": {
+            "items": []
+          }
+        },
+        {
+          "id": "U3",
+          "name": "Mixed slowdown",
+          "description": "Both ordinary and precision devices become slower.",
+          "removed_devices": [],
+          "device_states": [
+            {
+              "id": "O1",
+              "speed": 14.4
+            },
+            {
+              "id": "O2",
+              "speed": 10.08
+            },
+            {
+              "id": "O3",
+              "speed": 6.48
+            },
+            {
+              "id": "O4",
+              "speed": 3.96
+            }
+          ],
+          "hidden_cracks": {
+            "items": []
+          }
+        },
+        {
+          "id": "U4",
+          "name": "One ordinary failure",
+          "description": "One ordinary device is unavailable.",
+          "removed_devices": [
+            "O4"
+          ],
+          "device_states": [],
+          "hidden_cracks": {
+            "items": []
+          }
+        },
+        {
+          "id": "U5",
+          "name": "One precision failure",
+          "description": "One precision device is unavailable if present.",
+          "removed_devices": [
+            "P2"
+          ],
+          "device_states": [],
+          "hidden_cracks": {
+            "items": []
+          }
+        },
+        {
+          "id": "U6",
+          "name": "Hidden local crack",
+          "description": "A hidden local crack is added and all crack effects are recomputed from geometry.",
+          "removed_devices": [],
+          "device_states": [],
+          "hidden_cracks": {
+            "items": [
+              {
+                "id": "HC1",
+                "width": 0.34,
+                "polyline": [
+                  [
+                    13.92,
+                    4.5
+                  ],
+                  [
+                    14.973,
+                    4.751
+                  ],
+                  [
+                    15.84,
+                    5.4
+                  ],
+                  [
+                    16.766,
+                    5.033
+                  ],
+                  [
+                    17.76,
+                    5.1
+                  ]
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "id": "U7",
+          "name": "Hidden cross crack",
+          "description": "A hidden longer crack is added and all crack effects are recomputed from geometry.",
+          "removed_devices": [
+            "O4"
+          ],
+          "device_states": [
+            {
+              "id": "O1",
+              "speed": 15.0
+            },
+            {
+              "id": "P1",
+              "speed": 7.5
+            }
+          ],
+          "hidden_cracks": {
+            "items": [
+              {
+                "id": "HC2",
+                "width": 0.48,
+                "polyline": [
+                  [
+                    14.88,
+                    4.8
+                  ],
+                  [
+                    16.8,
+                    6.0
+                  ],
+                  [
+                    18.72,
+                    5.7
+                  ],
+                  [
+                    19.545,
+                    6.623
+                  ],
+                  [
+                    20.64,
+                    7.2
+                  ]
+                ]
+              }
+            ]
+          }
+        }
       ]
     },
     {
       "id": "C10",
-      "name": "低产能紧工期",
-      "description": "设备整体偏慢，同时共同工期较短，容量竞争明显",
-      "difficulty": "low_capacity_tight",
+      "name": "Small tight capacity",
+      "description": "6x4 board with only three devices and a tight deadline.",
+      "difficulty": "low_capacity",
       "deterministic_input": {
-        "random_seed": 20260725,
-        "board": {"width": 24.0, "height": 12.0, "m": 6, "n": 4, "base_value": 100.0},
+        "board": {
+          "width": 24,
+          "height": 12,
+          "m": 6,
+          "n": 4,
+          "base_value": 100
+        },
         "deadline": 3.4,
         "devices": [
-          {"id": "O1", "type": "ordinary", "speed": 10.0},
-          {"id": "O2", "type": "ordinary", "speed": 8.0},
-          {"id": "P1", "type": "precision", "speed": 5.5},
-          {"id": "P2", "type": "precision", "speed": 4.5}
+          {
+            "id": "O1",
+            "type": "ordinary",
+            "speed": 10
+          },
+          {
+            "id": "O2",
+            "type": "ordinary",
+            "speed": 8
+          },
+          {
+            "id": "P1",
+            "type": "precision",
+            "speed": 5.5
+          }
         ],
-        "values": {"r_ordinary": 1.2, "r_precision": 2.3, "default_same_precision_reward": 6.0, "default_precision_mismatch_penalty": 4.0, "default_cross_crack_loss": 2.0, "alpha": 0.8},
-        "cracks": {"mode": "direct", "blocks": {"B_2_2": {"C": 1, "CS": 0.34}, "B_3_2": {"C": 1, "CS": 0.46}, "B_4_3": {"C": 1, "CS": 0.52}, "B_5_3": {"C": 1, "CS": 0.40}}}
+        "values": {
+          "r_ordinary": 1.2,
+          "r_precision": 2.3,
+          "default_same_precision_reward": 6,
+          "default_precision_mismatch_penalty": 4,
+          "default_cross_crack_loss": 2,
+          "alpha": 0.8
+        },
+        "cracks": {
+          "mode": "geometry",
+          "epsilon": 0.08,
+          "R_max": 3.2,
+          "lambda_b": 2,
+          "items": [
+            {
+              "id": "OC1",
+              "width": 0.36,
+              "polyline": [
+                [
+                  2.88,
+                  9.6
+                ],
+                [
+                  5.76,
+                  8.64
+                ],
+                [
+                  9.12,
+                  7.92
+                ],
+                [
+                  10.86,
+                  7.652
+                ],
+                [
+                  12.48,
+                  6.96
+                ]
+              ]
+            },
+            {
+              "id": "OC2",
+              "width": 0.34,
+              "polyline": [
+                [
+                  3.36,
+                  2.4
+                ],
+                [
+                  7.2,
+                  3.36
+                ],
+                [
+                  11.52,
+                  3.84
+                ],
+                [
+                  15.84,
+                  4.8
+                ],
+                [
+                  19.68,
+                  5.76
+                ]
+              ]
+            }
+          ]
+        }
       },
       "uncertainty_scenarios": [
-        {"id": "U0", "name": "无扰动基准", "description": "保持确定性输入", "removed_devices": [], "device_states": [], "crack_updates": {}, "edge_loss_updates": {}},
-        {"id": "U1", "name": "设备轻度整体降速", "description": "多台设备小幅降速", "removed_devices": [], "device_states": [{"id": "O1", "speed": 9.0}, {"id": "O2", "speed": 7.2}, {"id": "P1", "speed": 5.0}], "crack_updates": {}, "edge_loss_updates": {}},
-        {"id": "U2", "name": "精密设备性能下降", "description": "精密设备速度明显下降", "removed_devices": [], "device_states": [{"id": "P1", "speed": 4.0}, {"id": "P2", "speed": 3.2}], "crack_updates": {}, "edge_loss_updates": {}},
-        {"id": "U3", "name": "普通设备性能下降", "description": "普通设备速度明显下降", "removed_devices": [], "device_states": [{"id": "O1", "speed": 7.0}, {"id": "O2", "speed": 5.5}], "crack_updates": {}, "edge_loss_updates": {}},
-        {"id": "U4", "name": "普通设备故障", "description": "一台普通设备不可用", "removed_devices": ["O2"], "device_states": [], "crack_updates": {}, "edge_loss_updates": {}},
-        {"id": "U5", "name": "精密设备故障", "description": "一台精密设备不可用", "removed_devices": ["P2"], "device_states": [], "crack_updates": {}, "edge_loss_updates": {}},
-        {"id": "U6", "name": "新增隐藏裂纹", "description": "新增隐藏裂纹", "removed_devices": [], "device_states": [], "crack_updates": {"B_5_2": {"C": 1, "CS": 0.60}, "B_6_3": {"C": 1, "CS": 0.55}}, "edge_loss_updates": {"B_5_2|B_5_3": 3.0, "B_5_3|B_6_3": 3.0}},
-        {"id": "U7", "name": "综合严重扰动", "description": "低产能紧工期复合扰动", "removed_devices": ["O2"], "device_states": [{"id": "O1", "speed": 7.5}, {"id": "P1", "speed": 4.2}], "crack_updates": {"B_5_2": {"C": 1, "CS": 0.70}, "B_6_3": {"C": 1, "CS": 0.62}}, "edge_loss_updates": {"B_5_2|B_5_3": 4.0, "B_5_3|B_6_3": 4.0}}
+        {
+          "id": "U0",
+          "name": "Base scenario",
+          "description": "No hidden cracks and no equipment change.",
+          "removed_devices": [],
+          "device_states": [],
+          "hidden_cracks": {
+            "items": []
+          }
+        },
+        {
+          "id": "U1",
+          "name": "Ordinary slowdown",
+          "description": "Ordinary devices slow down under processing pressure.",
+          "removed_devices": [],
+          "device_states": [
+            {
+              "id": "O1",
+              "speed": 9.0
+            },
+            {
+              "id": "O2",
+              "speed": 7.2
+            },
+            {
+              "id": "P1",
+              "speed": 4.95
+            }
+          ],
+          "hidden_cracks": {
+            "items": []
+          }
+        },
+        {
+          "id": "U2",
+          "name": "Precision slowdown",
+          "description": "Precision devices slow down under higher precision difficulty.",
+          "removed_devices": [],
+          "device_states": [
+            {
+              "id": "P1",
+              "speed": 3.85
+            }
+          ],
+          "hidden_cracks": {
+            "items": []
+          }
+        },
+        {
+          "id": "U3",
+          "name": "Mixed slowdown",
+          "description": "Both ordinary and precision devices become slower.",
+          "removed_devices": [],
+          "device_states": [
+            {
+              "id": "O1",
+              "speed": 7.2
+            },
+            {
+              "id": "O2",
+              "speed": 5.76
+            }
+          ],
+          "hidden_cracks": {
+            "items": []
+          }
+        },
+        {
+          "id": "U4",
+          "name": "One ordinary failure",
+          "description": "One ordinary device is unavailable.",
+          "removed_devices": [
+            "O2"
+          ],
+          "device_states": [],
+          "hidden_cracks": {
+            "items": []
+          }
+        },
+        {
+          "id": "U5",
+          "name": "One precision failure",
+          "description": "One precision device is unavailable if present.",
+          "removed_devices": [
+            "P1"
+          ],
+          "device_states": [],
+          "hidden_cracks": {
+            "items": []
+          }
+        },
+        {
+          "id": "U6",
+          "name": "Hidden local crack",
+          "description": "A hidden local crack is added and all crack effects are recomputed from geometry.",
+          "removed_devices": [],
+          "device_states": [],
+          "hidden_cracks": {
+            "items": [
+              {
+                "id": "HC1",
+                "width": 0.34,
+                "polyline": [
+                  [
+                    13.92,
+                    3.6
+                  ],
+                  [
+                    14.957,
+                    3.754
+                  ],
+                  [
+                    15.84,
+                    4.32
+                  ],
+                  [
+                    16.773,
+                    3.982
+                  ],
+                  [
+                    17.76,
+                    4.08
+                  ]
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "id": "U7",
+          "name": "Hidden cross crack",
+          "description": "A hidden longer crack is added and all crack effects are recomputed from geometry.",
+          "removed_devices": [
+            "O2"
+          ],
+          "device_states": [
+            {
+              "id": "O1",
+              "speed": 7.5
+            },
+            {
+              "id": "P1",
+              "speed": 4.125
+            }
+          ],
+          "hidden_cracks": {
+            "items": [
+              {
+                "id": "HC2",
+                "width": 0.48,
+                "polyline": [
+                  [
+                    14.88,
+                    3.84
+                  ],
+                  [
+                    16.8,
+                    4.8
+                  ],
+                  [
+                    18.72,
+                    4.56
+                  ],
+                  [
+                    19.563,
+                    5.347
+                  ],
+                  [
+                    20.64,
+                    5.76
+                  ]
+                ]
+              }
+            ]
+          }
+        }
       ]
     },
     {
       "id": "C11",
-      "name": "强邻接耦合工况",
-      "description": "相邻双精加工奖励和精度不一致损失均较高",
-      "difficulty": "strong_adjacency",
+      "name": "More precision devices",
+      "description": "Medium board with three ordinary and three precision devices.",
+      "difficulty": "strong_adj",
       "deterministic_input": {
-        "random_seed": 20260725,
-        "board": {"width": 24.0, "height": 15.0, "m": 6, "n": 5, "base_value": 100.0},
+        "board": {
+          "width": 24,
+          "height": 15,
+          "m": 6,
+          "n": 5,
+          "base_value": 100
+        },
         "deadline": 5.1,
         "devices": [
-          {"id": "O1", "type": "ordinary", "speed": 15.0},
-          {"id": "O2", "type": "ordinary", "speed": 12.0},
-          {"id": "O3", "type": "ordinary", "speed": 10.0},
-          {"id": "P1", "type": "precision", "speed": 8.5},
-          {"id": "P2", "type": "precision", "speed": 6.5}
+          {
+            "id": "O1",
+            "type": "ordinary",
+            "speed": 15
+          },
+          {
+            "id": "O2",
+            "type": "ordinary",
+            "speed": 12
+          },
+          {
+            "id": "O3",
+            "type": "ordinary",
+            "speed": 10
+          },
+          {
+            "id": "P1",
+            "type": "precision",
+            "speed": 8.5
+          },
+          {
+            "id": "P2",
+            "type": "precision",
+            "speed": 7
+          },
+          {
+            "id": "P3",
+            "type": "precision",
+            "speed": 6
+          }
         ],
-        "values": {"r_ordinary": 1.1, "r_precision": 2.2, "default_same_precision_reward": 13.0, "default_precision_mismatch_penalty": 9.0, "default_cross_crack_loss": 2.0, "alpha": 0.65},
-        "cracks": {"mode": "direct", "blocks": {"B_2_2": {"C": 1, "CS": 0.30}, "B_2_3": {"C": 1, "CS": 0.38}, "B_3_3": {"C": 1, "CS": 0.42}, "B_4_3": {"C": 1, "CS": 0.35}, "B_5_4": {"C": 1, "CS": 0.50}}}
+        "values": {
+          "r_ordinary": 1.1,
+          "r_precision": 2.2,
+          "default_same_precision_reward": 13,
+          "default_precision_mismatch_penalty": 9,
+          "default_cross_crack_loss": 2,
+          "alpha": 0.65
+        },
+        "cracks": {
+          "mode": "geometry",
+          "epsilon": 0.08,
+          "R_max": 3.2,
+          "lambda_b": 2,
+          "items": [
+            {
+              "id": "OC1",
+              "width": 0.48,
+              "polyline": [
+                [
+                  9.12,
+                  6.3
+                ],
+                [
+                  9.856,
+                  6.944
+                ],
+                [
+                  10.8,
+                  7.2
+                ],
+                [
+                  12.48,
+                  6.75
+                ],
+                [
+                  13.92,
+                  7.95
+                ]
+              ]
+            },
+            {
+              "id": "OC2",
+              "width": 0.52,
+              "polyline": [
+                [
+                  10.08,
+                  5.25
+                ],
+                [
+                  11.01,
+                  5.424
+                ],
+                [
+                  11.76,
+                  6.0
+                ],
+                [
+                  12.435,
+                  5.635
+                ],
+                [
+                  13.2,
+                  5.7
+                ]
+              ]
+            },
+            {
+              "id": "OC3",
+              "width": 0.44,
+              "polyline": [
+                [
+                  8.64,
+                  8.25
+                ],
+                [
+                  9.65,
+                  8.261
+                ],
+                [
+                  10.56,
+                  8.7
+                ],
+                [
+                  11.343,
+                  8.262
+                ],
+                [
+                  12.24,
+                  8.25
+                ]
+              ]
+            }
+          ]
+        }
       },
       "uncertainty_scenarios": [
-        {"id": "U0", "name": "无扰动基准", "description": "保持确定性输入", "removed_devices": [], "device_states": [], "crack_updates": {}, "edge_loss_updates": {}},
-        {"id": "U1", "name": "设备轻度整体降速", "description": "多台设备小幅降速", "removed_devices": [], "device_states": [{"id": "O1", "speed": 14.0}, {"id": "P1", "speed": 7.8}], "crack_updates": {}, "edge_loss_updates": {}},
-        {"id": "U2", "name": "精密设备性能下降", "description": "精密设备速度明显下降", "removed_devices": [], "device_states": [{"id": "P1", "speed": 6.2}, {"id": "P2", "speed": 5.0}], "crack_updates": {}, "edge_loss_updates": {}},
-        {"id": "U3", "name": "普通设备性能下降", "description": "普通设备速度明显下降", "removed_devices": [], "device_states": [{"id": "O1", "speed": 11.0}, {"id": "O2", "speed": 9.0}, {"id": "O3", "speed": 7.5}], "crack_updates": {}, "edge_loss_updates": {}},
-        {"id": "U4", "name": "普通设备故障", "description": "一台普通设备不可用", "removed_devices": ["O3"], "device_states": [], "crack_updates": {}, "edge_loss_updates": {}},
-        {"id": "U5", "name": "精密设备故障", "description": "一台精密设备不可用", "removed_devices": ["P2"], "device_states": [], "crack_updates": {}, "edge_loss_updates": {}},
-        {"id": "U6", "name": "新增隐藏裂纹", "description": "新增影响邻接结构的隐藏裂纹", "removed_devices": [], "device_states": [], "crack_updates": {"B_3_2": {"C": 1, "CS": 0.56}, "B_4_4": {"C": 1, "CS": 0.52}}, "edge_loss_updates": {"B_3_2|B_3_3": 4.0, "B_4_3|B_4_4": 4.0}},
-        {"id": "U7", "name": "综合严重扰动", "description": "强邻接耦合下复合扰动", "removed_devices": ["O3"], "device_states": [{"id": "O1", "speed": 12.0}, {"id": "P1", "speed": 6.6}], "crack_updates": {"B_3_2": {"C": 1, "CS": 0.64}, "B_4_4": {"C": 1, "CS": 0.60}}, "edge_loss_updates": {"B_3_2|B_3_3": 5.0, "B_4_3|B_4_4": 5.0}}
+        {
+          "id": "U0",
+          "name": "Base scenario",
+          "description": "No hidden cracks and no equipment change.",
+          "removed_devices": [],
+          "device_states": [],
+          "hidden_cracks": {
+            "items": []
+          }
+        },
+        {
+          "id": "U1",
+          "name": "Ordinary slowdown",
+          "description": "Ordinary devices slow down under processing pressure.",
+          "removed_devices": [],
+          "device_states": [
+            {
+              "id": "O1",
+              "speed": 13.5
+            },
+            {
+              "id": "O2",
+              "speed": 10.8
+            },
+            {
+              "id": "O3",
+              "speed": 9.0
+            }
+          ],
+          "hidden_cracks": {
+            "items": []
+          }
+        },
+        {
+          "id": "U2",
+          "name": "Precision slowdown",
+          "description": "Precision devices slow down under higher precision difficulty.",
+          "removed_devices": [],
+          "device_states": [
+            {
+              "id": "P1",
+              "speed": 5.95
+            },
+            {
+              "id": "P2",
+              "speed": 4.9
+            },
+            {
+              "id": "P3",
+              "speed": 4.2
+            }
+          ],
+          "hidden_cracks": {
+            "items": []
+          }
+        },
+        {
+          "id": "U3",
+          "name": "Mixed slowdown",
+          "description": "Both ordinary and precision devices become slower.",
+          "removed_devices": [],
+          "device_states": [
+            {
+              "id": "O1",
+              "speed": 10.8
+            },
+            {
+              "id": "O2",
+              "speed": 8.64
+            },
+            {
+              "id": "O3",
+              "speed": 7.2
+            }
+          ],
+          "hidden_cracks": {
+            "items": []
+          }
+        },
+        {
+          "id": "U4",
+          "name": "One ordinary failure",
+          "description": "One ordinary device is unavailable.",
+          "removed_devices": [
+            "O3"
+          ],
+          "device_states": [],
+          "hidden_cracks": {
+            "items": []
+          }
+        },
+        {
+          "id": "U5",
+          "name": "One precision failure",
+          "description": "One precision device is unavailable if present.",
+          "removed_devices": [
+            "P3"
+          ],
+          "device_states": [],
+          "hidden_cracks": {
+            "items": []
+          }
+        },
+        {
+          "id": "U6",
+          "name": "Hidden local crack",
+          "description": "A hidden local crack is added and all crack effects are recomputed from geometry.",
+          "removed_devices": [],
+          "device_states": [],
+          "hidden_cracks": {
+            "items": [
+              {
+                "id": "HC1",
+                "width": 0.34,
+                "polyline": [
+                  [
+                    13.92,
+                    4.5
+                  ],
+                  [
+                    14.973,
+                    4.751
+                  ],
+                  [
+                    15.84,
+                    5.4
+                  ],
+                  [
+                    16.766,
+                    5.033
+                  ],
+                  [
+                    17.76,
+                    5.1
+                  ]
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "id": "U7",
+          "name": "Hidden cross crack",
+          "description": "A hidden longer crack is added and all crack effects are recomputed from geometry.",
+          "removed_devices": [
+            "O3"
+          ],
+          "device_states": [
+            {
+              "id": "O1",
+              "speed": 11.25
+            },
+            {
+              "id": "P1",
+              "speed": 6.375
+            }
+          ],
+          "hidden_cracks": {
+            "items": [
+              {
+                "id": "HC2",
+                "width": 0.48,
+                "polyline": [
+                  [
+                    14.88,
+                    4.8
+                  ],
+                  [
+                    16.8,
+                    6.0
+                  ],
+                  [
+                    18.72,
+                    5.7
+                  ],
+                  [
+                    19.545,
+                    6.623
+                  ],
+                  [
+                    20.64,
+                    7.2
+                  ]
+                ]
+              }
+            ]
+          }
+        }
       ]
     },
     {
       "id": "C12",
-      "name": "极端综合工况",
-      "description": "大规模、重度聚集和跨块裂纹、异构设备、精密资源紧张、紧工期",
+      "name": "Large severe bottleneck",
+      "description": "Large 8x6 board with many cracks and only one precision device.",
       "difficulty": "extreme",
       "deterministic_input": {
-        "random_seed": 20260725,
-        "board": {"width": 32.0, "height": 18.0, "m": 8, "n": 6, "base_value": 105.0},
+        "board": {
+          "width": 32,
+          "height": 18,
+          "m": 8,
+          "n": 6,
+          "base_value": 105
+        },
         "deadline": 3.8,
         "devices": [
-          {"id": "O1", "type": "ordinary", "speed": 17.0},
-          {"id": "O2", "type": "ordinary", "speed": 10.0},
-          {"id": "O3", "type": "ordinary", "speed": 7.0},
-          {"id": "P1", "type": "precision", "speed": 6.0}
+          {
+            "id": "O1",
+            "type": "ordinary",
+            "speed": 17
+          },
+          {
+            "id": "O2",
+            "type": "ordinary",
+            "speed": 12
+          },
+          {
+            "id": "O3",
+            "type": "ordinary",
+            "speed": 9
+          },
+          {
+            "id": "O4",
+            "type": "ordinary",
+            "speed": 6.5
+          },
+          {
+            "id": "P1",
+            "type": "precision",
+            "speed": 6
+          }
         ],
-        "values": {"r_ordinary": 1.2, "r_precision": 3.0, "default_same_precision_reward": 12.0, "default_precision_mismatch_penalty": 9.0, "default_cross_crack_loss": 5.0, "alpha": 1.2, "cross_crack_loss": {"B_3_3|B_4_3": 5.0, "B_4_3|B_5_3": 5.0, "B_5_4|B_6_4": 5.0, "B_6_4|B_7_4": 5.0}},
-        "cracks": {"mode": "direct", "blocks": {"B_2_2": {"C": 1, "CS": 0.62}, "B_3_3": {"C": 1, "CS": 0.80}, "B_4_3": {"C": 1, "CS": 0.76}, "B_5_3": {"C": 1, "CS": 0.70}, "B_5_4": {"C": 1, "CS": 0.82}, "B_6_4": {"C": 1, "CS": 0.74}, "B_7_4": {"C": 1, "CS": 0.68}, "B_7_5": {"C": 1, "CS": 0.78}, "B_8_5": {"C": 1, "CS": 0.66}}}
+        "values": {
+          "r_ordinary": 1.2,
+          "r_precision": 3.0,
+          "default_same_precision_reward": 12,
+          "default_precision_mismatch_penalty": 9,
+          "default_cross_crack_loss": 5,
+          "alpha": 1.2
+        },
+        "cracks": {
+          "mode": "geometry",
+          "epsilon": 0.08,
+          "R_max": 4.5,
+          "lambda_b": 5,
+          "items": [
+            {
+              "id": "OC1",
+              "width": 0.62,
+              "polyline": [
+                [
+                  3.84,
+                  3.24
+                ],
+                [
+                  8.0,
+                  5.04
+                ],
+                [
+                  12.16,
+                  6.84
+                ],
+                [
+                  16.64,
+                  8.46
+                ],
+                [
+                  21.12,
+                  9.9
+                ]
+              ]
+            },
+            {
+              "id": "OC2",
+              "width": 0.6,
+              "polyline": [
+                [
+                  10.24,
+                  12.96
+                ],
+                [
+                  13.44,
+                  11.16
+                ],
+                [
+                  17.6,
+                  11.88
+                ],
+                [
+                  22.4,
+                  10.44
+                ],
+                [
+                  27.52,
+                  8.64
+                ]
+              ]
+            },
+            {
+              "id": "OC3",
+              "width": 0.56,
+              "polyline": [
+                [
+                  15.36,
+                  1.8
+                ],
+                [
+                  16.32,
+                  5.04
+                ],
+                [
+                  15.04,
+                  8.1
+                ],
+                [
+                  16.96,
+                  11.16
+                ],
+                [
+                  16.0,
+                  14.76
+                ]
+              ]
+            },
+            {
+              "id": "OC4",
+              "width": 0.52,
+              "polyline": [
+                [
+                  19.2,
+                  3.6
+                ],
+                [
+                  20.692,
+                  4.692
+                ],
+                [
+                  22.4,
+                  5.4
+                ],
+                [
+                  24.96,
+                  7.56
+                ],
+                [
+                  28.16,
+                  9.36
+                ]
+              ]
+            },
+            {
+              "id": "OC5",
+              "width": 0.48,
+              "polyline": [
+                [
+                  5.76,
+                  15.84
+                ],
+                [
+                  8.96,
+                  13.68
+                ],
+                [
+                  13.44,
+                  12.6
+                ],
+                [
+                  15.747,
+                  12.089
+                ],
+                [
+                  17.92,
+                  11.16
+                ]
+              ]
+            }
+          ]
+        }
       },
       "uncertainty_scenarios": [
-        {"id": "U0", "name": "无扰动基准", "description": "保持确定性输入", "removed_devices": [], "device_states": [], "crack_updates": {}, "edge_loss_updates": {}},
-        {"id": "U1", "name": "设备轻度整体降速", "description": "多台设备小幅降速", "removed_devices": [], "device_states": [{"id": "O1", "speed": 15.0}, {"id": "O2", "speed": 9.0}, {"id": "P1", "speed": 5.4}], "crack_updates": {}, "edge_loss_updates": {}},
-        {"id": "U2", "name": "精密设备性能下降", "description": "唯一精密设备速度明显下降", "removed_devices": [], "device_states": [{"id": "P1", "speed": 4.0}], "crack_updates": {}, "edge_loss_updates": {}},
-        {"id": "U3", "name": "普通设备性能下降", "description": "普通设备速度明显下降", "removed_devices": [], "device_states": [{"id": "O1", "speed": 12.5}, {"id": "O2", "speed": 7.5}, {"id": "O3", "speed": 5.0}], "crack_updates": {}, "edge_loss_updates": {}},
-        {"id": "U4", "name": "普通设备故障", "description": "一台普通设备不可用", "removed_devices": ["O3"], "device_states": [], "crack_updates": {}, "edge_loss_updates": {}},
-        {"id": "U5", "name": "精密设备故障", "description": "唯一精密设备不可用", "removed_devices": ["P1"], "device_states": [], "crack_updates": {}, "edge_loss_updates": {}},
-        {"id": "U6", "name": "新增隐藏裂纹", "description": "新增严重隐藏裂纹", "removed_devices": [], "device_states": [], "crack_updates": {"B_6_5": {"C": 1, "CS": 0.84}, "B_8_4": {"C": 1, "CS": 0.76}}, "edge_loss_updates": {"B_6_4|B_6_5": 6.0, "B_8_4|B_8_5": 6.0}},
-        {"id": "U7", "name": "综合严重扰动", "description": "极端工况下复合扰动", "removed_devices": ["O3"], "device_states": [{"id": "O1", "speed": 13.0}, {"id": "P1", "speed": 4.2}], "crack_updates": {"B_6_5": {"C": 1, "CS": 0.90}, "B_8_4": {"C": 1, "CS": 0.84}, "B_4_4": {"C": 1, "CS": 0.78}}, "edge_loss_updates": {"B_6_4|B_6_5": 7.0, "B_8_4|B_8_5": 7.0, "B_4_3|B_4_4": 6.0}}
+        {
+          "id": "U0",
+          "name": "Base scenario",
+          "description": "No hidden cracks and no equipment change.",
+          "removed_devices": [],
+          "device_states": [],
+          "hidden_cracks": {
+            "items": []
+          }
+        },
+        {
+          "id": "U1",
+          "name": "Ordinary slowdown",
+          "description": "Ordinary devices slow down under processing pressure.",
+          "removed_devices": [],
+          "device_states": [
+            {
+              "id": "O1",
+              "speed": 15.3
+            },
+            {
+              "id": "O2",
+              "speed": 10.8
+            },
+            {
+              "id": "O3",
+              "speed": 8.1
+            }
+          ],
+          "hidden_cracks": {
+            "items": []
+          }
+        },
+        {
+          "id": "U2",
+          "name": "Precision slowdown",
+          "description": "Precision devices slow down under higher precision difficulty.",
+          "removed_devices": [],
+          "device_states": [
+            {
+              "id": "P1",
+              "speed": 4.2
+            }
+          ],
+          "hidden_cracks": {
+            "items": []
+          }
+        },
+        {
+          "id": "U3",
+          "name": "Mixed slowdown",
+          "description": "Both ordinary and precision devices become slower.",
+          "removed_devices": [],
+          "device_states": [
+            {
+              "id": "O1",
+              "speed": 12.24
+            },
+            {
+              "id": "O2",
+              "speed": 8.64
+            },
+            {
+              "id": "O3",
+              "speed": 6.48
+            },
+            {
+              "id": "O4",
+              "speed": 4.68
+            }
+          ],
+          "hidden_cracks": {
+            "items": []
+          }
+        },
+        {
+          "id": "U4",
+          "name": "One ordinary failure",
+          "description": "One ordinary device is unavailable.",
+          "removed_devices": [
+            "O4"
+          ],
+          "device_states": [],
+          "hidden_cracks": {
+            "items": []
+          }
+        },
+        {
+          "id": "U5",
+          "name": "One precision failure",
+          "description": "One precision device is unavailable if present.",
+          "removed_devices": [
+            "P1"
+          ],
+          "device_states": [],
+          "hidden_cracks": {
+            "items": []
+          }
+        },
+        {
+          "id": "U6",
+          "name": "Hidden local crack",
+          "description": "A hidden local crack is added and all crack effects are recomputed from geometry.",
+          "removed_devices": [],
+          "device_states": [],
+          "hidden_cracks": {
+            "items": [
+              {
+                "id": "HC1",
+                "width": 0.34,
+                "polyline": [
+                  [
+                    18.56,
+                    5.4
+                  ],
+                  [
+                    19.926,
+                    5.737
+                  ],
+                  [
+                    21.12,
+                    6.48
+                  ],
+                  [
+                    22.369,
+                    6.082
+                  ],
+                  [
+                    23.68,
+                    6.12
+                  ]
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "id": "U7",
+          "name": "Hidden cross crack",
+          "description": "A hidden longer crack is added and all crack effects are recomputed from geometry.",
+          "removed_devices": [
+            "O4"
+          ],
+          "device_states": [
+            {
+              "id": "O1",
+              "speed": 12.75
+            },
+            {
+              "id": "P1",
+              "speed": 4.5
+            }
+          ],
+          "hidden_cracks": {
+            "items": [
+              {
+                "id": "HC2",
+                "width": 0.48,
+                "polyline": [
+                  [
+                    19.84,
+                    5.76
+                  ],
+                  [
+                    22.4,
+                    7.2
+                  ],
+                  [
+                    24.96,
+                    6.84
+                  ],
+                  [
+                    26.113,
+                    7.92
+                  ],
+                  [
+                    27.52,
+                    8.64
+                  ]
+                ]
+              }
+            ]
+          }
+        }
       ]
     }
   ]
