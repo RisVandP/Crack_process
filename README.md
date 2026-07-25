@@ -127,45 +127,6 @@ python -m src.experiment --config configs/example.json --output outputs/experime
 
 综合得分权重从 `configs/example.json` 的 `evaluation_weights` 读取，不写死在 Python 中。
 
-## 辅助实验入口
-
-当前的快速调试入口仍是：
-
-```bash
-python -m src.exp_grid --config configs/exp_grid.json --output outputs/grid_exp
-```
-
-输出包括：
-
-- `grid_rows.csv`
-- `grid_sum.csv`
-- `grid_sum.json`
-- `obj_by_alg.png`
-- `rt_by_alg.png`
-- `gap_by_alg.png`
-- `GRID_ANALYSIS.md`
-
-`configs/exp_grid.json` 仅用于快速调试旧的网格实验，不作为正式实验设计入口。
-
-## 单实例压力评价
-
-确定性算法先基于当前观测参数生成方案；随后用多组梯度场景评价同一方案在不同参数扰动下的表现。这里的场景不带发生概率，作用是分析算法在什么条件下表现较好或较差，并探索算法适用范围：
-
-```bash
-python -m src.scn_eval --config configs/scn_grid.json --output outputs/scn_eval --method all
-```
-
-压力测试配置文件中，每个等级只描述对已有确定性输入的修改，例如移除某台设备、降低设备速度、更新隐藏裂纹严重程度和跨块裂纹损失。示例配置采用 `S0-基准`、`S1-轻度扰动`、`S2-中度扰动`、`S3-重度扰动` 的梯度设计，确定性求解逻辑不因压力评价而改变。
-
-`configs/scn_grid.json` 和 `src.scn_eval` 是单实例兼容入口；正式 12 组合 × 8 情景实验请使用 `configs/example.json` 和 `src.experiment`。
-
-输出包括：
-
-- `scn_rows.csv`
-- `scn_sum.csv`
-- `scn_sum.json`
-- `scn_plot.png`
-
 ## JSON 输入
 
 核心字段：

@@ -14,9 +14,7 @@ from src.feasibility_checker import check_solution
 from src.greedy_baselines import solve_value_density_first, solve_value_first
 from src.marginal_greedy import solve_marginal_greedy
 from src.method_comparison import run_method_comparison
-from src.exp_grid import run_grid_exp
 from src.solution_evaluator import objective_breakdown
-from src.scn_eval import load_scn_cfg, run_scn_eval
 
 
 def comparison_raw_instance():
@@ -163,76 +161,3 @@ def test_source_and_requirements_do_not_reference_package_solvers():
     for token in banned:
         assert token not in text
 
-
-def test_scn_eval_outputs(tmp_path):
-    base_path = tmp_path / "small_scn_base.json"
-    base_path.write_text(json.dumps(comparison_raw_instance(), ensure_ascii=False), encoding="utf-8")
-    scn_cfg = {
-        "base_config": str(base_path),
-        "scenarios": [
-            {
-                "id": "normal",
-                "level": "S0-基准",
-                "description": "基准",
-                "removed_devices": [],
-                "speed_multiplier": {},
-                "crack_updates": {},
-                "edge_loss_updates": {},
-            },
-            {
-                "id": "stress",
-                "level": "S1-扰动",
-                "description": "设备变慢和裂缝加重",
-                "removed_devices": [],
-                "speed_multiplier": {"P_slow": 0.8},
-                "crack_updates": {"B_2_1": {"C": 1, "CS": 0.4}},
-                "edge_loss_updates": {"B_1_1|B_2_1": 1.0},
-            },
-        ],
-    }
-    scn_path = tmp_path / "small_scn.json"
-    scn_path.write_text(json.dumps(scn_cfg, ensure_ascii=False), encoding="utf-8")
-    summaries = run_scn_eval(scn_path, tmp_path, method="all")
-    assert {row["method"] for row in summaries} == {"VF", "VDF", "MG", "CNAG-LS"}
-    for row in summaries:
-        assert "average_scenario_value" in row
-        assert "worst_value" in row
-        assert "value_range" in row
-    assert (tmp_path / "scn_rows.csv").exists()
-    assert (tmp_path / "scn_sum.json").exists()
-
-
-def test_scn_config_uses_gradient_levels_not_probabilities():
-    _, scenarios = load_scn_cfg("configs/scn_grid.json")
-    assert [s.level for s in scenarios] == ["S0-基准", "S1-轻度扰动", "S2-中度扰动", "S3-重度扰动"]
-
-
-def test_grid_experiment_config_has_clear_gradients(tmp_path):
-    cfg = {
-        "random_seed": 20260724,
-        "reps": 1,
-        "boards": {
-            "S_sparse": {"width": 8.0, "height": 6.0, "m": 2, "n": 2, "base_value": 80.0},
-            "M_regular": {"width": 10.0, "height": 6.0, "m": 3, "n": 2, "base_value": 90.0},
-        },
-        "time": {"tight": 0.45, "loose": 0.90},
-        "cracks": {
-            "few_light": {"rate": 0.10, "max_cs": 0.25, "pattern": "random"},
-            "cross_heavy": {"rate": 0.45, "max_cs": 0.75, "pattern": "band"},
-        },
-        "adj": {"weak": {"same": 2.0, "diff": 1.0, "cross": 0.5}},
-        "devs": {
-            "balanced": {"ordinary": [12.0, 10.0], "precision": [7.0]},
-            "hetero_old": {"ordinary": [15.0, 6.0], "precision": [8.0, 4.0]},
-        },
-    }
-    cfg_path = tmp_path / "mini_grid.json"
-    cfg_path.write_text(json.dumps(cfg, ensure_ascii=False), encoding="utf-8")
-    rows, summary = run_grid_exp(cfg_path, tmp_path)
-    assert rows
-    assert summary
-    assert {row["board"] for row in rows} == {"S_sparse", "M_regular"}
-    assert {row["time"] for row in rows} == {"tight", "loose"}
-    assert {row["crack"] for row in rows} == {"few_light", "cross_heavy"}
-    assert (tmp_path / "grid_rows.csv").exists()
-    assert (tmp_path / "grid_sum.json").exists()
