@@ -4,9 +4,9 @@ import time
 from dataclasses import dataclass
 from typing import Optional
 
-from .data_models import BlockId, DeviceId, ProblemData, Solution
-from .deterministic_model import processing_time
-from .solution_utils import apply_task_copy, device_loads, empty_solution, finalize_solution, is_block_processed
+from ..data_models import BlockId, DeviceId, ProblemData, Solution
+from ..deterministic_model import processing_time
+from ..solution_utils import apply_task_copy, device_loads, empty_solution, finalize_solution, is_block_processed
 
 
 TOL = 1e-9
@@ -23,6 +23,7 @@ class MarginalMove:
 
 
 def solve_marginal_greedy(data: ProblemData, method_name: str = "MG") -> Solution:
+    # 逐轮选择当前边际收益密度最高的可行加工任务。
     """动态边际收益贪心。
 
     每轮重新枚举可行候选，按 DeltaF / 加工时间选择正收益候选。
@@ -45,6 +46,7 @@ def solve_marginal_greedy(data: ProblemData, method_name: str = "MG") -> Solutio
 
 
 def best_marginal_single_move(data: ProblemData, solution: Solution) -> Optional[MarginalMove]:
+    # 在当前方案下寻找最优的单块边际插入动作。
     loads = device_loads(data, solution)
     incident_edges = _incident_edges(data)
     best: Optional[MarginalMove] = None
@@ -67,6 +69,7 @@ def best_marginal_single_move(data: ProblemData, solution: Solution) -> Optional
 
 
 def _incident_edges(data: ProblemData) -> dict[BlockId, list[tuple[BlockId, tuple[BlockId, BlockId]]]]:
+    # 为每个木块预先整理与其相连的相邻边。
     incident = {u: [] for u in data.block_ids}
     for edge in data.edges:
         u, v = edge
@@ -76,6 +79,7 @@ def _incident_edges(data: ProblemData) -> dict[BlockId, list[tuple[BlockId, tupl
 
 
 def _single_move_delta(data: ProblemData, solution: Solution, block_id: BlockId, process_type: str, incident_edges) -> float:
+    # 精确计算加入一个单块任务带来的目标函数增量。
     area = data.board.area_per_block
     if process_type == "ordinary":
         return area * data.values.r_ordinary
@@ -94,6 +98,7 @@ def _single_move_delta(data: ProblemData, solution: Solution, block_id: BlockId,
 
 
 def _is_better_move(move: MarginalMove, best: Optional[MarginalMove]) -> bool:
+    # 按收益密度、增量和稳定字典序比较两个候选动作。
     if best is None:
         return True
     key = (-move.score, -move.delta, move.duration, move.block_id, move.device_id, 0 if move.process_type == "ordinary" else 1)

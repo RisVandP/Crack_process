@@ -16,8 +16,8 @@
   "cases": [
     {
       "id": "C01",
-      "name": "Baseline medium board",
-      "description": "Standard 6x5 board with moderate crack density and balanced devices.",
+      "name": "中等规模基准",
+      "description": "6×5中等规模木板，裂纹密度适中，普通设备与精密设备配置较均衡。",
       "difficulty": "standard",
       "deterministic_input": {
         "board": {
@@ -127,8 +127,8 @@
       "uncertainty_scenarios": [
         {
           "id": "U0",
-          "name": "Base scenario",
-          "description": "No hidden cracks and no equipment change.",
+          "name": "基准情景",
+          "description": "不加入隐藏裂纹，也不改变设备状态。",
           "removed_devices": [],
           "device_states": [],
           "hidden_cracks": {
@@ -137,8 +137,8 @@
         },
         {
           "id": "U1",
-          "name": "Ordinary slowdown",
-          "description": "Ordinary devices slow down under processing pressure.",
+          "name": "普通设备降速",
+          "description": "普通加工设备受压力影响，处理速度下降。",
           "removed_devices": [],
           "device_states": [
             {
@@ -160,8 +160,8 @@
         },
         {
           "id": "U2",
-          "name": "Precision slowdown",
-          "description": "Precision devices slow down under higher precision difficulty.",
+          "name": "精密设备降速",
+          "description": "精密加工设备受精度要求影响，处理速度下降。",
           "removed_devices": [],
           "device_states": [
             {
@@ -179,8 +179,8 @@
         },
         {
           "id": "U3",
-          "name": "Mixed slowdown",
-          "description": "Both ordinary and precision devices become slower.",
+          "name": "设备混合降速",
+          "description": "普通设备与精密设备同时出现处理速度下降。",
           "removed_devices": [],
           "device_states": [
             {
@@ -202,8 +202,8 @@
         },
         {
           "id": "U4",
-          "name": "One ordinary failure",
-          "description": "One ordinary device is unavailable.",
+          "name": "一台普通设备故障",
+          "description": "一台普通加工设备不可用，用于评估普通加工资源缺失的影响。",
           "removed_devices": [
             "O3"
           ],
@@ -214,8 +214,8 @@
         },
         {
           "id": "U5",
-          "name": "One precision failure",
-          "description": "One precision device is unavailable if present.",
+          "name": "一台精密设备故障",
+          "description": "若存在精密设备，则一台精密加工设备不可用。",
           "removed_devices": [
             "P2"
           ],
@@ -226,8 +226,8 @@
         },
         {
           "id": "U6",
-          "name": "Hidden local crack",
-          "description": "A hidden local crack is added and all crack effects are recomputed from geometry.",
+          "name": "隐藏局部裂纹",
+          "description": "加入一条局部隐藏裂纹，并根据完整裂纹几何重新计算裂纹影响。",
           "removed_devices": [],
           "device_states": [],
           "hidden_cracks": {
@@ -263,8 +263,8 @@
         },
         {
           "id": "U7",
-          "name": "Hidden cross crack",
-          "description": "A hidden longer crack is added and all crack effects are recomputed from geometry.",
+          "name": "隐藏跨区裂纹",
+          "description": "加入一条较长的跨区隐藏裂纹，并根据完整裂纹几何重新计算裂纹影响。",
           "removed_devices": [
             "O3"
           ],
@@ -313,8 +313,8 @@
     },
     {
       "id": "C02",
-      "name": "Small loose schedule",
-      "description": "Small 4x3 board with fewer cracks and a more relaxed deadline.",
+      "name": "小规模宽松工期",
+      "description": "4×3小规模木板，裂纹数量较少，工期相对宽松。",
       "difficulty": "easy",
       "deterministic_input": {
         "board": {
@@ -393,8 +393,8 @@
       "uncertainty_scenarios": [
         {
           "id": "U0",
-          "name": "Base scenario",
-          "description": "No hidden cracks and no equipment change.",
+          "name": "基准情景",
+          "description": "不加入隐藏裂纹，也不改变设备状态。",
           "removed_devices": [],
           "device_states": [],
           "hidden_cracks": {
@@ -403,8 +403,8 @@
         },
         {
           "id": "U1",
-          "name": "Ordinary slowdown",
-          "description": "Ordinary devices slow down under processing pressure.",
+          "name": "普通设备降速",
+          "description": "普通加工设备受压力影响，处理速度下降。",
           "removed_devices": [],
           "device_states": [
             {
@@ -426,8 +426,8 @@
         },
         {
           "id": "U2",
-          "name": "Precision slowdown",
-          "description": "Precision devices slow down under higher precision difficulty.",
+          "name": "精密设备降速",
+          "description": "精密加工设备受精度要求影响，处理速度下降。",
           "removed_devices": [],
           "device_states": [
             {
@@ -445,8 +445,8 @@
         },
         {
           "id": "U3",
-          "name": "Mixed slowdown",
-          "description": "Both ordinary and precision devices become slower.",
+          "name": "设备混合降速",
+          "description": "普通设备与精密设备同时出现处理速度下降。",
           "removed_devices": [],
           "device_states": [
             {
@@ -464,8 +464,8 @@
         },
         {
           "id": "U4",
-          "name": "One ordinary failure",
-          "description": "One ordinary device is unavailable.",
+          "name": "一台普通设备故障",
+          "description": "一台普通加工设备不可用，用于评估普通加工资源缺失的影响。",
           "removed_devices": [
             "O2"
           ],
@@ -476,8 +476,8 @@
         },
         {
           "id": "U5",
-          "name": "One precision failure",
-          "description": "One precision device is unavailable if present.",
+          "name": "一台精密设备故障",
+          "description": "若存在精密设备，则一台精密加工设备不可用。",
           "removed_devices": [
             "P2"
           ],
@@ -488,8 +488,8 @@
         },
         {
           "id": "U6",
-          "name": "Hidden local crack",
-          "description": "A hidden local crack is added and all crack effects are recomputed from geometry.",
+          "name": "隐藏局部裂纹",
+          "description": "加入一条局部隐藏裂纹，并根据完整裂纹几何重新计算裂纹影响。",
           "removed_devices": [],
           "device_states": [],
           "hidden_cracks": {
@@ -525,8 +525,8 @@
         },
         {
           "id": "U7",
-          "name": "Hidden cross crack",
-          "description": "A hidden longer crack is added and all crack effects are recomputed from geometry.",
+          "name": "隐藏跨区裂纹",
+          "description": "加入一条较长的跨区隐藏裂纹，并根据完整裂纹几何重新计算裂纹影响。",
           "removed_devices": [
             "O2"
           ],
@@ -575,8 +575,8 @@
     },
     {
       "id": "C03",
-      "name": "Large high capacity",
-      "description": "Large 8x6 board with more devices and a visible but limited precision capacity.",
+      "name": "大规模高设备能力",
+      "description": "8×6大规模木板，设备数量较多，但精密加工能力仍明显受限。",
       "difficulty": "standard_large",
       "deterministic_input": {
         "board": {
@@ -727,8 +727,8 @@
       "uncertainty_scenarios": [
         {
           "id": "U0",
-          "name": "Base scenario",
-          "description": "No hidden cracks and no equipment change.",
+          "name": "基准情景",
+          "description": "不加入隐藏裂纹，也不改变设备状态。",
           "removed_devices": [],
           "device_states": [],
           "hidden_cracks": {
@@ -737,8 +737,8 @@
         },
         {
           "id": "U1",
-          "name": "Ordinary slowdown",
-          "description": "Ordinary devices slow down under processing pressure.",
+          "name": "普通设备降速",
+          "description": "普通加工设备受压力影响，处理速度下降。",
           "removed_devices": [],
           "device_states": [
             {
@@ -760,8 +760,8 @@
         },
         {
           "id": "U2",
-          "name": "Precision slowdown",
-          "description": "Precision devices slow down under higher precision difficulty.",
+          "name": "精密设备降速",
+          "description": "精密加工设备受精度要求影响，处理速度下降。",
           "removed_devices": [],
           "device_states": [
             {
@@ -783,8 +783,8 @@
         },
         {
           "id": "U3",
-          "name": "Mixed slowdown",
-          "description": "Both ordinary and precision devices become slower.",
+          "name": "设备混合降速",
+          "description": "普通设备与精密设备同时出现处理速度下降。",
           "removed_devices": [],
           "device_states": [
             {
@@ -814,8 +814,8 @@
         },
         {
           "id": "U4",
-          "name": "One ordinary failure",
-          "description": "One ordinary device is unavailable.",
+          "name": "一台普通设备故障",
+          "description": "一台普通加工设备不可用，用于评估普通加工资源缺失的影响。",
           "removed_devices": [
             "O5"
           ],
@@ -826,8 +826,8 @@
         },
         {
           "id": "U5",
-          "name": "One precision failure",
-          "description": "One precision device is unavailable if present.",
+          "name": "一台精密设备故障",
+          "description": "若存在精密设备，则一台精密加工设备不可用。",
           "removed_devices": [
             "P3"
           ],
@@ -838,8 +838,8 @@
         },
         {
           "id": "U6",
-          "name": "Hidden local crack",
-          "description": "A hidden local crack is added and all crack effects are recomputed from geometry.",
+          "name": "隐藏局部裂纹",
+          "description": "加入一条局部隐藏裂纹，并根据完整裂纹几何重新计算裂纹影响。",
           "removed_devices": [],
           "device_states": [],
           "hidden_cracks": {
@@ -875,8 +875,8 @@
         },
         {
           "id": "U7",
-          "name": "Hidden cross crack",
-          "description": "A hidden longer crack is added and all crack effects are recomputed from geometry.",
+          "name": "隐藏跨区裂纹",
+          "description": "加入一条较长的跨区隐藏裂纹，并根据完整裂纹几何重新计算裂纹影响。",
           "removed_devices": [
             "O5"
           ],
@@ -925,8 +925,8 @@
     },
     {
       "id": "C04",
-      "name": "Large tight schedule",
-      "description": "Large 8x6 board with fewer devices and a tight deadline.",
+      "name": "大规模紧工期",
+      "description": "8×6大规模木板，设备数量减少且工期更紧。",
       "difficulty": "tight_large",
       "deterministic_input": {
         "board": {
@@ -1067,8 +1067,8 @@
       "uncertainty_scenarios": [
         {
           "id": "U0",
-          "name": "Base scenario",
-          "description": "No hidden cracks and no equipment change.",
+          "name": "基准情景",
+          "description": "不加入隐藏裂纹，也不改变设备状态。",
           "removed_devices": [],
           "device_states": [],
           "hidden_cracks": {
@@ -1077,8 +1077,8 @@
         },
         {
           "id": "U1",
-          "name": "Ordinary slowdown",
-          "description": "Ordinary devices slow down under processing pressure.",
+          "name": "普通设备降速",
+          "description": "普通加工设备受压力影响，处理速度下降。",
           "removed_devices": [],
           "device_states": [
             {
@@ -1100,8 +1100,8 @@
         },
         {
           "id": "U2",
-          "name": "Precision slowdown",
-          "description": "Precision devices slow down under higher precision difficulty.",
+          "name": "精密设备降速",
+          "description": "精密加工设备受精度要求影响，处理速度下降。",
           "removed_devices": [],
           "device_states": [
             {
@@ -1119,8 +1119,8 @@
         },
         {
           "id": "U3",
-          "name": "Mixed slowdown",
-          "description": "Both ordinary and precision devices become slower.",
+          "name": "设备混合降速",
+          "description": "普通设备与精密设备同时出现处理速度下降。",
           "removed_devices": [],
           "device_states": [
             {
@@ -1146,8 +1146,8 @@
         },
         {
           "id": "U4",
-          "name": "One ordinary failure",
-          "description": "One ordinary device is unavailable.",
+          "name": "一台普通设备故障",
+          "description": "一台普通加工设备不可用，用于评估普通加工资源缺失的影响。",
           "removed_devices": [
             "O4"
           ],
@@ -1158,8 +1158,8 @@
         },
         {
           "id": "U5",
-          "name": "One precision failure",
-          "description": "One precision device is unavailable if present.",
+          "name": "一台精密设备故障",
+          "description": "若存在精密设备，则一台精密加工设备不可用。",
           "removed_devices": [
             "P2"
           ],
@@ -1170,8 +1170,8 @@
         },
         {
           "id": "U6",
-          "name": "Hidden local crack",
-          "description": "A hidden local crack is added and all crack effects are recomputed from geometry.",
+          "name": "隐藏局部裂纹",
+          "description": "加入一条局部隐藏裂纹，并根据完整裂纹几何重新计算裂纹影响。",
           "removed_devices": [],
           "device_states": [],
           "hidden_cracks": {
@@ -1207,8 +1207,8 @@
         },
         {
           "id": "U7",
-          "name": "Hidden cross crack",
-          "description": "A hidden longer crack is added and all crack effects are recomputed from geometry.",
+          "name": "隐藏跨区裂纹",
+          "description": "加入一条较长的跨区隐藏裂纹，并根据完整裂纹几何重新计算裂纹影响。",
           "removed_devices": [
             "O4"
           ],
@@ -1257,8 +1257,8 @@
     },
     {
       "id": "C05",
-      "name": "Dense cracks",
-      "description": "Medium board with four observed cracks and stronger crack influence.",
+      "name": "裂纹密集场景",
+      "description": "6×5中等规模木板，观测裂纹数量较多，裂纹影响更强。",
       "difficulty": "damaged",
       "deterministic_input": {
         "board": {
@@ -1420,8 +1420,8 @@
       "uncertainty_scenarios": [
         {
           "id": "U0",
-          "name": "Base scenario",
-          "description": "No hidden cracks and no equipment change.",
+          "name": "基准情景",
+          "description": "不加入隐藏裂纹，也不改变设备状态。",
           "removed_devices": [],
           "device_states": [],
           "hidden_cracks": {
@@ -1430,8 +1430,8 @@
         },
         {
           "id": "U1",
-          "name": "Ordinary slowdown",
-          "description": "Ordinary devices slow down under processing pressure.",
+          "name": "普通设备降速",
+          "description": "普通加工设备受压力影响，处理速度下降。",
           "removed_devices": [],
           "device_states": [
             {
@@ -1453,8 +1453,8 @@
         },
         {
           "id": "U2",
-          "name": "Precision slowdown",
-          "description": "Precision devices slow down under higher precision difficulty.",
+          "name": "精密设备降速",
+          "description": "精密加工设备受精度要求影响，处理速度下降。",
           "removed_devices": [],
           "device_states": [
             {
@@ -1472,8 +1472,8 @@
         },
         {
           "id": "U3",
-          "name": "Mixed slowdown",
-          "description": "Both ordinary and precision devices become slower.",
+          "name": "设备混合降速",
+          "description": "普通设备与精密设备同时出现处理速度下降。",
           "removed_devices": [],
           "device_states": [
             {
@@ -1495,8 +1495,8 @@
         },
         {
           "id": "U4",
-          "name": "One ordinary failure",
-          "description": "One ordinary device is unavailable.",
+          "name": "一台普通设备故障",
+          "description": "一台普通加工设备不可用，用于评估普通加工资源缺失的影响。",
           "removed_devices": [
             "O3"
           ],
@@ -1507,8 +1507,8 @@
         },
         {
           "id": "U5",
-          "name": "One precision failure",
-          "description": "One precision device is unavailable if present.",
+          "name": "一台精密设备故障",
+          "description": "若存在精密设备，则一台精密加工设备不可用。",
           "removed_devices": [
             "P2"
           ],
@@ -1519,8 +1519,8 @@
         },
         {
           "id": "U6",
-          "name": "Hidden local crack",
-          "description": "A hidden local crack is added and all crack effects are recomputed from geometry.",
+          "name": "隐藏局部裂纹",
+          "description": "加入一条局部隐藏裂纹，并根据完整裂纹几何重新计算裂纹影响。",
           "removed_devices": [],
           "device_states": [],
           "hidden_cracks": {
@@ -1556,8 +1556,8 @@
         },
         {
           "id": "U7",
-          "name": "Hidden cross crack",
-          "description": "A hidden longer crack is added and all crack effects are recomputed from geometry.",
+          "name": "隐藏跨区裂纹",
+          "description": "加入一条较长的跨区隐藏裂纹，并根据完整裂纹几何重新计算裂纹影响。",
           "removed_devices": [
             "O3"
           ],
@@ -1606,8 +1606,8 @@
     },
     {
       "id": "C06",
-      "name": "Severe cracks",
-      "description": "Medium board with severe observed cracks and slightly tight time.",
+      "name": "严重裂纹场景",
+      "description": "6×5中等规模木板，裂纹破坏程度更高，工期略紧。",
       "difficulty": "clustered",
       "deterministic_input": {
         "board": {
@@ -1769,8 +1769,8 @@
       "uncertainty_scenarios": [
         {
           "id": "U0",
-          "name": "Base scenario",
-          "description": "No hidden cracks and no equipment change.",
+          "name": "基准情景",
+          "description": "不加入隐藏裂纹，也不改变设备状态。",
           "removed_devices": [],
           "device_states": [],
           "hidden_cracks": {
@@ -1779,8 +1779,8 @@
         },
         {
           "id": "U1",
-          "name": "Ordinary slowdown",
-          "description": "Ordinary devices slow down under processing pressure.",
+          "name": "普通设备降速",
+          "description": "普通加工设备受压力影响，处理速度下降。",
           "removed_devices": [],
           "device_states": [
             {
@@ -1802,8 +1802,8 @@
         },
         {
           "id": "U2",
-          "name": "Precision slowdown",
-          "description": "Precision devices slow down under higher precision difficulty.",
+          "name": "精密设备降速",
+          "description": "精密加工设备受精度要求影响，处理速度下降。",
           "removed_devices": [],
           "device_states": [
             {
@@ -1821,8 +1821,8 @@
         },
         {
           "id": "U3",
-          "name": "Mixed slowdown",
-          "description": "Both ordinary and precision devices become slower.",
+          "name": "设备混合降速",
+          "description": "普通设备与精密设备同时出现处理速度下降。",
           "removed_devices": [],
           "device_states": [
             {
@@ -1844,8 +1844,8 @@
         },
         {
           "id": "U4",
-          "name": "One ordinary failure",
-          "description": "One ordinary device is unavailable.",
+          "name": "一台普通设备故障",
+          "description": "一台普通加工设备不可用，用于评估普通加工资源缺失的影响。",
           "removed_devices": [
             "O3"
           ],
@@ -1856,8 +1856,8 @@
         },
         {
           "id": "U5",
-          "name": "One precision failure",
-          "description": "One precision device is unavailable if present.",
+          "name": "一台精密设备故障",
+          "description": "若存在精密设备，则一台精密加工设备不可用。",
           "removed_devices": [
             "P2"
           ],
@@ -1868,8 +1868,8 @@
         },
         {
           "id": "U6",
-          "name": "Hidden local crack",
-          "description": "A hidden local crack is added and all crack effects are recomputed from geometry.",
+          "name": "隐藏局部裂纹",
+          "description": "加入一条局部隐藏裂纹，并根据完整裂纹几何重新计算裂纹影响。",
           "removed_devices": [],
           "device_states": [],
           "hidden_cracks": {
@@ -1905,8 +1905,8 @@
         },
         {
           "id": "U7",
-          "name": "Hidden cross crack",
-          "description": "A hidden longer crack is added and all crack effects are recomputed from geometry.",
+          "name": "隐藏跨区裂纹",
+          "description": "加入一条较长的跨区隐藏裂纹，并根据完整裂纹几何重新计算裂纹影响。",
           "removed_devices": [
             "O3"
           ],
@@ -1955,8 +1955,8 @@
     },
     {
       "id": "C07",
-      "name": "Wide board",
-      "description": "7x5 board to test scale and horizontal crack distribution.",
+      "name": "宽幅木板场景",
+      "description": "7×5木板，用于考察更宽分块下的规模变化和横向裂纹分布影响。",
       "difficulty": "cross_region",
       "deterministic_input": {
         "board": {
@@ -2105,8 +2105,8 @@
       "uncertainty_scenarios": [
         {
           "id": "U0",
-          "name": "Base scenario",
-          "description": "No hidden cracks and no equipment change.",
+          "name": "基准情景",
+          "description": "不加入隐藏裂纹，也不改变设备状态。",
           "removed_devices": [],
           "device_states": [],
           "hidden_cracks": {
@@ -2115,8 +2115,8 @@
         },
         {
           "id": "U1",
-          "name": "Ordinary slowdown",
-          "description": "Ordinary devices slow down under processing pressure.",
+          "name": "普通设备降速",
+          "description": "普通加工设备受压力影响，处理速度下降。",
           "removed_devices": [],
           "device_states": [
             {
@@ -2138,8 +2138,8 @@
         },
         {
           "id": "U2",
-          "name": "Precision slowdown",
-          "description": "Precision devices slow down under higher precision difficulty.",
+          "name": "精密设备降速",
+          "description": "精密加工设备受精度要求影响，处理速度下降。",
           "removed_devices": [],
           "device_states": [
             {
@@ -2157,8 +2157,8 @@
         },
         {
           "id": "U3",
-          "name": "Mixed slowdown",
-          "description": "Both ordinary and precision devices become slower.",
+          "name": "设备混合降速",
+          "description": "普通设备与精密设备同时出现处理速度下降。",
           "removed_devices": [],
           "device_states": [
             {
@@ -2184,8 +2184,8 @@
         },
         {
           "id": "U4",
-          "name": "One ordinary failure",
-          "description": "One ordinary device is unavailable.",
+          "name": "一台普通设备故障",
+          "description": "一台普通加工设备不可用，用于评估普通加工资源缺失的影响。",
           "removed_devices": [
             "O4"
           ],
@@ -2196,8 +2196,8 @@
         },
         {
           "id": "U5",
-          "name": "One precision failure",
-          "description": "One precision device is unavailable if present.",
+          "name": "一台精密设备故障",
+          "description": "若存在精密设备，则一台精密加工设备不可用。",
           "removed_devices": [
             "P2"
           ],
@@ -2208,8 +2208,8 @@
         },
         {
           "id": "U6",
-          "name": "Hidden local crack",
-          "description": "A hidden local crack is added and all crack effects are recomputed from geometry.",
+          "name": "隐藏局部裂纹",
+          "description": "加入一条局部隐藏裂纹，并根据完整裂纹几何重新计算裂纹影响。",
           "removed_devices": [],
           "device_states": [],
           "hidden_cracks": {
@@ -2245,8 +2245,8 @@
         },
         {
           "id": "U7",
-          "name": "Hidden cross crack",
-          "description": "A hidden longer crack is added and all crack effects are recomputed from geometry.",
+          "name": "隐藏跨区裂纹",
+          "description": "加入一条较长的跨区隐藏裂纹，并根据完整裂纹几何重新计算裂纹影响。",
           "removed_devices": [
             "O4"
           ],
@@ -2295,8 +2295,8 @@
     },
     {
       "id": "C08",
-      "name": "Precision bottleneck",
-      "description": "Medium board with many ordinary devices but only one precision device.",
+      "name": "精密设备瓶颈",
+      "description": "6×5中等规模木板，普通设备较多，但只有一台精密设备。",
       "difficulty": "precision_scarce",
       "deterministic_input": {
         "board": {
@@ -2411,8 +2411,8 @@
       "uncertainty_scenarios": [
         {
           "id": "U0",
-          "name": "Base scenario",
-          "description": "No hidden cracks and no equipment change.",
+          "name": "基准情景",
+          "description": "不加入隐藏裂纹，也不改变设备状态。",
           "removed_devices": [],
           "device_states": [],
           "hidden_cracks": {
@@ -2421,8 +2421,8 @@
         },
         {
           "id": "U1",
-          "name": "Ordinary slowdown",
-          "description": "Ordinary devices slow down under processing pressure.",
+          "name": "普通设备降速",
+          "description": "普通加工设备受压力影响，处理速度下降。",
           "removed_devices": [],
           "device_states": [
             {
@@ -2444,8 +2444,8 @@
         },
         {
           "id": "U2",
-          "name": "Precision slowdown",
-          "description": "Precision devices slow down under higher precision difficulty.",
+          "name": "精密设备降速",
+          "description": "精密加工设备受精度要求影响，处理速度下降。",
           "removed_devices": [],
           "device_states": [
             {
@@ -2459,8 +2459,8 @@
         },
         {
           "id": "U3",
-          "name": "Mixed slowdown",
-          "description": "Both ordinary and precision devices become slower.",
+          "name": "设备混合降速",
+          "description": "普通设备与精密设备同时出现处理速度下降。",
           "removed_devices": [],
           "device_states": [
             {
@@ -2490,8 +2490,8 @@
         },
         {
           "id": "U4",
-          "name": "One ordinary failure",
-          "description": "One ordinary device is unavailable.",
+          "name": "一台普通设备故障",
+          "description": "一台普通加工设备不可用，用于评估普通加工资源缺失的影响。",
           "removed_devices": [
             "O5"
           ],
@@ -2502,8 +2502,8 @@
         },
         {
           "id": "U5",
-          "name": "One precision failure",
-          "description": "One precision device is unavailable if present.",
+          "name": "一台精密设备故障",
+          "description": "若存在精密设备，则一台精密加工设备不可用。",
           "removed_devices": [
             "P1"
           ],
@@ -2514,8 +2514,8 @@
         },
         {
           "id": "U6",
-          "name": "Hidden local crack",
-          "description": "A hidden local crack is added and all crack effects are recomputed from geometry.",
+          "name": "隐藏局部裂纹",
+          "description": "加入一条局部隐藏裂纹，并根据完整裂纹几何重新计算裂纹影响。",
           "removed_devices": [],
           "device_states": [],
           "hidden_cracks": {
@@ -2551,8 +2551,8 @@
         },
         {
           "id": "U7",
-          "name": "Hidden cross crack",
-          "description": "A hidden longer crack is added and all crack effects are recomputed from geometry.",
+          "name": "隐藏跨区裂纹",
+          "description": "加入一条较长的跨区隐藏裂纹，并根据完整裂纹几何重新计算裂纹影响。",
           "removed_devices": [
             "O5"
           ],
@@ -2601,8 +2601,8 @@
     },
     {
       "id": "C09",
-      "name": "Fast ordinary devices",
-      "description": "Medium board with stronger ordinary capacity and moderate precision resources.",
+      "name": "普通设备增强",
+      "description": "6×5中等规模木板，普通加工能力较强，精密资源保持中等水平。",
       "difficulty": "heterogeneous",
       "deterministic_input": {
         "board": {
@@ -2717,8 +2717,8 @@
       "uncertainty_scenarios": [
         {
           "id": "U0",
-          "name": "Base scenario",
-          "description": "No hidden cracks and no equipment change.",
+          "name": "基准情景",
+          "description": "不加入隐藏裂纹，也不改变设备状态。",
           "removed_devices": [],
           "device_states": [],
           "hidden_cracks": {
@@ -2727,8 +2727,8 @@
         },
         {
           "id": "U1",
-          "name": "Ordinary slowdown",
-          "description": "Ordinary devices slow down under processing pressure.",
+          "name": "普通设备降速",
+          "description": "普通加工设备受压力影响，处理速度下降。",
           "removed_devices": [],
           "device_states": [
             {
@@ -2750,8 +2750,8 @@
         },
         {
           "id": "U2",
-          "name": "Precision slowdown",
-          "description": "Precision devices slow down under higher precision difficulty.",
+          "name": "精密设备降速",
+          "description": "精密加工设备受精度要求影响，处理速度下降。",
           "removed_devices": [],
           "device_states": [
             {
@@ -2769,8 +2769,8 @@
         },
         {
           "id": "U3",
-          "name": "Mixed slowdown",
-          "description": "Both ordinary and precision devices become slower.",
+          "name": "设备混合降速",
+          "description": "普通设备与精密设备同时出现处理速度下降。",
           "removed_devices": [],
           "device_states": [
             {
@@ -2796,8 +2796,8 @@
         },
         {
           "id": "U4",
-          "name": "One ordinary failure",
-          "description": "One ordinary device is unavailable.",
+          "name": "一台普通设备故障",
+          "description": "一台普通加工设备不可用，用于评估普通加工资源缺失的影响。",
           "removed_devices": [
             "O4"
           ],
@@ -2808,8 +2808,8 @@
         },
         {
           "id": "U5",
-          "name": "One precision failure",
-          "description": "One precision device is unavailable if present.",
+          "name": "一台精密设备故障",
+          "description": "若存在精密设备，则一台精密加工设备不可用。",
           "removed_devices": [
             "P2"
           ],
@@ -2820,8 +2820,8 @@
         },
         {
           "id": "U6",
-          "name": "Hidden local crack",
-          "description": "A hidden local crack is added and all crack effects are recomputed from geometry.",
+          "name": "隐藏局部裂纹",
+          "description": "加入一条局部隐藏裂纹，并根据完整裂纹几何重新计算裂纹影响。",
           "removed_devices": [],
           "device_states": [],
           "hidden_cracks": {
@@ -2857,8 +2857,8 @@
         },
         {
           "id": "U7",
-          "name": "Hidden cross crack",
-          "description": "A hidden longer crack is added and all crack effects are recomputed from geometry.",
+          "name": "隐藏跨区裂纹",
+          "description": "加入一条较长的跨区隐藏裂纹，并根据完整裂纹几何重新计算裂纹影响。",
           "removed_devices": [
             "O4"
           ],
@@ -2907,8 +2907,8 @@
     },
     {
       "id": "C10",
-      "name": "Small tight capacity",
-      "description": "6x4 board with only three devices and a tight deadline.",
+      "name": "小规模紧资源",
+      "description": "6×4木板，仅配置三台设备且工期较紧。",
       "difficulty": "low_capacity",
       "deterministic_input": {
         "board": {
@@ -3008,8 +3008,8 @@
       "uncertainty_scenarios": [
         {
           "id": "U0",
-          "name": "Base scenario",
-          "description": "No hidden cracks and no equipment change.",
+          "name": "基准情景",
+          "description": "不加入隐藏裂纹，也不改变设备状态。",
           "removed_devices": [],
           "device_states": [],
           "hidden_cracks": {
@@ -3018,8 +3018,8 @@
         },
         {
           "id": "U1",
-          "name": "Ordinary slowdown",
-          "description": "Ordinary devices slow down under processing pressure.",
+          "name": "普通设备降速",
+          "description": "普通加工设备受压力影响，处理速度下降。",
           "removed_devices": [],
           "device_states": [
             {
@@ -3041,8 +3041,8 @@
         },
         {
           "id": "U2",
-          "name": "Precision slowdown",
-          "description": "Precision devices slow down under higher precision difficulty.",
+          "name": "精密设备降速",
+          "description": "精密加工设备受精度要求影响，处理速度下降。",
           "removed_devices": [],
           "device_states": [
             {
@@ -3056,8 +3056,8 @@
         },
         {
           "id": "U3",
-          "name": "Mixed slowdown",
-          "description": "Both ordinary and precision devices become slower.",
+          "name": "设备混合降速",
+          "description": "普通设备与精密设备同时出现处理速度下降。",
           "removed_devices": [],
           "device_states": [
             {
@@ -3075,8 +3075,8 @@
         },
         {
           "id": "U4",
-          "name": "One ordinary failure",
-          "description": "One ordinary device is unavailable.",
+          "name": "一台普通设备故障",
+          "description": "一台普通加工设备不可用，用于评估普通加工资源缺失的影响。",
           "removed_devices": [
             "O2"
           ],
@@ -3087,8 +3087,8 @@
         },
         {
           "id": "U5",
-          "name": "One precision failure",
-          "description": "One precision device is unavailable if present.",
+          "name": "一台精密设备故障",
+          "description": "若存在精密设备，则一台精密加工设备不可用。",
           "removed_devices": [
             "P1"
           ],
@@ -3099,8 +3099,8 @@
         },
         {
           "id": "U6",
-          "name": "Hidden local crack",
-          "description": "A hidden local crack is added and all crack effects are recomputed from geometry.",
+          "name": "隐藏局部裂纹",
+          "description": "加入一条局部隐藏裂纹，并根据完整裂纹几何重新计算裂纹影响。",
           "removed_devices": [],
           "device_states": [],
           "hidden_cracks": {
@@ -3136,8 +3136,8 @@
         },
         {
           "id": "U7",
-          "name": "Hidden cross crack",
-          "description": "A hidden longer crack is added and all crack effects are recomputed from geometry.",
+          "name": "隐藏跨区裂纹",
+          "description": "加入一条较长的跨区隐藏裂纹，并根据完整裂纹几何重新计算裂纹影响。",
           "removed_devices": [
             "O2"
           ],
@@ -3186,8 +3186,8 @@
     },
     {
       "id": "C11",
-      "name": "More precision devices",
-      "description": "Medium board with three ordinary and three precision devices.",
+      "name": "精密设备增加",
+      "description": "6×5中等规模木板，普通设备与精密设备数量均为三台。",
       "difficulty": "strong_adj",
       "deterministic_input": {
         "board": {
@@ -3328,8 +3328,8 @@
       "uncertainty_scenarios": [
         {
           "id": "U0",
-          "name": "Base scenario",
-          "description": "No hidden cracks and no equipment change.",
+          "name": "基准情景",
+          "description": "不加入隐藏裂纹，也不改变设备状态。",
           "removed_devices": [],
           "device_states": [],
           "hidden_cracks": {
@@ -3338,8 +3338,8 @@
         },
         {
           "id": "U1",
-          "name": "Ordinary slowdown",
-          "description": "Ordinary devices slow down under processing pressure.",
+          "name": "普通设备降速",
+          "description": "普通加工设备受压力影响，处理速度下降。",
           "removed_devices": [],
           "device_states": [
             {
@@ -3361,8 +3361,8 @@
         },
         {
           "id": "U2",
-          "name": "Precision slowdown",
-          "description": "Precision devices slow down under higher precision difficulty.",
+          "name": "精密设备降速",
+          "description": "精密加工设备受精度要求影响，处理速度下降。",
           "removed_devices": [],
           "device_states": [
             {
@@ -3384,8 +3384,8 @@
         },
         {
           "id": "U3",
-          "name": "Mixed slowdown",
-          "description": "Both ordinary and precision devices become slower.",
+          "name": "设备混合降速",
+          "description": "普通设备与精密设备同时出现处理速度下降。",
           "removed_devices": [],
           "device_states": [
             {
@@ -3407,8 +3407,8 @@
         },
         {
           "id": "U4",
-          "name": "One ordinary failure",
-          "description": "One ordinary device is unavailable.",
+          "name": "一台普通设备故障",
+          "description": "一台普通加工设备不可用，用于评估普通加工资源缺失的影响。",
           "removed_devices": [
             "O3"
           ],
@@ -3419,8 +3419,8 @@
         },
         {
           "id": "U5",
-          "name": "One precision failure",
-          "description": "One precision device is unavailable if present.",
+          "name": "一台精密设备故障",
+          "description": "若存在精密设备，则一台精密加工设备不可用。",
           "removed_devices": [
             "P3"
           ],
@@ -3431,8 +3431,8 @@
         },
         {
           "id": "U6",
-          "name": "Hidden local crack",
-          "description": "A hidden local crack is added and all crack effects are recomputed from geometry.",
+          "name": "隐藏局部裂纹",
+          "description": "加入一条局部隐藏裂纹，并根据完整裂纹几何重新计算裂纹影响。",
           "removed_devices": [],
           "device_states": [],
           "hidden_cracks": {
@@ -3468,8 +3468,8 @@
         },
         {
           "id": "U7",
-          "name": "Hidden cross crack",
-          "description": "A hidden longer crack is added and all crack effects are recomputed from geometry.",
+          "name": "隐藏跨区裂纹",
+          "description": "加入一条较长的跨区隐藏裂纹，并根据完整裂纹几何重新计算裂纹影响。",
           "removed_devices": [
             "O3"
           ],
@@ -3518,8 +3518,8 @@
     },
     {
       "id": "C12",
-      "name": "Large severe bottleneck",
-      "description": "Large 8x6 board with many cracks and only one precision device.",
+      "name": "大规模严重瓶颈",
+      "description": "8×6大规模木板，裂纹数量较多，且只有一台精密设备。",
       "difficulty": "extreme",
       "deterministic_input": {
         "board": {
@@ -3707,8 +3707,8 @@
       "uncertainty_scenarios": [
         {
           "id": "U0",
-          "name": "Base scenario",
-          "description": "No hidden cracks and no equipment change.",
+          "name": "基准情景",
+          "description": "不加入隐藏裂纹，也不改变设备状态。",
           "removed_devices": [],
           "device_states": [],
           "hidden_cracks": {
@@ -3717,8 +3717,8 @@
         },
         {
           "id": "U1",
-          "name": "Ordinary slowdown",
-          "description": "Ordinary devices slow down under processing pressure.",
+          "name": "普通设备降速",
+          "description": "普通加工设备受压力影响，处理速度下降。",
           "removed_devices": [],
           "device_states": [
             {
@@ -3740,8 +3740,8 @@
         },
         {
           "id": "U2",
-          "name": "Precision slowdown",
-          "description": "Precision devices slow down under higher precision difficulty.",
+          "name": "精密设备降速",
+          "description": "精密加工设备受精度要求影响，处理速度下降。",
           "removed_devices": [],
           "device_states": [
             {
@@ -3755,8 +3755,8 @@
         },
         {
           "id": "U3",
-          "name": "Mixed slowdown",
-          "description": "Both ordinary and precision devices become slower.",
+          "name": "设备混合降速",
+          "description": "普通设备与精密设备同时出现处理速度下降。",
           "removed_devices": [],
           "device_states": [
             {
@@ -3782,8 +3782,8 @@
         },
         {
           "id": "U4",
-          "name": "One ordinary failure",
-          "description": "One ordinary device is unavailable.",
+          "name": "一台普通设备故障",
+          "description": "一台普通加工设备不可用，用于评估普通加工资源缺失的影响。",
           "removed_devices": [
             "O4"
           ],
@@ -3794,8 +3794,8 @@
         },
         {
           "id": "U5",
-          "name": "One precision failure",
-          "description": "One precision device is unavailable if present.",
+          "name": "一台精密设备故障",
+          "description": "若存在精密设备，则一台精密加工设备不可用。",
           "removed_devices": [
             "P1"
           ],
@@ -3806,8 +3806,8 @@
         },
         {
           "id": "U6",
-          "name": "Hidden local crack",
-          "description": "A hidden local crack is added and all crack effects are recomputed from geometry.",
+          "name": "隐藏局部裂纹",
+          "description": "加入一条局部隐藏裂纹，并根据完整裂纹几何重新计算裂纹影响。",
           "removed_devices": [],
           "device_states": [],
           "hidden_cracks": {
@@ -3843,8 +3843,8 @@
         },
         {
           "id": "U7",
-          "name": "Hidden cross crack",
-          "description": "A hidden longer crack is added and all crack effects are recomputed from geometry.",
+          "name": "隐藏跨区裂纹",
+          "description": "加入一条较长的跨区隐藏裂纹，并根据完整裂纹几何重新计算裂纹影响。",
           "removed_devices": [
             "O4"
           ],

@@ -6,12 +6,13 @@ import json
 from pathlib import Path
 from typing import Dict, List
 
-from .cnag_ls import solve_cnag_ls
+from .Algorithm.CNAG_LS import solve_cnag_ls
 from .data_loader import load_problem
 from .exact_backtracking import ExactLimits, solve_exact_backtracking
 from .feasibility_checker import check_solution
-from .greedy_baselines import solve_value_density_first, solve_value_first
-from .marginal_greedy import solve_marginal_greedy
+from .Algorithm.MG import solve_marginal_greedy
+from .Algorithm.VDF import solve_value_density_first
+from .Algorithm.VF import solve_value_first
 from .reporting import write_solution_outputs
 from .solution_evaluator import device_usage, objective_breakdown
 

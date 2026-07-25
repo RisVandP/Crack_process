@@ -4,9 +4,9 @@ import time
 from dataclasses import dataclass
 from typing import Callable, List
 
-from .data_models import BlockId, DeviceId, ProblemData, Solution
-from .deterministic_model import processing_time
-from .solution_utils import assign_block, empty_solution, finalize_solution, is_block_processed, device_loads
+from ..data_models import BlockId, DeviceId, ProblemData, Solution
+from ..deterministic_model import processing_time
+from ..solution_utils import assign_block, empty_solution, finalize_solution, is_block_processed, device_loads
 
 
 TOL = 1e-9
@@ -23,18 +23,14 @@ class Candidate:
 
 
 def solve_value_first(data: ProblemData) -> Solution:
+    # 按单块加工后的绝对价值排序，构造VF基线方案。
     """单块价值优先基线：按 v_u + A*r_q 排序后依次安排。"""
 
     return _solve_static_greedy(data, "VF", _value_score)
 
 
-def solve_value_density_first(data: ProblemData) -> Solution:
-    """单位加工时间价值优先基线：按 (v_u + A*r_q)/hat_t[u,k] 排序。"""
-
-    return _solve_static_greedy(data, "VDF", _density_score)
-
-
 def _solve_static_greedy(data: ProblemData, method: str, score_fn: Callable[[ProblemData, BlockId, str, DeviceId], float]) -> Solution:
+    # 使用给定评分函数对候选任务排序，并在工期约束内贪心分配。
     start = time.perf_counter()
     solution = empty_solution(data, method)
     loads = device_loads(data, solution)
@@ -63,6 +59,7 @@ def _solve_static_greedy(data: ProblemData, method: str, score_fn: Callable[[Pro
 
 
 def _build_candidates(data: ProblemData, score_fn: Callable[[ProblemData, BlockId, str, DeviceId], float]) -> List[Candidate]:
+    # 枚举所有木块、加工方式和设备组成的可选任务。
     candidates: List[Candidate] = []
     for block_id in data.block_ids:
         for device_id in data.ordinary_device_ids:
@@ -73,6 +70,7 @@ def _build_candidates(data: ProblemData, score_fn: Callable[[ProblemData, BlockI
 
 
 def _make_candidate(data: ProblemData, block_id: BlockId, process_type: str, device_id: DeviceId, score_fn) -> Candidate:
+    # 计算单个候选任务的耗时、单块价值和排序分数。
     duration = processing_time(data, block_id, device_id)
     if duration <= 0:
         raise ValueError(f"候选项 {(block_id, process_type, device_id)} 的加工时间非法：{duration}")
@@ -81,6 +79,7 @@ def _make_candidate(data: ProblemData, block_id: BlockId, process_type: str, dev
 
 
 def single_processed_value(data: ProblemData, block_id: BlockId, process_type: str) -> float:
+    # 计算木块在指定加工方式下的单块基础收益。
     block = data.block_by_id()[block_id]
     value = data.board.base_value * block.intrinsic_value_factor
     if process_type == "ordinary":
@@ -91,10 +90,12 @@ def single_processed_value(data: ProblemData, block_id: BlockId, process_type: s
 
 
 def _value_score(data: ProblemData, block_id: BlockId, process_type: str, device_id: DeviceId) -> float:
+    # 返回VF使用的绝对价值评分。
     return single_processed_value(data, block_id, process_type)
 
 
 def _density_score(data: ProblemData, block_id: BlockId, process_type: str, device_id: DeviceId) -> float:
+    # 返回VDF使用的单位时间价值评分。
     duration = processing_time(data, block_id, device_id)
     if duration <= 0:
         raise ValueError(f"{block_id} 在设备 {device_id} 上的加工时间非法。")

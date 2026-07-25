@@ -4,11 +4,11 @@ import time
 from dataclasses import dataclass
 from typing import Optional
 
-from .data_models import ProblemData, Solution
-from .deterministic_model import processing_time
-from .feasibility_checker import check_solution
-from .marginal_greedy import best_marginal_single_move, solve_marginal_greedy
-from .solution_utils import (
+from ..data_models import ProblemData, Solution
+from ..deterministic_model import processing_time
+from ..feasibility_checker import check_solution
+from .MG import best_marginal_single_move, solve_marginal_greedy
+from ..solution_utils import (
     apply_task_copy,
     assign_block,
     clone_solution,
@@ -42,6 +42,7 @@ class PairMove:
 
 
 def solve_cnag_ls(data: ProblemData, config: CNAGConfig | None = None) -> Solution:
+    # 先构造初始方案，再用多邻域局部搜索改进方案。
     """Crack-and-Neighborhood-Aware Greedy Local Search (CNAG-LS)."""
 
     cfg = config or CNAGConfig()
@@ -77,6 +78,7 @@ def solve_cnag_ls(data: ProblemData, config: CNAGConfig | None = None) -> Soluti
 
 
 def _construct_with_single_and_pair(data: ProblemData, cfg: CNAGConfig) -> tuple[Solution, int, int]:
+    # 混合使用单块边际插入和相邻成对精加工来构造初始解。
     solution = empty_solution(data, "CNAG-LS")
     pair_accepts = 0
     iterations = 0
@@ -107,6 +109,7 @@ def _construct_with_single_and_pair(data: ProblemData, cfg: CNAGConfig) -> tuple
 
 
 def _best_pair_move(data: ProblemData, solution: Solution, cfg: CNAGConfig) -> Optional[PairMove]:
+    # 在规模允许时寻找收益密度最高的相邻双精加工动作。
     if len(data.blocks) > cfg.pair_construction_block_limit:
         return None
     current = solution.objective_value
@@ -134,6 +137,7 @@ def _best_pair_move(data: ProblemData, solution: Solution, cfg: CNAGConfig) -> O
 
 
 def _apply_pair_move(data: ProblemData, solution: Solution, move: PairMove) -> Solution:
+    # 将一条相邻边两侧木块同时分配为精密加工。
     new_solution = clone_solution(solution)
     u, v = move.edge
     assign_block(data, new_solution, u, "precision", move.device_u)
@@ -142,6 +146,7 @@ def _apply_pair_move(data: ProblemData, solution: Solution, move: PairMove) -> S
 
 
 def _is_better_pair(move: PairMove, best: Optional[PairMove]) -> bool:
+    # 按收益密度、增量和稳定字典序比较成对动作。
     if best is None:
         return True
     return (-move.score, -move.delta, move.duration, move.edge, move.device_u, move.device_v) < (
@@ -155,6 +160,7 @@ def _is_better_pair(move: PairMove, best: Optional[PairMove]) -> bool:
 
 
 def _local_search(data: ProblemData, solution: Solution, cfg: CNAGConfig) -> tuple[Solution, int, dict[str, int]]:
+    # 反复选择最优邻域改进，直到没有更优方案或达到迭代上限。
     success_counts = {name: 0 for name in ["Add", "Drop", "ModeChange", "Relocate", "Swap", "PairInsert"]}
     current = finalize_solution(data, solution)
     for iteration in range(cfg.max_local_iterations):
@@ -169,6 +175,7 @@ def _local_search(data: ProblemData, solution: Solution, cfg: CNAGConfig) -> tup
 
 
 def _best_neighbor(data: ProblemData, solution: Solution, cfg: CNAGConfig) -> Optional[Solution]:
+    # 流式枚举所有邻域候选，并返回目标值最高的可行改进。
     best: Optional[Solution] = None
     for neighbors in [
         _neighbors_add(data, solution),
@@ -192,12 +199,14 @@ def _best_neighbor(data: ProblemData, solution: Solution, cfg: CNAGConfig) -> Op
 
 
 def _tag(solution: Solution, move_type: str, tie_key: str) -> Solution:
+    # 给候选方案记录邻域类型和稳定排序键。
     solution.metadata["last_move_type"] = move_type
     solution.metadata["tie_key"] = tie_key
     return solution
 
 
 def _neighbors_add(data: ProblemData, solution: Solution):
+    # 枚举给未加工木块新增一次加工的邻域。
     for u in data.block_ids:
         if is_block_processed(solution, u):
             continue
@@ -207,6 +216,7 @@ def _neighbors_add(data: ProblemData, solution: Solution):
 
 
 def _neighbors_drop(data: ProblemData, solution: Solution):
+    # 枚举将已加工木块改为不加工的邻域。
     for u in data.block_ids:
         if not is_block_processed(solution, u):
             continue
@@ -216,6 +226,7 @@ def _neighbors_drop(data: ProblemData, solution: Solution):
 
 
 def _neighbors_mode_change(data: ProblemData, solution: Solution):
+    # 枚举普通加工与精密加工之间切换的邻域。
     for u in data.block_ids:
         if solution.y_ordinary[u] == 1:
             for k in data.precision_device_ids:
@@ -226,6 +237,7 @@ def _neighbors_mode_change(data: ProblemData, solution: Solution):
 
 
 def _neighbors_relocate(data: ProblemData, solution: Solution):
+    # 枚举在同类设备之间迁移木块的邻域。
     for u in data.block_ids:
         if solution.y_ordinary[u] == 1:
             for k in data.ordinary_device_ids:
@@ -238,6 +250,7 @@ def _neighbors_relocate(data: ProblemData, solution: Solution):
 
 
 def _neighbors_swap(data: ProblemData, solution: Solution):
+    # 枚举释放一个已加工木块并加入一个未加工木块的交换邻域。
     processed = [u for u in data.block_ids if is_block_processed(solution, u)]
     unprocessed = [u for u in data.block_ids if not is_block_processed(solution, u)]
     for drop_u in processed:
@@ -250,6 +263,7 @@ def _neighbors_swap(data: ProblemData, solution: Solution):
 
 
 def _neighbors_pair_insert(data: ProblemData, solution: Solution, cfg: CNAGConfig):
+    # 枚举相邻双精加工插入，并可少量释放已有木块腾出工期。
     processed = [u for u in data.block_ids if is_block_processed(solution, u)]
     release_sets = [()]
     if len(data.blocks) <= cfg.pair_release_block_limit:

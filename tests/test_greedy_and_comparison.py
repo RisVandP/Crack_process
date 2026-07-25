@@ -7,12 +7,13 @@ from pathlib import Path
 
 import pytest
 
-from src.cnag_ls import solve_cnag_ls
+from src.Algorithm.CNAG_LS import solve_cnag_ls
 from src.data_loader import parse_problem
 from src.deterministic_model import processing_time
 from src.feasibility_checker import check_solution
-from src.greedy_baselines import solve_value_density_first, solve_value_first
-from src.marginal_greedy import _incident_edges, _single_move_delta, solve_marginal_greedy
+from src.Algorithm.MG import _incident_edges, _single_move_delta, solve_marginal_greedy
+from src.Algorithm.VDF import solve_value_density_first
+from src.Algorithm.VF import solve_value_first
 from src.method_comparison import run_method_comparison
 from src.solution_evaluator import objective_breakdown
 from src.solution_utils import apply_task_copy, empty_solution

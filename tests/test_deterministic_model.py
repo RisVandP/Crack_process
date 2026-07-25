@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from src.data_loader import load_problem
 from src.feasibility_checker import check_solution
-from src.greedy_baselines import solve_value_first
+from src.Algorithm.VF import solve_value_first
 from src.solution_evaluator import objective_breakdown
 
 

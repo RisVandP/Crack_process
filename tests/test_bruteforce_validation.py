@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from src.data_loader import parse_problem
 from src.exact_backtracking import solve_exact_backtracking, ExactLimits
-from src.greedy_baselines import solve_value_first
+from src.Algorithm.VF import solve_value_first
 
 
 def small_raw_instance():
