@@ -7,7 +7,7 @@ from typing import Iterable, Optional
 
 from ..model.data_models import BlockId, DeviceId, ProblemData, Solution
 from ..evaluation.solution_evaluator import check_solution
-from ..model.solution_utils import (
+from .solution import (
     apply_task_copy,
     assign_block,
     clone_solution,

@@ -6,7 +6,7 @@ from typing import Callable, List
 
 from ..model.data_models import BlockId, DeviceId, ProblemData, Solution
 from ..model.data_models import processing_time
-from ..model.solution_utils import assign_block, empty_solution, finalize_solution, is_block_processed, device_loads
+from .solution import assign_block, empty_solution, finalize_solution, is_block_processed, device_loads
 
 
 TOL = 1e-9
@@ -80,8 +80,7 @@ def _make_candidate(data: ProblemData, block_id: BlockId, process_type: str, dev
 
 def single_processed_value(data: ProblemData, block_id: BlockId, process_type: str) -> float:
     # 计算木块在指定加工方式下的单块基础收益。
-    block = data.block_by_id()[block_id]
-    value = data.board.base_value * block.intrinsic_value_factor
+    value = data.block_intrinsic_value[block_id]
     if process_type == "ordinary":
         return value + data.board.area_per_block * data.values.r_ordinary
     if process_type == "precision":

@@ -2,8 +2,8 @@ from __future__ import annotations
 
 import copy
 
-from .data_models import BlockId, DeviceId, ProblemData, Solution
-from .data_models import processing_time
+from ..model.data_models import BlockId, DeviceId, ProblemData, Solution
+from ..model.data_models import processing_time
 from ..evaluation.solution_evaluator import objective_breakdown
 
 

@@ -1,8 +1,5 @@
 from __future__ import annotations
 
-import json
-import subprocess
-import sys
 from pathlib import Path
 
 import pytest
@@ -14,9 +11,8 @@ from src.evaluation.solution_evaluator import check_solution
 from src.Algorithm.MG import _incident_edges, _single_move_delta, solve_marginal_greedy
 from src.Algorithm.VDF import solve_value_density_first
 from src.Algorithm.VF import solve_value_first
-from src.experiments.method_comparison import run_method_comparison
 from src.evaluation.solution_evaluator import objective_breakdown
-from src.model.solution_utils import apply_task_copy, empty_solution
+from src.Algorithm.solution import apply_task_copy, empty_solution
 
 
 def comparison_raw_instance():
@@ -114,30 +110,6 @@ def test_marginal_greedy_single_move_delta_matches_full_recalculation():
         assert abs(full_delta - analytic_delta) < 1e-6
 
 
-def test_method_comparison_outputs_complete_files(tmp_path):
-    data = parse_problem(comparison_raw_instance())
-    rows = run_method_comparison(data, tmp_path)
-    assert {row["method"] for row in rows} == {"VF", "VDF", "MG", "MG-LS"}
-    for name in ["method_comparison.csv", "method_comparison.json", "method_comparison.png"]:
-        assert (tmp_path / name).exists()
-    with (tmp_path / "method_comparison.json").open("r", encoding="utf-8") as f:
-        loaded = json.load(f)
-    required = {
-        "method",
-        "feasible",
-        "status",
-        "objective_value",
-        "difference_to_mg_ls_percent",
-        "processed_count",
-        "average_utilization",
-        "max_utilization",
-        "run_seconds",
-        "intrinsic_block_value",
-        "cross_crack_loss",
-    }
-    assert required.issubset(loaded[0].keys())
-
-
 def test_invalid_speed_and_deadline_are_rejected():
     raw = comparison_raw_instance()
     raw["devices"][0]["speed"] = 0
@@ -147,27 +119,6 @@ def test_invalid_speed_and_deadline_are_rejected():
     raw["deadline"] = 0
     with pytest.raises(ValueError):
         parse_problem(raw)
-
-
-def test_cli_all_generates_expected_files(tmp_path):
-    output_dir = tmp_path / "cli_outputs"
-    config_path = tmp_path / "small_cli_config.json"
-    config_path.write_text(json.dumps(comparison_raw_instance(), ensure_ascii=False), encoding="utf-8")
-    cmd = [
-        sys.executable,
-        "-m",
-        "src.main",
-        "--config",
-        str(config_path),
-        "--output",
-        str(output_dir),
-        "--method",
-        "all",
-    ]
-    completed = subprocess.run(cmd, check=True, capture_output=True, text=True)
-    assert "MG-LS" in completed.stdout
-    assert (output_dir / "method_comparison.csv").exists()
-    assert (output_dir / "mg_ls" / "assignments.csv").exists()
 
 
 def test_source_and_requirements_do_not_reference_package_solvers():

@@ -43,6 +43,7 @@ class Block:
     j: int
     crack_present: int
     crack_severity: float
+    intrinsic_value: float
 
     @property
     def intrinsic_value_factor(self) -> float:
@@ -91,6 +92,9 @@ class ProblemData:
     same_precision_reward: Dict[EdgeKey, float]
     precision_mismatch_penalty: Dict[EdgeKey, float]
     cross_crack_loss: Dict[EdgeKey, float]
+    block_intrinsic_value: Dict[BlockId, float]
+    intrinsic_block_value: float
+    cross_crack_loss_total: float
     cracks: Tuple[Crack, ...] = ()
     crack_epsilon: float = 1e-6
     crack_r_max: float | None = None

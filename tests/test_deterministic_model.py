@@ -50,3 +50,14 @@ def test_geometry_cracks_generate_block_and_edge_effects():
     assert cracked_blocks
     assert all(0.0 <= block.crack_severity <= 1.0 for block in data.blocks)
     assert any(value > 0 for value in data.cross_crack_loss.values())
+
+
+def test_problem_data_contains_precomputed_static_values():
+    data = load_problem("configs/deterministic_example.json")
+    expected_by_block = {
+        block.id: data.board.base_value * (1.0 - block.crack_severity)
+        for block in data.blocks
+    }
+    assert data.block_intrinsic_value == expected_by_block
+    assert data.intrinsic_block_value == sum(expected_by_block.values())
+    assert data.cross_crack_loss_total == sum(data.cross_crack_loss.values())

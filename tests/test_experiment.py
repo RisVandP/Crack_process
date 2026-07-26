@@ -1,10 +1,12 @@
 from __future__ import annotations
 
 import json
+import math
+from pathlib import Path
 
 from src.experiments.experiment import _scenario_data, load_experiment_config, run_experiment
 from src.io.data_loader import parse_problem
-from src.model.solution_utils import empty_solution
+from src.Algorithm.solution import empty_solution
 
 
 def test_example_json_has_required_case_and_scenario_counts():
@@ -20,16 +22,46 @@ def test_sensitivity_json_has_controlled_factor_design():
     cfg = load_experiment_config("configs/sensitivity.json")
     assert cfg["experiment_type"] == "sensitivity"
     assert cfg["algorithms"] == ["VF", "VDF", "MG", "MG-LS"]
-    assert len(cfg["cases"]) == 30
+    assert len(cfg["cases"]) == 36
     factors = {}
     for case in cfg["cases"]:
         factors.setdefault(case["factor"], []).append(case)
         assert len(case["uncertainty_scenarios"]) == 8
         parse_problem(case["deterministic_input"])
-    assert set(factors) == {"board_scale", "crack_distribution", "device_performance", "deadline", "value_structure"}
+    assert set(factors) == {
+        "board_scale",
+        "crack_distribution",
+        "device_performance",
+        "deadline",
+        "input_combo",
+        "value_structure",
+    }
     assert all(len(cases) == 6 for cases in factors.values())
     assert [case["level"] for case in factors["board_scale"]] == [1, 2, 3, 4, 5, 6]
     assert [len(case["deterministic_input"]["cracks"]["items"]) for case in factors["crack_distribution"]] == [0, 1, 2, 3, 4, 5]
+    assert [case["deterministic_input"]["board"]["m"] * case["deterministic_input"]["board"]["n"] for case in factors["input_combo"]] == [12, 20, 30, 35, 48, 60]
+    assert [len(case["deterministic_input"]["cracks"]["items"]) for case in factors["input_combo"]] == [0, 1, 2, 3, 4, 5]
+    assert [case["deterministic_input"]["deadline"] for case in factors["input_combo"]] == [6.4, 5.6, 4.8, 4.0, 3.2, 2.4]
+
+
+def test_precision_capacity_cannot_cover_all_blocks():
+    config_cases = [
+        ("configs/deterministic_example.json", [{"id": "deterministic_example", "deterministic_input": json.loads(Path("configs/deterministic_example.json").read_text(encoding="utf-8"))}]),
+        ("configs/example.json", load_experiment_config("configs/example.json")["cases"]),
+        ("configs/sensitivity.json", load_experiment_config("configs/sensitivity.json")["cases"]),
+    ]
+    for config_path, cases in config_cases:
+        for case in cases:
+            raw = case["deterministic_input"]
+            board = raw["board"]
+            block_count = board["m"] * board["n"]
+            area = board["width"] * board["height"] / block_count
+            precision_cap = sum(
+                math.floor(raw["deadline"] * device["speed"] / area)
+                for device in raw["devices"]
+                if device["type"] == "precision"
+            )
+            assert precision_cap < block_count, (config_path, case["id"], precision_cap, block_count)
 
 
 def test_example_json_uses_only_formal_geometry_inputs():

@@ -71,6 +71,9 @@ def parse_problem(raw: Dict[str, Any]) -> ProblemData:
         cross_loss = _edge_values(edges, values.default_cross_crack_loss, value_raw.get("cross_crack_loss", {}))
     else:
         cross_loss = geometry_cross_loss
+    block_intrinsic_value = {block.id: block.intrinsic_value for block in blocks}
+    intrinsic_block_value = sum(block_intrinsic_value.values())
+    cross_crack_loss_total = sum(cross_loss[edge] for edge in edges)
 
     deadline = float(raw["deadline"])
     if deadline <= 0:
@@ -86,6 +89,9 @@ def parse_problem(raw: Dict[str, Any]) -> ProblemData:
         same_precision_reward=same_reward,
         precision_mismatch_penalty=mismatch_penalty,
         cross_crack_loss=cross_loss,
+        block_intrinsic_value=block_intrinsic_value,
+        intrinsic_block_value=intrinsic_block_value,
+        cross_crack_loss_total=cross_crack_loss_total,
         cracks=tuple(cracks),
         crack_epsilon=crack_epsilon,
         crack_r_max=crack_r_max,
@@ -176,7 +182,8 @@ def _build_blocks(board: Board, crack_by_block: Dict[str, Dict[str, Any]]) -> li
                 raise ValueError(f"{bid} 的 CS 必须位于[0,1]。")
             if crack_present == 0 and crack_severity > 0:
                 raise ValueError(f"{bid} 的 C=0 但 CS>0，裂缝状态不一致。")
-            blocks.append(Block(bid, i, j, crack_present, crack_severity))
+            intrinsic_value = board.base_value * (1.0 - crack_severity)
+            blocks.append(Block(bid, i, j, crack_present, crack_severity, intrinsic_value))
     return blocks
 
 

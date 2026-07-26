@@ -6,7 +6,7 @@ from typing import Optional
 
 from ..model.data_models import BlockId, DeviceId, ProblemData, Solution
 from ..model.data_models import processing_time
-from ..model.solution_utils import apply_task_copy, device_loads, empty_solution, finalize_solution, is_block_processed
+from .solution import apply_task_copy, device_loads, empty_solution, finalize_solution, is_block_processed
 
 
 TOL = 1e-9

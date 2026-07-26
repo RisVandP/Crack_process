@@ -260,13 +260,18 @@ def _scenario_data(data: ProblemData, scenario: dict) -> ProblemData:
                 j=block.j,
                 crack_present=int(update.get("C", block.crack_present)),
                 crack_severity=float(update.get("CS", block.crack_severity)),
+                intrinsic_value=data.board.base_value * (1.0 - float(update.get("CS", block.crack_severity))),
             )
         )
+    block_intrinsic_value = {block.id: block.intrinsic_value for block in blocks}
     return replace(
         data,
         devices=devices,
         blocks=blocks,
         cross_crack_loss=edge_loss,
+        block_intrinsic_value=block_intrinsic_value,
+        intrinsic_block_value=sum(block_intrinsic_value.values()),
+        cross_crack_loss_total=sum(edge_loss[edge] for edge in data.edges),
         cracks=all_cracks,
     )
 
@@ -430,42 +435,77 @@ def _plot_outputs(stage1_rows: list[dict], stage2_rows: list[dict], ranking: lis
     plt.rcParams["axes.unicode_minus"] = False
     preferred_methods = ["VF", "VDF", "MG", "MG-LS"]
     methods = [method for method in preferred_methods if any(row["method"] == method for row in stage1_rows)]
+    has_sensitivity = any(row.get("factor", "scenario") != "scenario" for row in stage1_rows)
     cases = sorted({row["case_id"] for row in stage1_rows})
+    if has_sensitivity:
+        overview_keys = sorted({row["factor"] for row in stage1_rows})
+        factor_labels = {
+            "board_scale": "Scale",
+            "crack_distribution": "Crack",
+            "deadline": "Time",
+            "device_performance": "Device",
+            "input_combo": "Combo",
+            "value_structure": "Value",
+        }
+        overview_labels = [factor_labels.get(key, key) for key in overview_keys]
+        overview_label = "Factor"
+        overview_title_suffix = "by factor"
+        objective_path = "obj_overview.png"
+        decision_path = "decision_overview.png"
+    else:
+        overview_keys = cases
+        overview_labels = overview_keys
+        overview_label = "Case"
+        overview_title_suffix = "by case"
+        objective_path = "objective_by_case_line.png"
+        decision_path = "decision_value_by_case_line.png"
 
     fig, ax = plt.subplots(figsize=(11, 4.8))
     markers = {"VF": "o", "VDF": "s", "MG": "^", "MG-LS": "D"}
     for method in methods:
         values = [
-            next(float(row["objective_value"]) for row in stage1_rows if row["case_id"] == case and row["method"] == method)
-            for case in cases
+            _mean(
+                float(row["objective_value"])
+                for row in stage1_rows
+                if row["method"] == method
+                and (row.get("factor") == key if has_sensitivity else row["case_id"] == key)
+            )
+            for key in overview_keys
         ]
-        ax.plot(cases, values, marker=markers.get(method, "o"), linewidth=2, markersize=5, label=method)
-    ax.set_xlabel("Case")
+        ax.plot(overview_labels, values, marker=markers.get(method, "o"), linewidth=2, markersize=5, label=method)
+    ax.set_xlabel(overview_label)
     ax.set_ylabel("Total objective value")
-    ax.set_title("Deterministic objective by case")
+    ax.set_title(f"Deterministic objective {overview_title_suffix}")
     ax.grid(True, axis="y", linestyle="--", alpha=0.35)
     ax.legend(ncol=len(methods), loc="upper center", bbox_to_anchor=(0.5, 1.18), frameon=False)
+    ax.tick_params(axis="x", rotation=0)
     fig.tight_layout()
-    fig.savefig(out / "objective_by_case_line.png", dpi=180)
+    fig.savefig(out / objective_path, dpi=180)
     plt.close(fig)
 
     fig, ax = plt.subplots(figsize=(11, 4.8))
     for method in methods:
         values = [
-            next(float(row["objective_decision"]) for row in stage1_rows if row["case_id"] == case and row["method"] == method)
-            for case in cases
+            _mean(
+                float(row["objective_decision"])
+                for row in stage1_rows
+                if row["method"] == method
+                and (row.get("factor") == key if has_sensitivity else row["case_id"] == key)
+            )
+            for key in overview_keys
         ]
-        ax.plot(cases, values, marker=markers.get(method, "o"), linewidth=2, markersize=5, label=method)
-    ax.set_xlabel("Case")
+        ax.plot(overview_labels, values, marker=markers.get(method, "o"), linewidth=2, markersize=5, label=method)
+    ax.set_xlabel(overview_label)
     ax.set_ylabel("Decision contribution")
-    ax.set_title("Processing decision contribution by case")
+    ax.set_title(f"Processing decision contribution {overview_title_suffix}")
     ax.grid(True, axis="y", linestyle="--", alpha=0.35)
     ax.legend(ncol=len(methods), loc="upper center", bbox_to_anchor=(0.5, 1.18), frameon=False)
+    ax.tick_params(axis="x", rotation=0)
     fig.tight_layout()
-    fig.savefig(out / "decision_value_by_case_line.png", dpi=180)
+    fig.savefig(out / decision_path, dpi=180)
     plt.close(fig)
 
-    if any(row.get("factor", "scenario") != "scenario" for row in stage1_rows):
+    if has_sensitivity:
         _plot_sensitivity_outputs(stage1_rows, methods, markers, out, plt)
 
     fig, ax = plt.subplots(figsize=(10, 4))
@@ -506,13 +546,22 @@ def _plot_outputs(stage1_rows: list[dict], stage2_rows: list[dict], ranking: lis
 
 def _plot_sensitivity_outputs(stage1_rows: list[dict], methods: list[str], markers: dict[str, str], out: Path, plt) -> None:
     factors = sorted({row["factor"] for row in stage1_rows if row.get("factor", "scenario") != "scenario"})
+    factor_names = {
+        "board_scale": "scale",
+        "crack_distribution": "crack",
+        "deadline": "time",
+        "device_performance": "device",
+        "input_combo": "combo",
+        "value_structure": "value",
+    }
     for factor in factors:
         factor_rows = [row for row in stage1_rows if row.get("factor") == factor]
         levels = sorted({int(row["level"]) for row in factor_rows})
         labels = [f"L{level}" for level in levels]
+        prefix = factor_names.get(factor, factor)
         for metric, ylabel, filename in [
-            ("objective_value", "Total objective value", f"sensitivity_{factor}_objective.png"),
-            ("objective_decision", "Decision contribution", f"sensitivity_{factor}_decision.png"),
+            ("objective_value", "Total objective value", f"{prefix}_obj.png"),
+            ("objective_decision", "Decision contribution", f"{prefix}_dec.png"),
         ]:
             fig, ax = plt.subplots(figsize=(9, 4.6))
             for method in methods:
