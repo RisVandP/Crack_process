@@ -1,0 +1,104 @@
+{
+  "case_id": "C02",
+  "method": "VF",
+  "solution_hash": "9524784b7dea1297",
+  "feasible": true,
+  "objective_value": 1178.8923295927848,
+  "objective_breakdown": {
+    "intrinsic_block_value": 1033.2923295927849,
+    "ordinary_processing_increment": 72.0,
+    "precision_processing_increment": 117.59999999999998,
+    "same_precision_reward": 0.0,
+    "precision_mismatch_penalty": 42.0,
+    "cross_crack_loss": 2.0,
+    "total_objective": 1178.8923295927848
+  },
+  "device_usage": {
+    "O1": {
+      "assigned_count": 0.0,
+      "total_processing_time": 0,
+      "deadline": 6.0,
+      "utilization": 0.0
+    },
+    "O2": {
+      "assigned_count": 5.0,
+      "total_processing_time": 3.506324705211907,
+      "deadline": 6.0,
+      "utilization": 0.5843874508686512
+    },
+    "P1": {
+      "assigned_count": 5.0,
+      "total_processing_time": 6.0,
+      "deadline": 6.0,
+      "utilization": 1.0
+    },
+    "P2": {
+      "assigned_count": 2.0,
+      "total_processing_time": 4.897959183673469,
+      "deadline": 6.0,
+      "utilization": 0.8163265306122448
+    }
+  },
+  "assignments": [
+    {
+      "block_id": "B_1_1",
+      "state": "precision",
+      "device_id": "P1"
+    },
+    {
+      "block_id": "B_1_2",
+      "state": "precision",
+      "device_id": "P1"
+    },
+    {
+      "block_id": "B_1_3",
+      "state": "ordinary",
+      "device_id": "O2"
+    },
+    {
+      "block_id": "B_2_1",
+      "state": "precision",
+      "device_id": "P1"
+    },
+    {
+      "block_id": "B_2_2",
+      "state": "ordinary",
+      "device_id": "O2"
+    },
+    {
+      "block_id": "B_2_3",
+      "state": "ordinary",
+      "device_id": "O2"
+    },
+    {
+      "block_id": "B_3_1",
+      "state": "precision",
+      "device_id": "P1"
+    },
+    {
+      "block_id": "B_3_2",
+      "state": "ordinary",
+      "device_id": "O2"
+    },
+    {
+      "block_id": "B_3_3",
+      "state": "ordinary",
+      "device_id": "O2"
+    },
+    {
+      "block_id": "B_4_1",
+      "state": "precision",
+      "device_id": "P1"
+    },
+    {
+      "block_id": "B_4_2",
+      "state": "precision",
+      "device_id": "P2"
+    },
+    {
+      "block_id": "B_4_3",
+      "state": "precision",
+      "device_id": "P2"
+    }
+  ]
+}

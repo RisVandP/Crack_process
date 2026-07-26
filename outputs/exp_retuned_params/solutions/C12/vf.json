@@ -1,0 +1,290 @@
+{
+  "case_id": "C12",
+  "method": "VF",
+  "solution_hash": "09753e254a939509",
+  "feasible": true,
+  "objective_value": 4153.899440926203,
+  "objective_breakdown": {
+    "intrinsic_block_value": 4092.299440926203,
+    "ordinary_processing_increment": 168.0,
+    "precision_processing_increment": 33.599999999999994,
+    "same_precision_reward": 0.0,
+    "precision_mismatch_penalty": 20.0,
+    "cross_crack_loss": 120.0,
+    "total_objective": 4153.899440926203
+  },
+  "device_usage": {
+    "O1": {
+      "assigned_count": 6.0,
+      "total_processing_time": 3.5294117647058827,
+      "deadline": 3.8,
+      "utilization": 0.9287925696594429
+    },
+    "O2": {
+      "assigned_count": 4.0,
+      "total_processing_time": 3.333333333333333,
+      "deadline": 3.8,
+      "utilization": 0.8771929824561403
+    },
+    "O3": {
+      "assigned_count": 2.0,
+      "total_processing_time": 3.333333333333333,
+      "deadline": 3.8,
+      "utilization": 0.8771929824561403
+    },
+    "O4": {
+      "assigned_count": 2.0,
+      "total_processing_time": 3.076923076923077,
+      "deadline": 3.8,
+      "utilization": 0.8097165991902835
+    },
+    "P1": {
+      "assigned_count": 2.0,
+      "total_processing_time": 3.2,
+      "deadline": 3.8,
+      "utilization": 0.8421052631578948
+    }
+  },
+  "assignments": [
+    {
+      "block_id": "B_1_1",
+      "state": "precision",
+      "device_id": "P1"
+    },
+    {
+      "block_id": "B_1_2",
+      "state": "unprocessed",
+      "device_id": ""
+    },
+    {
+      "block_id": "B_1_3",
+      "state": "precision",
+      "device_id": "P1"
+    },
+    {
+      "block_id": "B_1_4",
+      "state": "ordinary",
+      "device_id": "O1"
+    },
+    {
+      "block_id": "B_1_5",
+      "state": "ordinary",
+      "device_id": "O1"
+    },
+    {
+      "block_id": "B_1_6",
+      "state": "ordinary",
+      "device_id": "O1"
+    },
+    {
+      "block_id": "B_2_1",
+      "state": "ordinary",
+      "device_id": "O1"
+    },
+    {
+      "block_id": "B_2_2",
+      "state": "unprocessed",
+      "device_id": ""
+    },
+    {
+      "block_id": "B_2_3",
+      "state": "ordinary",
+      "device_id": "O1"
+    },
+    {
+      "block_id": "B_2_4",
+      "state": "ordinary",
+      "device_id": "O1"
+    },
+    {
+      "block_id": "B_2_5",
+      "state": "unprocessed",
+      "device_id": ""
+    },
+    {
+      "block_id": "B_2_6",
+      "state": "unprocessed",
+      "device_id": ""
+    },
+    {
+      "block_id": "B_3_1",
+      "state": "ordinary",
+      "device_id": "O2"
+    },
+    {
+      "block_id": "B_3_2",
+      "state": "unprocessed",
+      "device_id": ""
+    },
+    {
+      "block_id": "B_3_3",
+      "state": "unprocessed",
+      "device_id": ""
+    },
+    {
+      "block_id": "B_3_4",
+      "state": "ordinary",
+      "device_id": "O2"
+    },
+    {
+      "block_id": "B_3_5",
+      "state": "unprocessed",
+      "device_id": ""
+    },
+    {
+      "block_id": "B_3_6",
+      "state": "ordinary",
+      "device_id": "O2"
+    },
+    {
+      "block_id": "B_4_1",
+      "state": "unprocessed",
+      "device_id": ""
+    },
+    {
+      "block_id": "B_4_2",
+      "state": "unprocessed",
+      "device_id": ""
+    },
+    {
+      "block_id": "B_4_3",
+      "state": "unprocessed",
+      "device_id": ""
+    },
+    {
+      "block_id": "B_4_4",
+      "state": "unprocessed",
+      "device_id": ""
+    },
+    {
+      "block_id": "B_4_5",
+      "state": "unprocessed",
+      "device_id": ""
+    },
+    {
+      "block_id": "B_4_6",
+      "state": "ordinary",
+      "device_id": "O2"
+    },
+    {
+      "block_id": "B_5_1",
+      "state": "ordinary",
+      "device_id": "O4"
+    },
+    {
+      "block_id": "B_5_2",
+      "state": "unprocessed",
+      "device_id": ""
+    },
+    {
+      "block_id": "B_5_3",
+      "state": "unprocessed",
+      "device_id": ""
+    },
+    {
+      "block_id": "B_5_4",
+      "state": "unprocessed",
+      "device_id": ""
+    },
+    {
+      "block_id": "B_5_5",
+      "state": "unprocessed",
+      "device_id": ""
+    },
+    {
+      "block_id": "B_5_6",
+      "state": "ordinary",
+      "device_id": "O4"
+    },
+    {
+      "block_id": "B_6_1",
+      "state": "ordinary",
+      "device_id": "O3"
+    },
+    {
+      "block_id": "B_6_2",
+      "state": "unprocessed",
+      "device_id": ""
+    },
+    {
+      "block_id": "B_6_3",
+      "state": "unprocessed",
+      "device_id": ""
+    },
+    {
+      "block_id": "B_6_4",
+      "state": "unprocessed",
+      "device_id": ""
+    },
+    {
+      "block_id": "B_6_5",
+      "state": "ordinary",
+      "device_id": "O3"
+    },
+    {
+      "block_id": "B_6_6",
+      "state": "unprocessed",
+      "device_id": ""
+    },
+    {
+      "block_id": "B_7_1",
+      "state": "unprocessed",
+      "device_id": ""
+    },
+    {
+      "block_id": "B_7_2",
+      "state": "unprocessed",
+      "device_id": ""
+    },
+    {
+      "block_id": "B_7_3",
+      "state": "unprocessed",
+      "device_id": ""
+    },
+    {
+      "block_id": "B_7_4",
+      "state": "unprocessed",
+      "device_id": ""
+    },
+    {
+      "block_id": "B_7_5",
+      "state": "unprocessed",
+      "device_id": ""
+    },
+    {
+      "block_id": "B_7_6",
+      "state": "unprocessed",
+      "device_id": ""
+    },
+    {
+      "block_id": "B_8_1",
+      "state": "unprocessed",
+      "device_id": ""
+    },
+    {
+      "block_id": "B_8_2",
+      "state": "unprocessed",
+      "device_id": ""
+    },
+    {
+      "block_id": "B_8_3",
+      "state": "unprocessed",
+      "device_id": ""
+    },
+    {
+      "block_id": "B_8_4",
+      "state": "unprocessed",
+      "device_id": ""
+    },
+    {
+      "block_id": "B_8_5",
+      "state": "unprocessed",
+      "device_id": ""
+    },
+    {
+      "block_id": "B_8_6",
+      "state": "unprocessed",
+      "device_id": ""
+    }
+  ]
+}

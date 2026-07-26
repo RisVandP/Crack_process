@@ -422,6 +422,25 @@ def _plot_outputs(stage1_rows: list[dict], stage2_rows: list[dict], ranking: lis
     plt.rcParams["font.sans-serif"] = ["Microsoft YaHei", "SimHei", "Arial Unicode MS", "DejaVu Sans"]
     plt.rcParams["axes.unicode_minus"] = False
     methods = sorted({row["method"] for row in stage1_rows})
+    cases = sorted({row["case_id"] for row in stage1_rows})
+
+    fig, ax = plt.subplots(figsize=(11, 4.8))
+    markers = {"VF": "o", "VDF": "s", "MG": "^", "MG-LS": "D"}
+    for method in methods:
+        values = [
+            next(float(row["objective_value"]) for row in stage1_rows if row["case_id"] == case and row["method"] == method)
+            for case in cases
+        ]
+        ax.plot(cases, values, marker=markers.get(method, "o"), linewidth=2, markersize=5, label=method)
+    ax.set_xlabel("Case")
+    ax.set_ylabel("Total objective value")
+    ax.set_title("Deterministic objective by case")
+    ax.grid(True, axis="y", linestyle="--", alpha=0.35)
+    ax.legend(ncol=len(methods), loc="upper center", bbox_to_anchor=(0.5, 1.18), frameon=False)
+    fig.tight_layout()
+    fig.savefig(out / "objective_by_case_line.png", dpi=180)
+    plt.close(fig)
+
     fig, ax = plt.subplots(figsize=(10, 4))
     ax.bar(methods, [_mean(float(row["objective_value"]) for row in stage1_rows if row["method"] == method) for method in methods])
     ax.set_title("Mean deterministic objective")

@@ -1,0 +1,104 @@
+{
+  "case_id": "C02",
+  "method": "MG-LS",
+  "solution_hash": "79f34d142778f2f1",
+  "feasible": true,
+  "objective_value": 1204.0923295927848,
+  "objective_breakdown": {
+    "intrinsic_block_value": 1033.2923295927849,
+    "ordinary_processing_increment": 172.80000000000004,
+    "precision_processing_increment": 0.0,
+    "same_precision_reward": 0.0,
+    "precision_mismatch_penalty": 0.0,
+    "cross_crack_loss": 2.0,
+    "total_objective": 1204.0923295927848
+  },
+  "device_usage": {
+    "O1": {
+      "assigned_count": 4.0,
+      "total_processing_time": 3.624537974056296,
+      "deadline": 6.0,
+      "utilization": 0.604089662342716
+    },
+    "O2": {
+      "assigned_count": 8.0,
+      "total_processing_time": 5.3539062809459,
+      "deadline": 6.0,
+      "utilization": 0.8923177134909833
+    },
+    "P1": {
+      "assigned_count": 0.0,
+      "total_processing_time": 0,
+      "deadline": 6.0,
+      "utilization": 0.0
+    },
+    "P2": {
+      "assigned_count": 0.0,
+      "total_processing_time": 0,
+      "deadline": 6.0,
+      "utilization": 0.0
+    }
+  },
+  "assignments": [
+    {
+      "block_id": "B_1_1",
+      "state": "ordinary",
+      "device_id": "O2"
+    },
+    {
+      "block_id": "B_1_2",
+      "state": "ordinary",
+      "device_id": "O2"
+    },
+    {
+      "block_id": "B_1_3",
+      "state": "ordinary",
+      "device_id": "O2"
+    },
+    {
+      "block_id": "B_2_1",
+      "state": "ordinary",
+      "device_id": "O2"
+    },
+    {
+      "block_id": "B_2_2",
+      "state": "ordinary",
+      "device_id": "O1"
+    },
+    {
+      "block_id": "B_2_3",
+      "state": "ordinary",
+      "device_id": "O1"
+    },
+    {
+      "block_id": "B_3_1",
+      "state": "ordinary",
+      "device_id": "O2"
+    },
+    {
+      "block_id": "B_3_2",
+      "state": "ordinary",
+      "device_id": "O1"
+    },
+    {
+      "block_id": "B_3_3",
+      "state": "ordinary",
+      "device_id": "O1"
+    },
+    {
+      "block_id": "B_4_1",
+      "state": "ordinary",
+      "device_id": "O2"
+    },
+    {
+      "block_id": "B_4_2",
+      "state": "ordinary",
+      "device_id": "O2"
+    },
+    {
+      "block_id": "B_4_3",
+      "state": "ordinary",
+      "device_id": "O2"
+    }
+  ]
+}
