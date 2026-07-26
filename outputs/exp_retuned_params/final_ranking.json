@@ -1,15 +1,5 @@
 [
   {
-    "method": "MG",
-    "deterministic_quality_score": 0.9737909293367042,
-    "average_robustness_score": 0.9737909293367041,
-    "worst_case_score": 0.8169014084507042,
-    "scenario_feasibility_score": 0.2708333333333333,
-    "runtime_efficiency_score": 0.9499563950574198,
-    "final_score": 0.8345859323310701,
-    "rank": 1
-  },
-  {
     "method": "MG-LS",
     "deterministic_quality_score": 1.0,
     "average_robustness_score": 1.0,
@@ -17,26 +7,36 @@
     "scenario_feasibility_score": 0.2916666666666667,
     "runtime_efficiency_score": 0.0,
     "final_score": 0.79375,
+    "rank": 1
+  },
+  {
+    "method": "MG",
+    "deterministic_quality_score": 0.8561586772622404,
+    "average_robustness_score": 0.8561586772622404,
+    "worst_case_score": 0.0,
+    "scenario_feasibility_score": 0.3020833333333333,
+    "runtime_efficiency_score": 0.9446128298500213,
+    "final_score": 0.6106610554792343,
     "rank": 2
   },
   {
     "method": "VDF",
-    "deterministic_quality_score": 0.34722222222222227,
-    "average_robustness_score": 0.34722222222222227,
+    "deterministic_quality_score": 0.2183017139367103,
+    "average_robustness_score": 0.21830171393671027,
     "worst_case_score": 0.0,
-    "scenario_feasibility_score": 0.2708333333333333,
-    "runtime_efficiency_score": 0.9992819143524457,
-    "final_score": 0.3315254136574668,
+    "scenario_feasibility_score": 0.2916666666666667,
+    "runtime_efficiency_score": 0.9985397117897327,
+    "final_score": 0.26366991384416394,
     "rank": 3
   },
   {
     "method": "VF",
-    "deterministic_quality_score": 0.26071512521893436,
-    "average_robustness_score": 0.2607151252189343,
+    "deterministic_quality_score": 0.2047859449228465,
+    "average_robustness_score": 0.2047859449228465,
     "worst_case_score": 0.0,
-    "scenario_feasibility_score": 0.25,
-    "runtime_efficiency_score": 0.9997251346566526,
-    "final_score": 0.2808658323360792,
+    "scenario_feasibility_score": 0.2604166666666667,
+    "runtime_efficiency_score": 0.999364868808716,
+    "final_score": 0.25163125658843716,
     "rank": 4
   }
 ]

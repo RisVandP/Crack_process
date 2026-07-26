@@ -1,24 +1,24 @@
 {
   "case_id": "C09",
   "method": "MG",
-  "solution_hash": "635098caab79f282",
+  "solution_hash": "083ad9e94a26f044",
   "feasible": true,
-  "objective_value": 3076.6553675601435,
+  "objective_value": 2570.6349154020645,
   "objective_breakdown": {
-    "intrinsic_block_value": 2705.855367560144,
-    "ordinary_processing_increment": 250.7999999999999,
-    "precision_processing_increment": 132.0,
-    "same_precision_reward": 24.0,
-    "precision_mismatch_penalty": 20.0,
+    "intrinsic_block_value": 1217.6349154020647,
+    "ordinary_processing_increment": 684.0,
+    "precision_processing_increment": 540.0,
+    "same_precision_reward": 320.0,
+    "precision_mismatch_penalty": 175.0,
     "cross_crack_loss": 16.0,
-    "total_objective": 3076.6553675601435
+    "total_objective": 2570.6349154020645
   },
   "device_usage": {
     "O1": {
-      "assigned_count": 8.0,
-      "total_processing_time": 4.8,
+      "assigned_count": 9.0,
+      "total_processing_time": 4.909090909090908,
       "deadline": 5.2,
-      "utilization": 0.923076923076923
+      "utilization": 0.9440559440559438
     },
     "O2": {
       "assigned_count": 6.0,
@@ -28,15 +28,15 @@
     },
     "O3": {
       "assigned_count": 3.0,
-      "total_processing_time": 4.0859770711363765,
+      "total_processing_time": 4.175170048067818,
       "deadline": 5.2,
-      "utilization": 0.7857648213723801
+      "utilization": 0.8029173169361188
     },
     "O4": {
-      "assigned_count": 2.0,
-      "total_processing_time": 4.7150370255172405,
+      "assigned_count": 1.0,
+      "total_processing_time": 2.420072727272727,
       "deadline": 5.2,
-      "utilization": 0.9067378895225462
+      "utilization": 0.46539860139860134
     },
     "P1": {
       "assigned_count": 4.0,
@@ -130,7 +130,7 @@
     {
       "block_id": "B_4_1",
       "state": "ordinary",
-      "device_id": "O2"
+      "device_id": "O1"
     },
     {
       "block_id": "B_4_2",
@@ -140,7 +140,7 @@
     {
       "block_id": "B_4_3",
       "state": "ordinary",
-      "device_id": "O4"
+      "device_id": "O3"
     },
     {
       "block_id": "B_4_4",
@@ -175,7 +175,7 @@
     {
       "block_id": "B_5_5",
       "state": "ordinary",
-      "device_id": "O3"
+      "device_id": "O2"
     },
     {
       "block_id": "B_6_1",

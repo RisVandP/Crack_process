@@ -1,66 +1,66 @@
 {
   "case_id": "C07",
   "method": "MG-LS",
-  "solution_hash": "4c6a49834b34527f",
+  "solution_hash": "4f6b31069ca8f02b",
   "feasible": true,
-  "objective_value": 3217.3439403220477,
+  "objective_value": 2915.542063978215,
   "objective_breakdown": {
-    "intrinsic_block_value": 2921.9439403220476,
-    "ordinary_processing_increment": 248.4000000000001,
-    "precision_processing_increment": 132.0,
-    "same_precision_reward": 35.0,
-    "precision_mismatch_penalty": 25.0,
+    "intrinsic_block_value": 1530.542063978215,
+    "ordinary_processing_increment": 960.0,
+    "precision_processing_increment": 180.0,
+    "same_precision_reward": 360.0,
+    "precision_mismatch_penalty": 20.0,
     "cross_crack_loss": 95.0,
-    "total_objective": 3217.3439403220477
+    "total_objective": 2915.542063978215
   },
   "device_usage": {
     "O1": {
       "assigned_count": 6.0,
-      "total_processing_time": 4.5,
-      "deadline": 5.0,
-      "utilization": 0.9
+      "total_processing_time": 3.461538461538461,
+      "deadline": 3.6,
+      "utilization": 0.9615384615384613
     },
     "O2": {
-      "assigned_count": 5.0,
-      "total_processing_time": 4.285714285714286,
-      "deadline": 5.0,
-      "utilization": 0.8571428571428571
+      "assigned_count": 4.0,
+      "total_processing_time": 3.116883116883117,
+      "deadline": 3.6,
+      "utilization": 0.8658008658008658
     },
     "O3": {
-      "assigned_count": 4.0,
-      "total_processing_time": 4.0,
-      "deadline": 5.0,
-      "utilization": 0.8
+      "assigned_count": 3.0,
+      "total_processing_time": 2.7272727272727275,
+      "deadline": 3.6,
+      "utilization": 0.7575757575757576
     },
     "O4": {
       "assigned_count": 3.0,
-      "total_processing_time": 3.927424024882026,
-      "deadline": 5.0,
-      "utilization": 0.7854848049764052
+      "total_processing_time": 2.769230769230769,
+      "deadline": 3.6,
+      "utilization": 0.7692307692307692
     },
     "P1": {
-      "assigned_count": 3.0,
-      "total_processing_time": 4.438699214222194,
-      "deadline": 5.0,
-      "utilization": 0.8877398428444389
+      "assigned_count": 2.0,
+      "total_processing_time": 3.182973203134667,
+      "deadline": 3.6,
+      "utilization": 0.884159223092963
     },
     "P2": {
-      "assigned_count": 2.0,
-      "total_processing_time": 4.22154003242164,
-      "deadline": 5.0,
-      "utilization": 0.8443080064843279
+      "assigned_count": 1.0,
+      "total_processing_time": 2.343557019234913,
+      "deadline": 3.6,
+      "utilization": 0.6509880608985869
     }
   },
   "assignments": [
     {
       "block_id": "B_1_1",
-      "state": "ordinary",
-      "device_id": "O4"
+      "state": "unprocessed",
+      "device_id": ""
     },
     {
       "block_id": "B_1_2",
-      "state": "ordinary",
-      "device_id": "O4"
+      "state": "unprocessed",
+      "device_id": ""
     },
     {
       "block_id": "B_1_3",
@@ -99,8 +99,8 @@
     },
     {
       "block_id": "B_2_5",
-      "state": "ordinary",
-      "device_id": "O4"
+      "state": "unprocessed",
+      "device_id": ""
     },
     {
       "block_id": "B_3_1",
@@ -175,7 +175,7 @@
     {
       "block_id": "B_5_5",
       "state": "ordinary",
-      "device_id": "O2"
+      "device_id": "O3"
     },
     {
       "block_id": "B_6_1",
@@ -194,28 +194,28 @@
     },
     {
       "block_id": "B_6_4",
-      "state": "precision",
-      "device_id": "P2"
+      "state": "unprocessed",
+      "device_id": ""
     },
     {
       "block_id": "B_6_5",
-      "state": "precision",
-      "device_id": "P2"
+      "state": "ordinary",
+      "device_id": "O4"
     },
     {
       "block_id": "B_7_1",
       "state": "ordinary",
-      "device_id": "O3"
+      "device_id": "O4"
     },
     {
       "block_id": "B_7_2",
       "state": "ordinary",
-      "device_id": "O3"
+      "device_id": "O4"
     },
     {
       "block_id": "B_7_3",
       "state": "precision",
-      "device_id": "P1"
+      "device_id": "P2"
     },
     {
       "block_id": "B_7_4",

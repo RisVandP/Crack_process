@@ -1,17 +1,17 @@
 {
   "case_id": "C04",
   "method": "MG-LS",
-  "solution_hash": "b9233224bc9f699d",
+  "solution_hash": "46b83eec5a8e8e14",
   "feasible": true,
-  "objective_value": 5054.845820946014,
+  "objective_value": 4262.079538697825,
   "objective_breakdown": {
-    "intrinsic_block_value": 4691.645820946014,
-    "ordinary_processing_increment": 259.20000000000005,
-    "precision_processing_increment": 144.0,
-    "same_precision_reward": 32.0,
-    "precision_mismatch_penalty": 33.0,
+    "intrinsic_block_value": 2559.0795386978252,
+    "ordinary_processing_increment": 432.0,
+    "precision_processing_increment": 720.0,
+    "same_precision_reward": 840.0,
+    "precision_mismatch_penalty": 250.0,
     "cross_crack_loss": 39.0,
-    "total_objective": 5054.845820946014
+    "total_objective": 4262.079538697825
   },
   "device_usage": {
     "O1": {
@@ -27,22 +27,22 @@
       "utilization": 0.9756097560975611
     },
     "O3": {
+      "assigned_count": 3.0,
+      "total_processing_time": 3.75,
+      "deadline": 4.1,
+      "utilization": 0.9146341463414634
+    },
+    "O4": {
       "assigned_count": 4.0,
       "total_processing_time": 4.0,
       "deadline": 4.1,
       "utilization": 0.9756097560975611
     },
-    "O4": {
-      "assigned_count": 3.0,
-      "total_processing_time": 3.5999999999999996,
-      "deadline": 4.1,
-      "utilization": 0.8780487804878049
-    },
     "P1": {
-      "assigned_count": 3.0,
-      "total_processing_time": 3.5999999999999996,
+      "assigned_count": 4.0,
+      "total_processing_time": 4.0,
       "deadline": 4.1,
-      "utilization": 0.8780487804878049
+      "utilization": 0.9756097560975611
     },
     "P2": {
       "assigned_count": 2.0,
@@ -140,12 +140,12 @@
     {
       "block_id": "B_3_6",
       "state": "ordinary",
-      "device_id": "O3"
+      "device_id": "O4"
     },
     {
       "block_id": "B_4_1",
-      "state": "precision",
-      "device_id": "P2"
+      "state": "ordinary",
+      "device_id": "O4"
     },
     {
       "block_id": "B_4_2",
@@ -155,7 +155,7 @@
     {
       "block_id": "B_4_3",
       "state": "ordinary",
-      "device_id": "O3"
+      "device_id": "O4"
     },
     {
       "block_id": "B_4_4",
@@ -165,7 +165,7 @@
     {
       "block_id": "B_4_5",
       "state": "ordinary",
-      "device_id": "O3"
+      "device_id": "O4"
     },
     {
       "block_id": "B_4_6",
@@ -174,8 +174,8 @@
     },
     {
       "block_id": "B_5_1",
-      "state": "precision",
-      "device_id": "P2"
+      "state": "ordinary",
+      "device_id": "O3"
     },
     {
       "block_id": "B_5_2",
@@ -200,7 +200,7 @@
     {
       "block_id": "B_5_6",
       "state": "ordinary",
-      "device_id": "O4"
+      "device_id": "O3"
     },
     {
       "block_id": "B_6_1",
@@ -209,8 +209,8 @@
     },
     {
       "block_id": "B_6_2",
-      "state": "ordinary",
-      "device_id": "O4"
+      "state": "precision",
+      "device_id": "P1"
     },
     {
       "block_id": "B_6_3",
@@ -219,8 +219,8 @@
     },
     {
       "block_id": "B_6_4",
-      "state": "ordinary",
-      "device_id": "O4"
+      "state": "unprocessed",
+      "device_id": ""
     },
     {
       "block_id": "B_6_5",
@@ -239,8 +239,8 @@
     },
     {
       "block_id": "B_7_2",
-      "state": "unprocessed",
-      "device_id": ""
+      "state": "precision",
+      "device_id": "P2"
     },
     {
       "block_id": "B_7_3",
@@ -269,8 +269,8 @@
     },
     {
       "block_id": "B_8_2",
-      "state": "unprocessed",
-      "device_id": ""
+      "state": "precision",
+      "device_id": "P2"
     },
     {
       "block_id": "B_8_3",

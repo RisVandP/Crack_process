@@ -3,15 +3,15 @@
   "method": "MG-LS",
   "solution_hash": "bf96a69dd78f63fe",
   "feasible": true,
-  "objective_value": 4173.899440926203,
+  "objective_value": 2155.8426175398013,
   "objective_breakdown": {
-    "intrinsic_block_value": 4092.299440926203,
-    "ordinary_processing_increment": 168.0,
-    "precision_processing_increment": 33.599999999999994,
-    "same_precision_reward": 12.0,
-    "precision_mismatch_penalty": 12.0,
+    "intrinsic_block_value": 1753.8426175398013,
+    "ordinary_processing_increment": 336.0,
+    "precision_processing_increment": 216.0,
+    "same_precision_reward": 90.0,
+    "precision_mismatch_penalty": 120.0,
     "cross_crack_loss": 120.0,
-    "total_objective": 4173.899440926203
+    "total_objective": 2155.8426175398013
   },
   "device_usage": {
     "O1": {

@@ -1,17 +1,17 @@
 {
   "case_id": "C12",
   "method": "VDF",
-  "solution_hash": "d0c4844cc3dc0db2",
+  "solution_hash": "1e4e0e75408e06b2",
   "feasible": true,
-  "objective_value": 4169.899440926203,
+  "objective_value": 2035.8426175398013,
   "objective_breakdown": {
-    "intrinsic_block_value": 4092.299440926203,
-    "ordinary_processing_increment": 168.0,
-    "precision_processing_increment": 33.599999999999994,
-    "same_precision_reward": 12.0,
-    "precision_mismatch_penalty": 16.0,
+    "intrinsic_block_value": 1753.8426175398013,
+    "ordinary_processing_increment": 336.0,
+    "precision_processing_increment": 216.0,
+    "same_precision_reward": 90.0,
+    "precision_mismatch_penalty": 240.0,
     "cross_crack_loss": 120.0,
-    "total_objective": 4169.899440926203
+    "total_objective": 2035.8426175398013
   },
   "device_usage": {
     "O1": {
@@ -88,13 +88,13 @@
     },
     {
       "block_id": "B_2_3",
-      "state": "ordinary",
-      "device_id": "O2"
+      "state": "precision",
+      "device_id": "P1"
     },
     {
       "block_id": "B_2_4",
-      "state": "ordinary",
-      "device_id": "O2"
+      "state": "precision",
+      "device_id": "P1"
     },
     {
       "block_id": "B_2_5",
@@ -133,8 +133,8 @@
     },
     {
       "block_id": "B_3_6",
-      "state": "precision",
-      "device_id": "P1"
+      "state": "ordinary",
+      "device_id": "O2"
     },
     {
       "block_id": "B_4_1",
@@ -163,8 +163,8 @@
     },
     {
       "block_id": "B_4_6",
-      "state": "precision",
-      "device_id": "P1"
+      "state": "ordinary",
+      "device_id": "O2"
     },
     {
       "block_id": "B_5_1",

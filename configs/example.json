@@ -25,43 +25,43 @@
           "height": 15,
           "m": 6,
           "n": 5,
-          "base_value": 100
+          "base_value": 50
         },
         "deadline": 5.0,
         "devices": [
           {
             "id": "O1",
             "type": "ordinary",
-            "speed": 14
+            "speed": 24
           },
           {
             "id": "O2",
             "type": "ordinary",
-            "speed": 12
+            "speed": 18
           },
           {
             "id": "O3",
             "type": "ordinary",
-            "speed": 10
+            "speed": 15
           },
           {
             "id": "P1",
             "type": "precision",
-            "speed": 8
+            "speed": 5.2
           },
           {
             "id": "P2",
             "type": "precision",
-            "speed": 6.5
+            "speed": 4.2
           }
         ],
         "values": {
-          "r_ordinary": 1.1,
-          "r_precision": 2.0,
+          "r_ordinary": 4,
+          "r_precision": 6,
           "default_same_precision_reward": 5,
-          "default_precision_mismatch_penalty": 3,
-          "default_cross_crack_loss": 1.5,
-          "alpha": 0.7
+          "default_precision_mismatch_penalty": 20,
+          "default_cross_crack_loss": 4,
+          "alpha": 1.0
         },
         "cracks": {
           "mode": "geometry",
@@ -322,38 +322,38 @@
           "height": 9,
           "m": 4,
           "n": 3,
-          "base_value": 90
+          "base_value": 40
         },
         "deadline": 6.0,
         "devices": [
           {
             "id": "O1",
             "type": "ordinary",
-            "speed": 14.0
+            "speed": 21.0
           },
           {
             "id": "O2",
             "type": "ordinary",
-            "speed": 18.0
+            "speed": 21.6
           },
           {
             "id": "P1",
             "type": "precision",
-            "speed": 10.0
+            "speed": 15.0
           },
           {
             "id": "P2",
             "type": "precision",
-            "speed": 4.9
+            "speed": 7.35
           }
         ],
         "values": {
-          "r_ordinary": 1.2,
-          "r_precision": 1.4,
-          "default_same_precision_reward": 0,
-          "default_precision_mismatch_penalty": 7,
-          "default_cross_crack_loss": 0.5,
-          "alpha": 0.5
+          "r_ordinary": 1,
+          "r_precision": 12,
+          "default_same_precision_reward": 180,
+          "default_precision_mismatch_penalty": 70,
+          "default_cross_crack_loss": 2,
+          "alpha": 0.4
         },
         "cracks": {
           "mode": "geometry",
@@ -584,58 +584,58 @@
           "height": 18,
           "m": 8,
           "n": 6,
-          "base_value": 110
+          "base_value": 40
         },
         "deadline": 5.2,
         "devices": [
           {
             "id": "O1",
             "type": "ordinary",
-            "speed": 18
+            "speed": 18.0
           },
           {
             "id": "O2",
             "type": "ordinary",
-            "speed": 16
+            "speed": 12.8
           },
           {
             "id": "O3",
             "type": "ordinary",
-            "speed": 14
+            "speed": 16.8
           },
           {
             "id": "O4",
             "type": "ordinary",
-            "speed": 12
+            "speed": 12.0
           },
           {
             "id": "O5",
             "type": "ordinary",
-            "speed": 10
+            "speed": 10.0
           },
           {
             "id": "P1",
             "type": "precision",
-            "speed": 10
+            "speed": 12.0
           },
           {
             "id": "P2",
             "type": "precision",
-            "speed": 8
+            "speed": 6.4
           },
           {
             "id": "P3",
             "type": "precision",
-            "speed": 6.5
+            "speed": 7.8
           }
         ],
         "values": {
-          "r_ordinary": 1.2,
-          "r_precision": 2.6,
-          "default_same_precision_reward": 8,
-          "default_precision_mismatch_penalty": 5,
-          "default_cross_crack_loss": 3,
-          "alpha": 0.75
+          "r_ordinary": 3,
+          "r_precision": 10,
+          "default_same_precision_reward": 120,
+          "default_precision_mismatch_penalty": 30,
+          "default_cross_crack_loss": 8,
+          "alpha": 0.6
         },
         "cracks": {
           "mode": "geometry",
@@ -934,48 +934,48 @@
           "height": 18,
           "m": 8,
           "n": 6,
-          "base_value": 110
+          "base_value": 60
         },
         "deadline": 4.1,
         "devices": [
           {
             "id": "O1",
             "type": "ordinary",
-            "speed": 18
+            "speed": 18.0
           },
           {
             "id": "O2",
             "type": "ordinary",
-            "speed": 15
+            "speed": 15.0
           },
           {
             "id": "O3",
             "type": "ordinary",
-            "speed": 12
+            "speed": 9.6
           },
           {
             "id": "O4",
             "type": "ordinary",
-            "speed": 10
+            "speed": 12.0
           },
           {
             "id": "P1",
             "type": "precision",
-            "speed": 10
+            "speed": 12.0
           },
           {
             "id": "P2",
             "type": "precision",
-            "speed": 7
+            "speed": 7.0
           }
         ],
         "values": {
-          "r_ordinary": 1.2,
-          "r_precision": 2.4,
-          "default_same_precision_reward": 8,
-          "default_precision_mismatch_penalty": 5.5,
-          "default_cross_crack_loss": 3,
-          "alpha": 0.7
+          "r_ordinary": 2,
+          "r_precision": 10,
+          "default_same_precision_reward": 120,
+          "default_precision_mismatch_penalty": 50,
+          "default_cross_crack_loss": 8,
+          "alpha": 0.6
         },
         "cracks": {
           "mode": "geometry",
@@ -1266,43 +1266,43 @@
           "height": 15,
           "m": 6,
           "n": 5,
-          "base_value": 95
+          "base_value": 50
         },
-        "deadline": 5.4,
+        "deadline": 3.78,
         "devices": [
           {
             "id": "O1",
             "type": "ordinary",
-            "speed": 15.0
+            "speed": 19.5
           },
           {
             "id": "O2",
             "type": "ordinary",
-            "speed": 14.4
+            "speed": 18.72
           },
           {
             "id": "O3",
             "type": "ordinary",
-            "speed": 10.0
+            "speed": 13.0
           },
           {
             "id": "P1",
             "type": "precision",
-            "speed": 5.6
+            "speed": 5.04
           },
           {
             "id": "P2",
             "type": "precision",
-            "speed": 4.2
+            "speed": 3.78
           }
         ],
         "values": {
-          "r_ordinary": 1.5,
-          "r_precision": 3.6,
-          "default_same_precision_reward": 12,
-          "default_precision_mismatch_penalty": 7,
-          "default_cross_crack_loss": 6,
-          "alpha": 1.2
+          "r_ordinary": 6,
+          "r_precision": 8,
+          "default_same_precision_reward": 5,
+          "default_precision_mismatch_penalty": 35,
+          "default_cross_crack_loss": 2,
+          "alpha": 1.4
         },
         "cracks": {
           "mode": "geometry",
@@ -1615,29 +1615,29 @@
           "height": 15,
           "m": 6,
           "n": 5,
-          "base_value": 100
+          "base_value": 40
         },
         "deadline": 5.1,
         "devices": [
           {
             "id": "O1",
             "type": "ordinary",
-            "speed": 15
+            "speed": 18.0
           },
           {
             "id": "O2",
             "type": "ordinary",
-            "speed": 12
+            "speed": 14.4
           },
           {
             "id": "O3",
             "type": "ordinary",
-            "speed": 9
+            "speed": 7.2
           },
           {
             "id": "P1",
             "type": "precision",
-            "speed": 8
+            "speed": 9.6
           },
           {
             "id": "P2",
@@ -1646,12 +1646,12 @@
           }
         ],
         "values": {
-          "r_ordinary": 1.1,
-          "r_precision": 2.1,
-          "default_same_precision_reward": 8,
-          "default_precision_mismatch_penalty": 5,
-          "default_cross_crack_loss": 2,
-          "alpha": 0.85
+          "r_ordinary": 2,
+          "r_precision": 10,
+          "default_same_precision_reward": 120,
+          "default_precision_mismatch_penalty": 50,
+          "default_cross_crack_loss": 4,
+          "alpha": 1.0
         },
         "cracks": {
           "mode": "geometry",
@@ -1964,29 +1964,29 @@
           "height": 15,
           "m": 7,
           "n": 5,
-          "base_value": 105
+          "base_value": 55
         },
-        "deadline": 5.0,
+        "deadline": 3.6,
         "devices": [
           {
             "id": "O1",
             "type": "ordinary",
-            "speed": 16
+            "speed": 20.8
           },
           {
             "id": "O2",
             "type": "ordinary",
-            "speed": 14
+            "speed": 15.4
           },
           {
             "id": "O3",
             "type": "ordinary",
-            "speed": 12
+            "speed": 13.2
           },
           {
             "id": "O4",
             "type": "ordinary",
-            "speed": 10
+            "speed": 13.0
           },
           {
             "id": "P1",
@@ -1996,16 +1996,16 @@
           {
             "id": "P2",
             "type": "precision",
-            "speed": 6.5
+            "speed": 5.2
           }
         ],
         "values": {
-          "r_ordinary": 1.15,
-          "r_precision": 2.2,
-          "default_same_precision_reward": 7,
+          "r_ordinary": 5,
+          "r_precision": 5,
+          "default_same_precision_reward": 180,
           "default_precision_mismatch_penalty": 5,
-          "default_cross_crack_loss": 5,
-          "alpha": 0.8
+          "default_cross_crack_loss": 8,
+          "alpha": 1.5
         },
         "cracks": {
           "mode": "geometry",
@@ -2304,48 +2304,48 @@
           "height": 15,
           "m": 6,
           "n": 5,
-          "base_value": 100
+          "base_value": 50
         },
         "deadline": 5.0,
         "devices": [
           {
             "id": "O1",
             "type": "ordinary",
-            "speed": 24.0
+            "speed": 52.8
           },
           {
             "id": "O2",
             "type": "ordinary",
-            "speed": 14.0
+            "speed": 25.2
           },
           {
             "id": "O3",
             "type": "ordinary",
-            "speed": 14.4
+            "speed": 18.72
           },
           {
             "id": "O4",
             "type": "ordinary",
-            "speed": 10.0
+            "speed": 22.0
           },
           {
             "id": "O5",
             "type": "ordinary",
-            "speed": 9.6
+            "speed": 17.28
           },
           {
             "id": "P1",
             "type": "precision",
-            "speed": 5.5
+            "speed": 4.95
           }
         ],
         "values": {
-          "r_ordinary": 2.2,
-          "r_precision": 2.6,
-          "default_same_precision_reward": 1,
-          "default_precision_mismatch_penalty": 0,
-          "default_cross_crack_loss": 4,
-          "alpha": 0.2
+          "r_ordinary": 6,
+          "r_precision": 8,
+          "default_same_precision_reward": 5,
+          "default_precision_mismatch_penalty": 35,
+          "default_cross_crack_loss": 5,
+          "alpha": 0.8
         },
         "cracks": {
           "mode": "geometry",
@@ -2610,24 +2610,24 @@
           "height": 15,
           "m": 6,
           "n": 5,
-          "base_value": 100
+          "base_value": 45
         },
         "deadline": 5.2,
         "devices": [
           {
             "id": "O1",
             "type": "ordinary",
-            "speed": 20
+            "speed": 22.0
           },
           {
             "id": "O2",
             "type": "ordinary",
-            "speed": 14
+            "speed": 14.0
           },
           {
             "id": "O3",
             "type": "ordinary",
-            "speed": 9
+            "speed": 9.0
           },
           {
             "id": "O4",
@@ -2637,7 +2637,7 @@
           {
             "id": "P1",
             "type": "precision",
-            "speed": 10
+            "speed": 10.0
           },
           {
             "id": "P2",
@@ -2646,12 +2646,12 @@
           }
         ],
         "values": {
-          "r_ordinary": 1.1,
-          "r_precision": 2.2,
-          "default_same_precision_reward": 6,
-          "default_precision_mismatch_penalty": 4,
-          "default_cross_crack_loss": 2,
-          "alpha": 0.75
+          "r_ordinary": 3,
+          "r_precision": 9,
+          "default_same_precision_reward": 80,
+          "default_precision_mismatch_penalty": 35,
+          "default_cross_crack_loss": 6,
+          "alpha": 0.8
         },
         "cracks": {
           "mode": "geometry",
@@ -2916,33 +2916,33 @@
           "height": 12,
           "m": 6,
           "n": 4,
-          "base_value": 100
+          "base_value": 40
         },
-        "deadline": 3.4,
+        "deadline": 2.72,
         "devices": [
           {
             "id": "O1",
             "type": "ordinary",
-            "speed": 10
+            "speed": 15.0
           },
           {
             "id": "O2",
             "type": "ordinary",
-            "speed": 8
+            "speed": 9.6
           },
           {
             "id": "P1",
             "type": "precision",
-            "speed": 5.5
+            "speed": 8.25
           }
         ],
         "values": {
-          "r_ordinary": 1.2,
-          "r_precision": 2.3,
-          "default_same_precision_reward": 6,
-          "default_precision_mismatch_penalty": 4,
+          "r_ordinary": 5,
+          "r_precision": 10,
+          "default_same_precision_reward": 100,
+          "default_precision_mismatch_penalty": 70,
           "default_cross_crack_loss": 2,
-          "alpha": 0.8
+          "alpha": 0.4
         },
         "cracks": {
           "mode": "geometry",
@@ -3195,48 +3195,48 @@
           "height": 15,
           "m": 6,
           "n": 5,
-          "base_value": 100
+          "base_value": 50
         },
-        "deadline": 5.1,
+        "deadline": 4.2,
         "devices": [
           {
             "id": "O1",
             "type": "ordinary",
-            "speed": 15
+            "speed": 16.5
           },
           {
             "id": "O2",
             "type": "ordinary",
-            "speed": 12
+            "speed": 13.2
           },
           {
             "id": "O3",
             "type": "ordinary",
-            "speed": 10
+            "speed": 9.0
           },
           {
             "id": "P1",
             "type": "precision",
-            "speed": 8.5
+            "speed": 10.2
           },
           {
             "id": "P2",
             "type": "precision",
-            "speed": 7
+            "speed": 5.04
           },
           {
             "id": "P3",
             "type": "precision",
-            "speed": 6
+            "speed": 5.76
           }
         ],
         "values": {
-          "r_ordinary": 1.1,
-          "r_precision": 2.2,
-          "default_same_precision_reward": 13,
-          "default_precision_mismatch_penalty": 9,
-          "default_cross_crack_loss": 2,
-          "alpha": 0.65
+          "r_ordinary": 5,
+          "r_precision": 5,
+          "default_same_precision_reward": 140,
+          "default_precision_mismatch_penalty": 5,
+          "default_cross_crack_loss": 4,
+          "alpha": 1.5
         },
         "cracks": {
           "mode": "geometry",
@@ -3527,7 +3527,7 @@
           "height": 18,
           "m": 8,
           "n": 6,
-          "base_value": 105
+          "base_value": 45
         },
         "deadline": 3.8,
         "devices": [
@@ -3558,12 +3558,12 @@
           }
         ],
         "values": {
-          "r_ordinary": 1.0,
-          "r_precision": 1.4,
-          "default_same_precision_reward": 12,
-          "default_precision_mismatch_penalty": 4,
-          "default_cross_crack_loss": 6,
-          "alpha": 0.8
+          "r_ordinary": 2,
+          "r_precision": 9,
+          "default_same_precision_reward": 90,
+          "default_precision_mismatch_penalty": 40,
+          "default_cross_crack_loss": 8,
+          "alpha": 1.0
         },
         "cracks": {
           "mode": "geometry",

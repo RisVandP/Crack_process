@@ -421,7 +421,8 @@ def _plot_outputs(stage1_rows: list[dict], stage2_rows: list[dict], ranking: lis
 
     plt.rcParams["font.sans-serif"] = ["Microsoft YaHei", "SimHei", "Arial Unicode MS", "DejaVu Sans"]
     plt.rcParams["axes.unicode_minus"] = False
-    methods = sorted({row["method"] for row in stage1_rows})
+    preferred_methods = ["VF", "VDF", "MG", "MG-LS"]
+    methods = [method for method in preferred_methods if any(row["method"] == method for row in stage1_rows)]
     cases = sorted({row["case_id"] for row in stage1_rows})
 
     fig, ax = plt.subplots(figsize=(11, 4.8))
@@ -439,6 +440,22 @@ def _plot_outputs(stage1_rows: list[dict], stage2_rows: list[dict], ranking: lis
     ax.legend(ncol=len(methods), loc="upper center", bbox_to_anchor=(0.5, 1.18), frameon=False)
     fig.tight_layout()
     fig.savefig(out / "objective_by_case_line.png", dpi=180)
+    plt.close(fig)
+
+    fig, ax = plt.subplots(figsize=(11, 4.8))
+    for method in methods:
+        values = [
+            next(float(row["objective_decision"]) for row in stage1_rows if row["case_id"] == case and row["method"] == method)
+            for case in cases
+        ]
+        ax.plot(cases, values, marker=markers.get(method, "o"), linewidth=2, markersize=5, label=method)
+    ax.set_xlabel("Case")
+    ax.set_ylabel("Decision contribution")
+    ax.set_title("Processing decision contribution by case")
+    ax.grid(True, axis="y", linestyle="--", alpha=0.35)
+    ax.legend(ncol=len(methods), loc="upper center", bbox_to_anchor=(0.5, 1.18), frameon=False)
+    fig.tight_layout()
+    fig.savefig(out / "decision_value_by_case_line.png", dpi=180)
     plt.close(fig)
 
     fig, ax = plt.subplots(figsize=(10, 4))

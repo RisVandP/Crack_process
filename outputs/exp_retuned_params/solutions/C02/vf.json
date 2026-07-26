@@ -1,17 +1,17 @@
 {
   "case_id": "C02",
   "method": "VF",
-  "solution_hash": "9524784b7dea1297",
+  "solution_hash": "10d8340f57d7f20f",
   "feasible": true,
-  "objective_value": 1178.8923295927848,
+  "objective_value": 3231.241035374571,
   "objective_breakdown": {
-    "intrinsic_block_value": 1033.2923295927849,
-    "ordinary_processing_increment": 72.0,
-    "precision_processing_increment": 117.59999999999998,
-    "same_precision_reward": 0.0,
-    "precision_mismatch_penalty": 42.0,
+    "intrinsic_block_value": 459.2410353745711,
+    "ordinary_processing_increment": 24.0,
+    "precision_processing_increment": 1440.0,
+    "same_precision_reward": 1800.0,
+    "precision_mismatch_penalty": 490.0,
     "cross_crack_loss": 2.0,
-    "total_objective": 1178.8923295927848
+    "total_objective": 3231.241035374571
   },
   "device_usage": {
     "O1": {
@@ -21,22 +21,22 @@
       "utilization": 0.0
     },
     "O2": {
-      "assigned_count": 5.0,
-      "total_processing_time": 3.506324705211907,
+      "assigned_count": 2.0,
+      "total_processing_time": 1.1809475802699019,
       "deadline": 6.0,
-      "utilization": 0.5843874508686512
+      "utilization": 0.1968245967116503
     },
     "P1": {
-      "assigned_count": 5.0,
-      "total_processing_time": 6.0,
+      "assigned_count": 7.0,
+      "total_processing_time": 5.6,
       "deadline": 6.0,
-      "utilization": 1.0
+      "utilization": 0.9333333333333332
     },
     "P2": {
-      "assigned_count": 2.0,
-      "total_processing_time": 4.897959183673469,
+      "assigned_count": 3.0,
+      "total_processing_time": 5.031647349826065,
       "deadline": 6.0,
-      "utilization": 0.8163265306122448
+      "utilization": 0.8386078916376776
     }
   },
   "assignments": [
@@ -52,8 +52,8 @@
     },
     {
       "block_id": "B_1_3",
-      "state": "ordinary",
-      "device_id": "O2"
+      "state": "precision",
+      "device_id": "P2"
     },
     {
       "block_id": "B_2_1",
@@ -62,8 +62,8 @@
     },
     {
       "block_id": "B_2_2",
-      "state": "ordinary",
-      "device_id": "O2"
+      "state": "precision",
+      "device_id": "P2"
     },
     {
       "block_id": "B_2_3",
@@ -82,8 +82,8 @@
     },
     {
       "block_id": "B_3_3",
-      "state": "ordinary",
-      "device_id": "O2"
+      "state": "precision",
+      "device_id": "P2"
     },
     {
       "block_id": "B_4_1",
@@ -93,12 +93,12 @@
     {
       "block_id": "B_4_2",
       "state": "precision",
-      "device_id": "P2"
+      "device_id": "P1"
     },
     {
       "block_id": "B_4_3",
       "state": "precision",
-      "device_id": "P2"
+      "device_id": "P1"
     }
   ]
 }

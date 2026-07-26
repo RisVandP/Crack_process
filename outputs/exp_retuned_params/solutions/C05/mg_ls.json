@@ -1,48 +1,48 @@
 {
   "case_id": "C05",
   "method": "MG-LS",
-  "solution_hash": "ee80605c5120f023",
+  "solution_hash": "2bffc8747d1ed2fa",
   "feasible": true,
-  "objective_value": 2853.1435747054056,
+  "objective_value": 2438.917670897582,
   "objective_breakdown": {
-    "intrinsic_block_value": 2475.5435747054057,
-    "ordinary_processing_increment": 288.0,
-    "precision_processing_increment": 129.60000000000002,
-    "same_precision_reward": 24.0,
-    "precision_mismatch_penalty": 28.0,
+    "intrinsic_block_value": 1302.917670897582,
+    "ordinary_processing_increment": 1080.0,
+    "precision_processing_increment": 192.0,
+    "same_precision_reward": 5.0,
+    "precision_mismatch_penalty": 105.0,
     "cross_crack_loss": 36.0,
-    "total_objective": 2853.1435747054056
+    "total_objective": 2438.917670897582
   },
   "device_usage": {
     "O1": {
       "assigned_count": 6.0,
-      "total_processing_time": 4.8,
-      "deadline": 5.4,
-      "utilization": 0.8888888888888888
+      "total_processing_time": 3.6923076923076925,
+      "deadline": 3.78,
+      "utilization": 0.9768009768009769
     },
     "O2": {
-      "assigned_count": 6.0,
-      "total_processing_time": 4.999999999999999,
-      "deadline": 5.4,
-      "utilization": 0.9259259259259257
+      "assigned_count": 5.0,
+      "total_processing_time": 3.2051282051282053,
+      "deadline": 3.78,
+      "utilization": 0.8479175145841813
     },
     "O3": {
       "assigned_count": 4.0,
-      "total_processing_time": 4.8,
-      "deadline": 5.4,
-      "utilization": 0.8888888888888888
+      "total_processing_time": 3.6923076923076925,
+      "deadline": 3.78,
+      "utilization": 0.9768009768009769
     },
     "P1": {
-      "assigned_count": 2.0,
-      "total_processing_time": 4.285714285714286,
-      "deadline": 5.4,
-      "utilization": 0.7936507936507936
+      "assigned_count": 1.0,
+      "total_processing_time": 2.380952380952381,
+      "deadline": 3.78,
+      "utilization": 0.6298815822625347
     },
     "P2": {
       "assigned_count": 1.0,
-      "total_processing_time": 2.857142857142857,
-      "deadline": 5.4,
-      "utilization": 0.5291005291005291
+      "total_processing_time": 3.174603174603175,
+      "deadline": 3.78,
+      "utilization": 0.8398421096833797
     }
   },
   "assignments": [
@@ -149,7 +149,7 @@
     {
       "block_id": "B_5_1",
       "state": "ordinary",
-      "device_id": "O2"
+      "device_id": "O3"
     },
     {
       "block_id": "B_5_2",
@@ -178,18 +178,18 @@
     },
     {
       "block_id": "B_6_2",
-      "state": "ordinary",
-      "device_id": "O3"
+      "state": "unprocessed",
+      "device_id": ""
     },
     {
       "block_id": "B_6_3",
-      "state": "precision",
-      "device_id": "P2"
+      "state": "unprocessed",
+      "device_id": ""
     },
     {
       "block_id": "B_6_4",
       "state": "precision",
-      "device_id": "P1"
+      "device_id": "P2"
     },
     {
       "block_id": "B_6_5",
