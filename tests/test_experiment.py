@@ -9,10 +9,27 @@ from src.model.solution_utils import empty_solution
 
 def test_example_json_has_required_case_and_scenario_counts():
     cfg = load_experiment_config("configs/example.json")
+    assert cfg["experiment_type"] == "scenario"
     assert len(cfg["cases"]) == 12
     assert cfg["algorithms"] == ["VF", "VDF", "MG", "MG-LS"]
     for case in cfg["cases"]:
         assert len(case["uncertainty_scenarios"]) == 8
+
+
+def test_sensitivity_json_has_controlled_factor_design():
+    cfg = load_experiment_config("configs/sensitivity.json")
+    assert cfg["experiment_type"] == "sensitivity"
+    assert cfg["algorithms"] == ["VF", "VDF", "MG", "MG-LS"]
+    assert len(cfg["cases"]) == 30
+    factors = {}
+    for case in cfg["cases"]:
+        factors.setdefault(case["factor"], []).append(case)
+        assert len(case["uncertainty_scenarios"]) == 8
+        parse_problem(case["deterministic_input"])
+    assert set(factors) == {"board_scale", "crack_distribution", "device_performance", "deadline", "value_structure"}
+    assert all(len(cases) == 6 for cases in factors.values())
+    assert [case["level"] for case in factors["board_scale"]] == [1, 2, 3, 4, 5, 6]
+    assert [len(case["deterministic_input"]["cracks"]["items"]) for case in factors["crack_distribution"]] == [0, 1, 2, 3, 4, 5]
 
 
 def test_example_json_uses_only_formal_geometry_inputs():

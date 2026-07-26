@@ -1,4 +1,4 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 import argparse
 import csv
@@ -106,6 +106,8 @@ def eval_scenario(case: dict, data: ProblemData, solution: Solution, solution_ha
     return {
         "case_id": case["id"],
         "case_name": case["name"],
+        "factor": case.get("factor", "scenario"),
+        "level": case.get("level", ""),
         "scenario_id": scenario["id"],
         "scenario_name": scenario["name"],
         "method": solution.solver_name,
@@ -184,6 +186,8 @@ def _stage1_row(case: dict, method: str, data: ProblemData, solution: Solution, 
     return {
         "case_id": case["id"],
         "case_name": case["name"],
+        "factor": case.get("factor", "scenario"),
+        "level": case.get("level", ""),
         "difficulty": case["difficulty"],
         "method": method,
         "solution_hash": solution_hash,
@@ -348,8 +352,11 @@ def _validate_experiment_config(cfg: dict) -> None:
         raise ValueError("schema_version必须为2.0。")
     if set(cfg["algorithms"]) != set(METHODS):
         raise ValueError("algorithms必须包含VF、VDF、MG、MG-LS。")
-    if len(cfg["cases"]) != 12:
-        raise ValueError("正式实验必须包含12个确定性案例。")
+    experiment_type = cfg.get("experiment_type", "scenario")
+    if experiment_type == "scenario" and len(cfg["cases"]) != 12:
+        raise ValueError("scenario experiment must contain 12 deterministic cases.")
+    if experiment_type == "sensitivity" and len(cfg["cases"]) == 0:
+        raise ValueError("sensitivity experiment must contain at least one deterministic case.")
     weight_sum = sum(float(v) for v in cfg["evaluation_weights"].values())
     if abs(weight_sum - 1.0) > 1e-9:
         raise ValueError("evaluation_weights之和必须为1。")
@@ -391,7 +398,7 @@ def _validate_experiment_config(cfg: dict) -> None:
         cracks = case["deterministic_input"].get("cracks", {})
         if cracks.get("mode") != "geometry":
             raise ValueError(f"{case['id']} 正式实验必须使用geometry裂纹模式。")
-        if not cracks.get("items"):
+        if experiment_type == "scenario" and not cracks.get("items"):
             raise ValueError(f"{case['id']} 至少需要一条观测裂纹。")
         for item in cracks.get("items", []):
             for x, y in item["polyline"]:
@@ -458,6 +465,9 @@ def _plot_outputs(stage1_rows: list[dict], stage2_rows: list[dict], ranking: lis
     fig.savefig(out / "decision_value_by_case_line.png", dpi=180)
     plt.close(fig)
 
+    if any(row.get("factor", "scenario") != "scenario" for row in stage1_rows):
+        _plot_sensitivity_outputs(stage1_rows, methods, markers, out, plt)
+
     fig, ax = plt.subplots(figsize=(10, 4))
     ax.bar(methods, [_mean(float(row["objective_value"]) for row in stage1_rows if row["method"] == method) for method in methods])
     ax.set_title("Mean deterministic objective")
@@ -492,6 +502,37 @@ def _plot_outputs(stage1_rows: list[dict], stage2_rows: list[dict], ranking: lis
     fig.tight_layout()
     fig.savefig(out / "final_score_comparison.png", dpi=180)
     plt.close(fig)
+
+
+def _plot_sensitivity_outputs(stage1_rows: list[dict], methods: list[str], markers: dict[str, str], out: Path, plt) -> None:
+    factors = sorted({row["factor"] for row in stage1_rows if row.get("factor", "scenario") != "scenario"})
+    for factor in factors:
+        factor_rows = [row for row in stage1_rows if row.get("factor") == factor]
+        levels = sorted({int(row["level"]) for row in factor_rows})
+        labels = [f"L{level}" for level in levels]
+        for metric, ylabel, filename in [
+            ("objective_value", "Total objective value", f"sensitivity_{factor}_objective.png"),
+            ("objective_decision", "Decision contribution", f"sensitivity_{factor}_decision.png"),
+        ]:
+            fig, ax = plt.subplots(figsize=(9, 4.6))
+            for method in methods:
+                values = []
+                for level in levels:
+                    matched = [
+                        row
+                        for row in factor_rows
+                        if int(row["level"]) == level and row["method"] == method
+                    ]
+                    values.append(float(matched[0][metric]) if matched else 0.0)
+                ax.plot(labels, values, marker=markers.get(method, "o"), linewidth=2, markersize=5, label=method)
+            ax.set_xlabel("Parameter level")
+            ax.set_ylabel(ylabel)
+            ax.set_title(f"{factor}: {ylabel}")
+            ax.grid(True, axis="y", linestyle="--", alpha=0.35)
+            ax.legend(ncol=len(methods), loc="upper center", bbox_to_anchor=(0.5, 1.18), frameon=False)
+            fig.tight_layout()
+            fig.savefig(out / filename, dpi=180)
+            plt.close(fig)
 
 
 def _write_analysis(cfg: dict, stage1_rows: list[dict], stage2_rows: list[dict], ranking: list[dict], path: Path) -> None:
@@ -557,3 +598,4 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+

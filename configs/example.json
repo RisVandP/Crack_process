@@ -3891,5 +3891,8 @@
         }
       ]
     }
-  ]
+  ],
+  "experiment_type": "scenario",
+  "name": "算法适用性场景实验配置",
+  "description": "用于比较VF、VDF、MG、MG-LS在典型组合场景与不确定情景下的适用范围。"
 }

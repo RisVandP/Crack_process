@@ -1,0 +1,42 @@
+[
+  {
+    "method": "MG",
+    "deterministic_quality_score": 0.7238216223655459,
+    "average_robustness_score": 0.7238216223655468,
+    "worst_case_score": 0.0,
+    "scenario_feasibility_score": 0.25416666666666665,
+    "runtime_efficiency_score": 0.9604471165630529,
+    "final_score": 0.5322716039573558,
+    "rank": 2
+  },
+  {
+    "method": "MG-LS",
+    "deterministic_quality_score": 0.9123431400351159,
+    "average_robustness_score": 0.9123431400351163,
+    "worst_case_score": 0.0,
+    "scenario_feasibility_score": 0.225,
+    "runtime_efficiency_score": 0.0,
+    "final_score": 0.5355387270193137,
+    "rank": 1
+  },
+  {
+    "method": "VDF",
+    "deterministic_quality_score": 0.3130309091691206,
+    "average_robustness_score": 0.3130309091691206,
+    "worst_case_score": 0.0,
+    "scenario_feasibility_score": 0.20416666666666666,
+    "runtime_efficiency_score": 0.9991077466808469,
+    "final_score": 0.302702774711101,
+    "rank": 4
+  },
+  {
+    "method": "VF",
+    "deterministic_quality_score": 0.3375642378009266,
+    "average_robustness_score": 0.33756423780092626,
+    "worst_case_score": 0.0,
+    "scenario_feasibility_score": 0.17916666666666667,
+    "runtime_efficiency_score": 0.9998798967317348,
+    "final_score": 0.31252332046368303,
+    "rank": 3
+  }
+]

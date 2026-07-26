@@ -15,8 +15,8 @@
     "average_robustness_score": 0.8561586772622404,
     "worst_case_score": 0.0,
     "scenario_feasibility_score": 0.3020833333333333,
-    "runtime_efficiency_score": 0.9446128298500213,
-    "final_score": 0.6106610554792343,
+    "runtime_efficiency_score": 0.9415147826520586,
+    "final_score": 0.6103512507594381,
     "rank": 2
   },
   {
@@ -25,8 +25,8 @@
     "average_robustness_score": 0.21830171393671027,
     "worst_case_score": 0.0,
     "scenario_feasibility_score": 0.2916666666666667,
-    "runtime_efficiency_score": 0.9985397117897327,
-    "final_score": 0.26366991384416394,
+    "runtime_efficiency_score": 0.9985870214902253,
+    "final_score": 0.2636746448142132,
     "rank": 3
   },
   {
@@ -35,8 +35,8 @@
     "average_robustness_score": 0.2047859449228465,
     "worst_case_score": 0.0,
     "scenario_feasibility_score": 0.2604166666666667,
-    "runtime_efficiency_score": 0.999364868808716,
-    "final_score": 0.25163125658843716,
+    "runtime_efficiency_score": 0.9999458453306843,
+    "final_score": 0.251689354240634,
     "rank": 4
   }
 ]

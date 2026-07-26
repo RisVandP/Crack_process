@@ -1,0 +1,150 @@
+{
+  "case_id": "SCALE02",
+  "method": "VDF",
+  "solution_hash": "c5c8bb1a0fa202cd",
+  "feasible": true,
+  "objective_value": 1669.6498881960763,
+  "objective_breakdown": {
+    "intrinsic_block_value": 877.6498881960763,
+    "ordinary_processing_increment": 672.0,
+    "precision_processing_increment": 288.0,
+    "same_precision_reward": 60.0,
+    "precision_mismatch_penalty": 200.0,
+    "cross_crack_loss": 28.0,
+    "total_objective": 1669.6498881960763
+  },
+  "device_usage": {
+    "O1": {
+      "assigned_count": 6.0,
+      "total_processing_time": 3.9999999999999996,
+      "deadline": 4.5,
+      "utilization": 0.8888888888888888
+    },
+    "O2": {
+      "assigned_count": 5.0,
+      "total_processing_time": 4.299708570261914,
+      "deadline": 4.5,
+      "utilization": 0.9554907933915364
+    },
+    "O3": {
+      "assigned_count": 3.0,
+      "total_processing_time": 4.257073832586418,
+      "deadline": 4.5,
+      "utilization": 0.9460164072414261
+    },
+    "P1": {
+      "assigned_count": 2.0,
+      "total_processing_time": 3.12606615119735,
+      "deadline": 4.5,
+      "utilization": 0.6946813669327444
+    },
+    "P2": {
+      "assigned_count": 1.0,
+      "total_processing_time": 2.5934480737121377,
+      "deadline": 4.5,
+      "utilization": 0.5763217941582528
+    }
+  },
+  "assignments": [
+    {
+      "block_id": "B_1_1",
+      "state": "precision",
+      "device_id": "P1"
+    },
+    {
+      "block_id": "B_1_2",
+      "state": "ordinary",
+      "device_id": "O3"
+    },
+    {
+      "block_id": "B_1_3",
+      "state": "ordinary",
+      "device_id": "O2"
+    },
+    {
+      "block_id": "B_1_4",
+      "state": "ordinary",
+      "device_id": "O3"
+    },
+    {
+      "block_id": "B_2_1",
+      "state": "ordinary",
+      "device_id": "O1"
+    },
+    {
+      "block_id": "B_2_2",
+      "state": "unprocessed",
+      "device_id": ""
+    },
+    {
+      "block_id": "B_2_3",
+      "state": "ordinary",
+      "device_id": "O3"
+    },
+    {
+      "block_id": "B_2_4",
+      "state": "ordinary",
+      "device_id": "O1"
+    },
+    {
+      "block_id": "B_3_1",
+      "state": "ordinary",
+      "device_id": "O1"
+    },
+    {
+      "block_id": "B_3_2",
+      "state": "unprocessed",
+      "device_id": ""
+    },
+    {
+      "block_id": "B_3_3",
+      "state": "precision",
+      "device_id": "P2"
+    },
+    {
+      "block_id": "B_3_4",
+      "state": "ordinary",
+      "device_id": "O1"
+    },
+    {
+      "block_id": "B_4_1",
+      "state": "ordinary",
+      "device_id": "O1"
+    },
+    {
+      "block_id": "B_4_2",
+      "state": "unprocessed",
+      "device_id": ""
+    },
+    {
+      "block_id": "B_4_3",
+      "state": "precision",
+      "device_id": "P1"
+    },
+    {
+      "block_id": "B_4_4",
+      "state": "ordinary",
+      "device_id": "O1"
+    },
+    {
+      "block_id": "B_5_1",
+      "state": "ordinary",
+      "device_id": "O2"
+    },
+    {
+      "block_id": "B_5_2",
+      "state": "ordinary",
+      "device_id": "O2"
+    },
+    {
+      "block_id": "B_5_3",
+      "state": "ordinary",
+      "device_id": "O2"
+    },
+    {
+      "block_id": "B_5_4",
+      "state": "ordinary",
+      "device_id": "O2"
+    }
+  ]
+}
