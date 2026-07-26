@@ -3,7 +3,7 @@ from __future__ import annotations
 from math import hypot
 from typing import Dict, Iterable, List, Tuple
 
-from .data_models import Board, Crack, EdgeKey, Point, block_id
+from ..model.data_models import Board, Crack, EdgeKey, Point, block_id
 
 
 Rect = Tuple[float, float, float, float]

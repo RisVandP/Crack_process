@@ -1,0 +1,80 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="880" viewBox="0 0 1200 880">
+  <defs>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="2" dy="3" stdDeviation="2" flood-color="#9a9a9a" flood-opacity="0.45"/>
+    </filter>
+    <marker id="arrow" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#064796"/>
+    </marker>
+    <style>
+      .title { font-family: SimSun, STSong, "Times New Roman", serif; font-size: 30px; font-weight: 700; fill: #ff0000; }
+      .box { fill: #ffffff; stroke: #1f5aa6; stroke-width: 1.8; rx: 4; ry: 4; filter: url(#shadow); }
+      .txt { font-family: SimSun, STSong, "Times New Roman", serif; font-size: 23px; font-weight: 700; fill: #000000; }
+      .small { font-family: SimSun, STSong, "Times New Roman", serif; font-size: 20px; font-weight: 700; fill: #000000; }
+      .math { font-family: "Times New Roman", SimSun, serif; font-size: 27px; font-style: italic; fill: #333333; }
+      .arrow { stroke: #064796; stroke-width: 18; marker-end: url(#arrow); }
+    </style>
+  </defs>
+
+  <rect x="0" y="0" width="1200" height="880" fill="#ffffff"/>
+
+  <text x="300" y="54" text-anchor="middle" class="title">动态收益贪心MG</text>
+
+  <rect x="90" y="88" width="420" height="72" class="box"/>
+  <text x="300" y="133" text-anchor="middle" class="txt">生成当前可接受单块候选</text>
+  <line x1="300" y1="166" x2="300" y2="204" class="arrow"/>
+
+  <rect x="65" y="214" width="470" height="110" class="box"/>
+  <text x="300" y="252" text-anchor="middle" class="txt">计算候选在当前方案下的收益</text>
+  <text x="300" y="294" text-anchor="middle" class="math">g<tspan baseline-shift="super" font-size="18">MG</tspan>(a)=gain(a|S)/t<tspan baseline-shift="sub" font-size="18">u,k</tspan></text>
+  <line x1="300" y1="330" x2="300" y2="368" class="arrow"/>
+
+  <rect x="80" y="378" width="440" height="72" class="box"/>
+  <text x="300" y="423" text-anchor="middle" class="txt">选择评分最高且收益为正的候选</text>
+  <line x1="300" y1="456" x2="300" y2="494" class="arrow"/>
+
+  <rect x="52" y="504" width="496" height="142" class="box"/>
+  <text x="300" y="543" text-anchor="middle" class="txt">接受候选加入方案</text>
+  <text x="300" y="583" text-anchor="middle" class="small">更新 S 与设备负载 L<tspan baseline-shift="sub" font-size="14">k</tspan>(S)</text>
+  <text x="300" y="622" text-anchor="middle" class="small">同步更新相邻关系 h<tspan baseline-shift="sub" font-size="14">uv</tspan>、m<tspan baseline-shift="sub" font-size="14">uv</tspan></text>
+  <line x1="300" y1="652" x2="300" y2="690" class="arrow"/>
+
+  <rect x="75" y="700" width="450" height="72" class="box"/>
+  <text x="300" y="744" text-anchor="middle" class="txt">无正收益候选，输出MG方案</text>
+
+  <path d="M 548 736 L 592 736 L 592 124 L 518 124" fill="none" stroke="#064796" stroke-width="10" marker-end="url(#arrow)"/>
+  <text x="575" y="430" text-anchor="middle" class="small" transform="rotate(-90 575,430)">循环</text>
+
+  <text x="900" y="54" text-anchor="middle" class="title">边际收益引导局部搜索MG-LS</text>
+
+  <rect x="690" y="88" width="420" height="82" class="box"/>
+  <text x="900" y="120" text-anchor="middle" class="txt">运行MG得到初始解</text>
+  <text x="900" y="153" text-anchor="middle" class="small">S ← S<tspan baseline-shift="sub" font-size="14">MG</tspan></text>
+  <line x1="900" y1="176" x2="900" y2="214" class="arrow"/>
+
+  <rect x="648" y="224" width="504" height="116" class="box"/>
+  <text x="900" y="260" text-anchor="middle" class="txt">生成三类局部调整候选</text>
+  <text x="900" y="298" text-anchor="middle" class="small">SingleAdjust / PrecisionExchange / EdgeRebuild</text>
+  <line x1="900" y1="346" x2="900" y2="384" class="arrow"/>
+
+  <rect x="670" y="394" width="460" height="82" class="box"/>
+  <text x="900" y="428" text-anchor="middle" class="txt">删除违反约束的候选</text>
+  <text x="900" y="461" text-anchor="middle" class="small">唯一分配、设备类型、工期限制</text>
+  <line x1="900" y1="482" x2="900" y2="520" class="arrow"/>
+
+  <rect x="665" y="530" width="470" height="100" class="box"/>
+  <text x="900" y="566" text-anchor="middle" class="txt">计算完整目标值增量</text>
+  <text x="900" y="607" text-anchor="middle" class="math">gain(S'|S)=F(S')-F(S)</text>
+  <line x1="900" y1="636" x2="900" y2="674" class="arrow"/>
+
+  <rect x="680" y="684" width="440" height="82" class="box"/>
+  <text x="900" y="718" text-anchor="middle" class="txt">接受最大正增益调整</text>
+  <text x="900" y="751" text-anchor="middle" class="small">若无正增益，则停止</text>
+  <line x1="900" y1="772" x2="900" y2="804" class="arrow"/>
+
+  <rect x="675" y="810" width="450" height="58" class="box"/>
+  <text x="900" y="846" text-anchor="middle" class="txt">输出MG-LS方案</text>
+
+  <path d="M 1130 724 L 1170 724 L 1170 282 L 1154 282" fill="none" stroke="#064796" stroke-width="10" marker-end="url(#arrow)"/>
+  <text x="1160" y="505" text-anchor="middle" class="small" transform="rotate(-90 1160,505)">改进后循环</text>
+</svg>

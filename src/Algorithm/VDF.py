@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from ..data_models import ProblemData, Solution
+from ..model.data_models import ProblemData, Solution
 from .VF import _density_score, _solve_static_greedy
 
 

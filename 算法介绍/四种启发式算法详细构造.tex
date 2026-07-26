@@ -1,0 +1,1010 @@
+% !TeX program = xelatex
+\newif\ifctexavailable
+\IfFileExists{ctexart.cls}{\ctexavailabletrue}{\ctexavailablefalse}
+\ifctexavailable
+  \documentclass[UTF8,12pt,a4paper]{ctexart}
+\else
+  % 兼容仅安装基础 XeLaTeX、但没有 ctex 的环境。
+  % 正式中文排版仍推荐安装 ctex 并使用上面的分支。
+  \documentclass[12pt,a4paper]{article}
+  \usepackage{fontspec}
+  \setmainfont{DejaVu Serif}
+  \setsansfont{DejaVu Sans}
+  \setmonofont{DejaVu Sans Mono}
+\fi
+
+\usepackage{amsmath,amssymb,mathtools,bm}
+\usepackage{booktabs,longtable,array}
+\usepackage{geometry}
+\usepackage{enumitem}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{fancyhdr}
+\usepackage[most]{tcolorbox}
+
+\geometry{
+  left=2.35cm,
+  right=2.35cm,
+  top=2.35cm,
+  bottom=2.35cm
+}
+
+\setlength{\parindent}{2em}
+\setlength{\parskip}{0.2em}
+\setlist[itemize]{leftmargin=2em,itemsep=0.18em,topsep=0.25em}
+\setlist[enumerate]{leftmargin=2em,itemsep=0.18em,topsep=0.25em}
+
+\definecolor{mainblue}{RGB}{52,76,130}
+\definecolor{accent}{RGB}{194,91,47}
+\definecolor{softblue}{RGB}{240,244,252}
+\definecolor{softgray}{RGB}{247,247,247}
+\definecolor{darkgray}{RGB}{65,65,65}
+
+\hypersetup{
+  colorlinks=true,
+  linkcolor=mainblue,
+  urlcolor=mainblue
+}
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{裂纹板材加工问题}
+\fancyhead[R]{四种启发式算法详细构造}
+\fancyfoot[C]{\thepage}
+\setlength{\headheight}{15pt}
+
+\newcommand{\Alg}[1]{\textsc{#1}}
+\newcommand{\U}{\mathcal{U}}
+\newcommand{\K}{\mathcal{K}}
+\newcommand{\KO}{\mathcal{K}^{O}}
+\newcommand{\KP}{\mathcal{K}^{P}}
+\newcommand{\E}{\mathcal{E}}
+\newcommand{\Aone}{\mathcal{A}_{1}}
+\newcommand{\Atwo}{\mathcal{A}_{2}}
+\newcommand{\N}{\mathcal{N}}
+\newcommand{\score}{g}
+\newcommand{\load}{L}
+\newcommand{\eps}{\varepsilon}
+
+\newtcolorbox{keybox}[1][]{
+  colback=softblue,
+  colframe=mainblue,
+  boxrule=0.7pt,
+  arc=1.5mm,
+  left=2mm,
+  right=2mm,
+  top=1.2mm,
+  bottom=1.2mm,
+  #1
+}
+
+\newtcolorbox{algobox}[1]{
+  title=#1,
+  colback=softgray,
+  colframe=darkgray,
+  boxrule=0.6pt,
+  arc=1.5mm,
+  fonttitle=\bfseries,
+  left=2mm,
+  right=2mm,
+  top=1.5mm,
+  bottom=1.5mm
+}
+
+\title{\textbf{裂纹板材加工问题中\\四种启发式算法的详细构造}}
+\author{}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+本文在同一确定性数学模型下，依次构造价值优先算法
+\(\Alg{VF}\)、价值密度优先算法 \(\Alg{VDF}\)、动态边际收益贪心算法
+\(\Alg{MG}\) 以及边际收益引导局部搜索算法
+\(\Alg{MG-LS}\)。
+四种算法共享相同的候选表示、设备容量约束、木块状态编码和确定性
+并列规则，仅逐层升级候选评分与搜索范围：
+\[
+\boxed{
+\text{单块价值}
+\longrightarrow
+\text{单位时间价值}
+\longrightarrow
+\text{动态边际收益}
+\longrightarrow
+\text{局部反悔与区域重构}
+}.
+\]
+文中给出每种算法的候选生成、评分公式、可行性检查、逐轮更新、
+停止条件、伪代码和复杂度，并明确木块的身份、原始位置与邻接关系
+在全部算法中始终固定。
+\end{abstract}
+
+\tableofcontents
+\newpage
+
+\section{四种算法共用的模型基础}
+
+\subsection{集合、参数与固定位置约束}
+
+设木块集合为
+\[
+\U=\{1,2,\ldots,n\},
+\]
+普通加工设备集合和精密加工设备集合分别为
+\[
+\KO,\qquad \KP,
+\]
+且
+\[
+\KO\cap\KP=\varnothing,
+\qquad
+\K=\KO\cup\KP.
+\]
+
+木块之间的原始相邻关系由无向边集合
+\[
+\E=\left\{\{u,v\}\mid u,v\in\U,\ u<v,\ u\text{ 与 }v\text{ 在原板材中相邻}\right\}
+\]
+给出。木块 \(u\) 的相邻木块集合记为
+\[
+\N_u=\{v\in\U\mid \{u,v\}\in\E\}.
+\]
+
+\begin{keybox}
+\textbf{位置不变性：}
+木块的身份、原始空间位置和邻接关系均为固定数据。
+算法只决定木块是否加工、采用何种加工方式以及分配给哪台设备，
+绝不交换或改变木块的最终位置。即使木块被改派到另一台设备，
+加工结束后仍回到它自己的原始位置。
+\end{keybox}
+
+木块 \(u\) 的面积、固有价值和裂纹严重程度分别记为
+\[
+A,\qquad v_u,\qquad CS_u.
+\]
+设备 \(k\) 的加工速度、单位面积加工增值和时间上限分别记为
+\[
+s_k,\qquad r_k,\qquad T.
+\]
+木块 \(u\) 在设备 \(k\) 上的确定性加工时间为
+\[
+\boxed{
+t_{u,k}
+=
+\frac{A}{s_k}\left(1+\alpha CS_u\right)
+}.
+\]
+
+对于相邻木块对 \(\{u,v\}\in\E\)，若两块均采用精密加工，可获得
+组合增值 \(b_{uv}\)；若恰有一块采用精密加工，则产生精度不一致
+损失 \(p_{uv}\)。
+
+\subsection{加工状态与方案表示}
+
+木块 \(u\) 的加工状态为
+\[
+q_u\in\{0,O,P\},
+\]
+其中 \(0\)、\(O\)、\(P\) 分别表示不加工、普通加工和精密加工。
+设备分配变量为
+\[
+x_{u,k}=
+\begin{cases}
+1, & \text{木块 \(u\) 分配给设备 \(k\)},\\
+0, & \text{否则}.
+\end{cases}
+\]
+
+普通加工和精密加工状态分别为
+\[
+y_u^{O}=\sum_{k\in\KO}x_{u,k},
+\qquad
+y_u^{P}=\sum_{k\in\KP}x_{u,k},
+\]
+并满足
+\[
+\sum_{k\in\K}x_{u,k}\leq 1,
+\qquad
+y_u^{0}+y_u^{O}+y_u^{P}=1.
+\]
+
+一个部分或完整加工方案记为
+\[
+S=\{(u,q,k)\mid q\in\{O,P\},\ x_{u,k}=1\}.
+\]
+若木块 \(u\) 没有出现在 \(S\) 中，则 \(q_u=0\)，但木块本身仍保留在
+原始位置。
+
+设备 \(k\) 在方案 \(S\) 下的当前负载为
+\[
+\boxed{
+\load_k(S)
+=
+\sum_{(u,q,k)\in S}t_{u,k}
+}.
+\]
+设备容量约束为
+\[
+\load_k(S)\leq T,
+\qquad \forall k\in\K.
+\]
+
+\subsection{目标函数与等价优化部分}
+
+对于相邻木块对 \(\{u,v\}\in\E\)，定义
+\[
+h_{uv}(S)=y_u^P(S)y_v^P(S),
+\]
+\[
+m_{uv}(S)
+=
+y_u^P(S)+y_v^P(S)-2h_{uv}(S).
+\]
+于是确定性目标函数为
+\[
+\begin{aligned}
+Z(S)
+={}&
+\sum_{u\in\U}v_u
++
+ \sum_{(u,q,k)\in S}A r_k\\
+&+
+\sum_{\{u,v\}\in\E}
+\left[
+b_{uv}h_{uv}(S)
+-
+p_{uv}m_{uv}(S)
+-
+L_{uv}^{\mathrm{cr}}
+\right].
+\end{aligned}
+\]
+
+由于木块及其位置固定，
+\[
+\sum_{u\in\U}v_u
+\quad\text{与}\quad
+\sum_{\{u,v\}\in\E}L_{uv}^{\mathrm{cr}}
+\]
+都是与加工决策无关的常数。算法比较两个方案优劣时，可以使用等价的
+决策相关目标
+\[
+\boxed{
+F(S)
+=
+\sum_{(u,q,k)\in S}A r_k
++
+\sum_{\{u,v\}\in\E}
+\left[
+b_{uv}h_{uv}(S)-p_{uv}m_{uv}(S)
+\right]
+}.
+\]
+最终汇报板材总价值时，再将固定项加回即可。
+
+\subsection{共用的单块候选集合}
+
+单块加工候选统一写成
+\[
+a=(u,q,k),
+\]
+其中 \(u\) 是尚未加工的木块，\(q\in\{O,P\}\)，设备 \(k\) 必须与
+加工方式兼容：
+\[
+k\in
+\begin{cases}
+\KO, & q=O,\\
+\KP, & q=P.
+\end{cases}
+\]
+
+给定当前方案 \(S\)，可行单块候选集合为
+\[
+\boxed{
+\Aone(S)
+=
+\left\{
+(u,q,k)
+\ \middle|\
+\begin{array}{l}
+q_u(S)=0,\\
+k\in\K^q,\\
+\load_k(S)+t_{u,k}\leq T
+\end{array}
+\right\}
+}.
+\]
+若执行候选 \(a=(u,q,k)\)，新方案记为
+\[
+S\oplus a=S\cup\{(u,q,k)\}.
+\]
+
+\subsection{统一的确定性并列规则}
+
+不同候选可能具有相同评分。为保证算法可复现，四种算法均使用固定的
+并列规则。一般按照以下顺序比较：
+\begin{enumerate}
+  \item 主评分更高者优先；
+  \item 若主评分相同，实际增益或单块价值更高者优先；
+  \item 若仍相同，加工时间更短者优先；
+  \item 若仍相同，按木块编号、设备编号和加工方式的固定字典序选择。
+\end{enumerate}
+因此，同一组输入参数每次都会得到相同结果。
+
+\section{\Alg{VF}：单块价值优先算法}
+
+\subsection{设计动机}
+
+\Alg{VF} 是四种算法的基础基线。它只回答一个最直接的问题：
+\[
+\text{“哪个单块加工方案的表面价值最高？”}
+\]
+算法不考虑单位加工时间效率，也不根据当前相邻木块的加工状态动态
+改变评分。
+
+\subsection{静态候选与评分}
+
+先在空方案下生成全部单块候选：
+\[
+\Aone^{\mathrm{all}}
+=
+\left\{
+(u,q,k)
+\ \middle|\
+u\in\U,\ q\in\{O,P\},\ k\in\K^q,\ t_{u,k}\leq T
+\right\}.
+\]
+
+候选 \(a=(u,q,k)\) 的单块价值为
+\[
+\boxed{
+\score^{\mathrm{VF}}(a)
+=
+v_u+A r_k
+}.
+\]
+其中 \(v_u\) 用于体现木块本身的重要程度，\(A r_k\) 表示设备加工
+带来的增值。该评分只在算法开始前计算一次。
+
+\subsection{详细构造过程}
+
+\begin{enumerate}
+  \item 初始化空方案 \(S\leftarrow\varnothing\)，并令
+        \(\load_k(S)=0,\ \forall k\in\K\)。
+  \item 枚举全部 \(a\in\Aone^{\mathrm{all}}\)，计算
+        \(\score^{\mathrm{VF}}(a)\)。
+  \item 按 \(\score^{\mathrm{VF}}\) 从高到低排序，得到静态序列
+        \[
+        a_{(1)},a_{(2)},\ldots,a_{(M)}.
+        \]
+  \item 从头到尾扫描该序列。对当前候选
+        \(a_{(j)}=(u,q,k)\)：
+        \begin{itemize}
+          \item 若木块 \(u\) 已经被更早的候选安排，则跳过；
+          \item 若 \(\load_k(S)+t_{u,k}>T\)，则跳过；
+          \item 否则接受该候选，令
+                \(S\leftarrow S\oplus a_{(j)}\)，并更新设备负载。
+        \end{itemize}
+  \item 扫描完全部候选后输出方案 \(S_{\mathrm{VF}}\)。
+\end{enumerate}
+
+\begin{algobox}{算法 1：\Alg{VF} 的伪代码}
+\begin{enumerate}[label=\arabic*.,leftmargin=2.4em]
+  \item \(S\leftarrow\varnothing\)，\(\load_k\leftarrow0\)；
+  \item 构造 \(\Aone^{\mathrm{all}}\)；
+  \item 对每个 \(a=(u,q,k)\) 计算
+        \(\score(a)\leftarrow v_u+A r_k\)；
+  \item 按评分降序及统一并列规则对候选排序；
+  \item \textbf{for} 每个候选 \(a=(u,q,k)\) \textbf{do}
+        \begin{itemize}
+          \item 若 \(q_u(S)\neq0\)，\textbf{continue}；
+          \item 若 \(\load_k+t_{u,k}>T\)，\textbf{continue}；
+          \item \(S\leftarrow S\oplus a\)；
+          \item \(\load_k\leftarrow\load_k+t_{u,k}\)；
+        \end{itemize}
+  \item \textbf{return} \(S_{\mathrm{VF}}\leftarrow S\)。
+\end{enumerate}
+\end{algobox}
+
+\subsection{算法性质与局限}
+
+\Alg{VF} 始终保持以下可行性不变量：
+\[
+\sum_{k\in\K}x_{u,k}\leq1,
+\qquad
+\load_k(S)\leq T.
+\]
+其主要局限是：高价值候选可能占用很长的加工时间，从而挤占多个
+“价值略低但耗时很短”的候选；同时，固定评分无法体现相邻木块的
+组合增值和精度不一致损失。
+
+\section{\Alg{VDF}：单位加工时间价值优先算法}
+
+\subsection{从 \Alg{VF} 到 \Alg{VDF} 的唯一核心改动}
+
+\Alg{VDF} 完全保留 \Alg{VF} 的候选表示、静态排序、可行性检查和
+扫描更新过程，只将评分从“单块价值”改为“单位加工时间价值”：
+\[
+\boxed{
+\underbrace{v_u+A r_k}_{\Alg{VF}}
+\quad\Longrightarrow\quad
+\underbrace{
+\frac{v_u+A r_k}{t_{u,k}}
+}_{\Alg{VDF}}
+}.
+\]
+
+因此
+\[
+\boxed{
+\score^{\mathrm{VDF}}(a)
+=
+\frac{v_u+A r_k}{t_{u,k}}
+}.
+\]
+
+\subsection{详细构造过程}
+
+\begin{enumerate}
+  \item 初始化 \(S\leftarrow\varnothing\) 和全部设备负载。
+  \item 生成与 \Alg{VF} 完全相同的候选集合
+        \(\Aone^{\mathrm{all}}\)。
+  \item 对每个候选 \(a=(u,q,k)\) 计算
+        \[
+        \score^{\mathrm{VDF}}(a)
+        =
+        \frac{v_u+A r_k}{t_{u,k}}.
+        \]
+  \item 按价值密度从高到低一次性排序。
+  \item 依次扫描候选，并使用与 \Alg{VF} 相同的“木块未安排且设备
+        容量充足”判定接受候选。
+  \item 扫描结束后输出 \(S_{\mathrm{VDF}}\)。
+\end{enumerate}
+
+\begin{algobox}{算法 2：\Alg{VDF} 的伪代码}
+\begin{enumerate}[label=\arabic*.,leftmargin=2.4em]
+  \item \(S\leftarrow\varnothing\)，\(\load_k\leftarrow0\)；
+  \item 构造 \(\Aone^{\mathrm{all}}\)；
+  \item 对每个 \(a=(u,q,k)\) 计算
+        \[
+        \score(a)\leftarrow\frac{v_u+A r_k}{t_{u,k}};
+        \]
+  \item 按评分降序及统一并列规则对候选排序；
+  \item \textbf{for} 每个候选 \(a=(u,q,k)\) \textbf{do}
+        \begin{itemize}
+          \item 若 \(q_u(S)\neq0\)，\textbf{continue}；
+          \item 若 \(\load_k+t_{u,k}>T\)，\textbf{continue}；
+          \item \(S\leftarrow S\oplus a\)；
+          \item \(\load_k\leftarrow\load_k+t_{u,k}\)；
+        \end{itemize}
+  \item \textbf{return} \(S_{\mathrm{VDF}}\leftarrow S\)。
+\end{enumerate}
+\end{algobox}
+
+\subsection{改进效果与剩余局限}
+
+\Alg{VDF} 能够避免“价值高但耗时过长”的候选过早占满设备，更符合
+有限工期下的资源利用逻辑。但是，它仍然使用预先计算的静态评分。
+当一个相邻木块被选为精密加工后，其他相邻木块的真实收益会发生变化，
+\Alg{VDF} 却不会重新计算排序。
+
+\section{\Alg{MG}：动态边际收益贪心算法}
+
+\subsection{从静态密度到动态边际密度}
+
+\Alg{MG} 保留 \Alg{VDF} 的“收益除以加工时间”结构，但把静态的
+单块价值改成候选加入当前方案后带来的当前收益评分：
+\[
+\boxed{
+\underbrace{
+\frac{v_u+A r_k}{t_{u,k}}
+}_{\Alg{VDF}：静态价值密度}
+\quad\Longrightarrow\quad
+\underbrace{
+\score^{\mathrm{MG}}(a\mid S)
+}_{\Alg{MG}：动态评分}
+}.
+\]
+
+候选 \(a\) 相对于当前方案 \(S\) 的当前收益来自新旧方案目标值之差：
+\[
+\boxed{
+\operatorname{gain}(a\mid S)
+=
+F(S\oplus a)-F(S)
+}.
+\]
+由于木块固有价值和跨块裂纹损失为常数，它们在差分中自动抵消。
+
+\subsection{单块边际收益的展开}
+
+对候选 \(a=(u,q,k)\)，只有木块 \(u\) 的加工增值以及所有与 \(u\)
+相连的邻接边可能发生变化。因此
+\[
+\boxed{
+\operatorname{gain}(a\mid S)
+=
+A r_k
++
+\sum_{v\in\N_u}
+\left[
+b_{uv}d^h_{uv}
+-
+p_{uv}d^m_{uv}
+\right]
+}.
+\]
+其中
+\[
+d^h_{uv}
+=
+h_{uv}(S\oplus a)-h_{uv}(S),
+\]
+\[
+d^m_{uv}
+=
+m_{uv}(S\oplus a)-m_{uv}(S).
+\]
+
+若 \(q=O\)，木块 \(u\) 的精密状态仍为 \(0\)，所以邻接状态不变：
+\[
+\boxed{
+\operatorname{gain}((u,O,k)\mid S)=A r_k
+}.
+\]
+
+若 \(q=P\)，可进一步写成
+\[
+\boxed{
+\operatorname{gain}((u,P,k)\mid S)
+=
+A r_k
++
+\sum_{\substack{v\in\N_u\\y_v^P(S)=1}}
+\left(b_{uv}+p_{uv}\right)
+-
+\sum_{\substack{v\in\N_u\\y_v^P(S)=0}}
+p_{uv}
+}.
+\]
+其含义是：
+\begin{itemize}
+  \item 若相邻木块 \(v\) 已经精密加工，则新增 \(b_{uv}\)，同时消除
+        原先的精度不一致损失 \(p_{uv}\)；
+  \item 若相邻木块 \(v\) 尚未精密加工，则新产生精度不一致损失
+        \(p_{uv}\)。
+\end{itemize}
+
+\subsection{动态评分与选择规则}
+
+\Alg{MG} 的评分为
+\[
+\boxed{
+\score^{\mathrm{MG}}(a\mid S)
+=
+\frac{\operatorname{gain}(a\mid S)}{t_{u,k}}
+}.
+\]
+每一轮重新生成当前可行候选集合，并选择
+\[
+\boxed{
+a^*
+=
+\arg\max_{a\in\Aone(S)}
+\score^{\mathrm{MG}}(a\mid S)
+}.
+\]
+只有当
+\[
+\operatorname{gain}(a^*\mid S)>\eps
+\]
+时才执行该候选，其中 \(\eps>0\) 是数值容差。
+
+\subsection{详细构造过程}
+
+\begin{enumerate}
+  \item 初始化 \(S\leftarrow\varnothing\)。
+  \item 根据当前木块状态和设备剩余容量生成 \(\Aone(S)\)。
+  \item 对每个 \(a\in\Aone(S)\) 计算当前收益和评分 \(g(a)\)。
+  \item 选择评分最大的候选 \(a^*\)。
+  \item 若不存在候选，或 \(\operatorname{gain}(a^*\mid S)\leq\eps\)，停止构造。
+  \item 否则执行 \(a^*\)，更新方案和设备负载，然后返回步骤 2。
+\end{enumerate}
+
+\begin{algobox}{算法 3：\Alg{MG} 的伪代码}
+\begin{enumerate}[label=\arabic*.,leftmargin=2.4em]
+  \item \(S\leftarrow\varnothing\)；
+  \item \textbf{while true do}
+        \begin{enumerate}[label*=\arabic*.,leftmargin=2.6em]
+          \item 生成当前可行候选集合 \(\Aone(S)\)；
+          \item 若 \(\Aone(S)=\varnothing\)，\textbf{break}；
+          \item 对每个 \(a=(u,q,k)\in\Aone(S)\)：
+                \[
+                \operatorname{gain}(a)\leftarrow F(S\oplus a)-F(S),
+                \qquad
+                \score(a)\leftarrow\frac{\operatorname{gain}(a)}{t_{u,k}};
+                \]
+          \item \(a^*\leftarrow\arg\max_{a\in\Aone(S)}\score(a)\)；
+          \item 若 \(\operatorname{gain}(a^*)\leq\eps\)，\textbf{break}；
+          \item \(S\leftarrow S\oplus a^*\)；
+        \end{enumerate}
+  \item \textbf{return} \(S_{\mathrm{MG}}\leftarrow S\)。
+\end{enumerate}
+\end{algobox}
+
+\subsection{为什么必须每轮重新计算}
+
+执行一个精密加工候选后，至少会改变以下信息：
+\begin{itemize}
+  \item 相关设备的剩余容量；
+  \item 相邻边上的 \(h_{uv}\) 和 \(m_{uv}\)；
+  \item 相邻木块下一轮的精密加工边际收益；
+  \item 当前可行候选集合。
+\end{itemize}
+因此，\Alg{MG} 不能像 \Alg{VF} 和 \Alg{VDF} 一样只排序一次。
+
+\subsection{剩余局限}
+
+\Alg{MG} 每轮只加入一个木块。可能存在两个相邻木块单独加入时均不
+划算，但同时进行精密加工时能够获得较大的组合增值，即
+\[
+\operatorname{gain}(u\mid S)\leq0,
+\qquad
+\operatorname{gain}(v\mid S)\leq0,
+\]
+却有
+\[
+\operatorname{gain}(\{u,v\}\mid S)>0.
+\]
+单块贪心无法直接发现这种“只有联合选择才有价值”的机会，也不能撤销
+早期已经接受的决定。
+
+\section{\Alg{MG-LS}：边际收益引导局部搜索算法}
+
+\subsection{总体结构}
+
+\textbf{\Alg{MG-LS}：Marginal-Gain-Guided Local Search。}\par
+该算法不再设计额外的相邻对联合构造阶段，而是直接以 \Alg{MG} 的结果
+作为初始解，再通过局部搜索修正早期贪心决策：
+\[
+\boxed{
+\Alg{MG-LS}
+=
+\text{\Alg{MG} 初始解}
++
+\text{针对性局部搜索}
+}.
+\]
+对应流程为
+\[
+\varnothing
+\xrightarrow{\text{\Alg{MG} 动态构造}}
+S_{\mathrm{MG}}
+\xrightarrow{\text{局部反悔与重构}}
+S_{\mathrm{MG-LS}}.
+\]
+
+\Alg{MG} 的优势是每轮都能感知当前方案下的真实边际收益；但它只有
+“加入”操作，不能撤销已经占用设备容量的早期选择。因此其核心缺陷是：
+\[
+\boxed{
+\text{\Alg{MG} 能发现当前最优候选，但早期贪心决策一旦接受就无法反悔。}
+}
+\]
+\Alg{MG-LS} 的作用正是允许在保持木块位置和邻接关系不变的前提下，
+对加工方式、设备分配和局部精加工区域进行有限调整。
+
+\subsection{第一阶段：\Alg{MG} 初始解}
+
+首先运行前一节的动态边际收益贪心算法：
+\[
+\boxed{
+S^{(0)}=S_{\mathrm{MG}}.
+}
+\]
+由于后续局部搜索只接受正增益调整，因此必然有
+\[
+\boxed{
+F(S_{\mathrm{MG-LS}})\geq F(S_{\mathrm{MG}}).
+}
+\]
+
+\subsection{第二阶段：三类局部搜索邻域}
+
+\subsubsection{邻域总集合}
+
+给定当前可行方案 \(S\)，\Alg{MG-LS} 的局部搜索邻域定义为
+\[
+\boxed{
+\N_{\mathrm{MG-LS}}(S)
+=
+\N_{\mathrm{SA}}(S)
+\cup
+\N_{\mathrm{EX}}(S)
+\cup
+\N_{\mathrm{ER}}(S)
+}.
+\]
+三类邻域分别对应单块调整、精加工机会替换和相邻木块重加工。
+
+\subsubsection{SingleAdjust：单块调整}
+
+选择一个木块 \(u\)，重新枚举其加工状态和兼容设备：
+\[
+(u,q_u,k_u)
+\longrightarrow
+(u,q'_u,k'_u),
+\qquad
+q'_u\in\{0,O,P\}.
+\]
+该邻域覆盖取消加工、普通加工改精密加工、精密加工改普通加工、
+未加工木块新增加工，以及同类型设备之间的重新分配。
+
+\subsubsection{PrecisionExchange：精加工机会替换}
+
+选择当前精加工木块 \(u\) 和当前非精加工木块 \(v\)：
+\[
+q_u=P,\qquad q_v\neq P.
+\]
+联合执行
+\[
+u:P\rightarrow O/0,
+\qquad
+v:O/0\rightarrow P.
+\]
+也就是说，该邻域释放一个被早期选择占用的精加工机会，再交给当前更适合
+精加工的木块。
+
+\subsubsection{EdgeRebuild：相邻木块重加工}
+
+对每条相邻边 \(\{u,v\}\in\E\)，先释放不超过 \(\rho\) 个当前已经精加工
+的木块，腾出精密加工资源；再尝试让该相邻边两端同时精加工：
+\[
+R\subseteq P(S),
+\qquad
+|R|\leq\rho.
+\]
+局部候选方案可以概括为
+\[
+S'
+=
+\left(S\setminus S_{R\cup\{u,v\}}\right)
+\cup
+\widehat S_{R\cup\{u,v\}},
+\]
+其中要求 \(q'_u=q'_v=P\)，而 \(R\) 中木块可降为普通加工或不加工。
+该邻域可概括为“释放旧精加工资源，换取相邻木块联合精加工机会”，
+用于形成更合理的连续精加工局部区域。通常取 \(\rho=1\) 或
+\(\rho=2\)，避免候选数量过大。
+
+\subsection{邻域评价与每轮操作依据}
+
+对所有邻域生成的每个具体候选方案 \(S'\)，依次执行：
+\begin{enumerate}
+  \item 检查每个木块是否至多分配给一台设备；
+  \item 检查设备类型与加工方式是否兼容；
+  \item 检查全部设备容量约束；
+  \item 重新计算受影响的加工增值和邻接价值；
+  \item 计算调整方案增益
+        \[
+        \operatorname{gain}_{\mathrm{LS}}(S'\mid S)=F(S')-F(S).
+        \]
+\end{enumerate}
+
+采用全邻域最优改进策略：
+\[
+\boxed{
+S^*
+=
+\arg\max_{
+S'\in\N_{\mathrm{MG-LS}}(S),\ S'\text{ 可行}
+}
+\operatorname{gain}_{\mathrm{LS}}(S'\mid S)
+}.
+\]
+因此，每轮执行什么操作完全由当前方案下所有具体可行候选的增益
+决定，而不是预先规定某一轮必须执行哪一种邻域操作。
+
+若
+\[
+\operatorname{gain}_{\mathrm{LS}}(S^*\mid S)>\eps,
+\]
+则更新 \(S\leftarrow S^*\)；否则算法到达当前邻域下的局部最优并
+停止。最大局部搜索轮数 \(R_{\mathrm{LS}}\) 只是计算时间保护上限。
+
+\begin{algobox}{算法 4：\Alg{MG-LS} 边际收益引导局部搜索}
+\begin{enumerate}[label=\arabic*.,leftmargin=2.4em]
+  \item 运行 \Alg{MG}，得到初始方案 \(S\leftarrow S_{\mathrm{MG}}\)；
+  \item \textbf{for} \(r=1,2,\ldots,R_{\mathrm{LS}}\) \textbf{do}
+        \begin{enumerate}[label*=\arabic*.,leftmargin=2.6em]
+          \item 生成 SingleAdjust、PrecisionExchange 和 EdgeRebuild
+                的全部具体候选；
+          \item 删除所有违反唯一分配、设备兼容或容量约束的候选；
+          \item 对每个剩余候选 \(S'\) 计算
+                \(\operatorname{gain}_{\mathrm{LS}}(S')=F(S')-F(S)\)；
+          \item 若不存在候选，\textbf{break}；
+          \item \(S^*\leftarrow\arg\max_{S'}\operatorname{gain}_{\mathrm{LS}}(S')\)；
+          \item 若 \(\operatorname{gain}_{\mathrm{LS}}(S^*)\leq\eps\)，\textbf{break}；
+          \item \(S\leftarrow S^*\)；
+        \end{enumerate}
+  \item \textbf{return} \(S_{\mathrm{MG-LS}}\leftarrow S\)。
+\end{enumerate}
+\end{algobox}
+
+\subsection{完整停止条件}
+
+\Alg{MG-LS} 的构造阶段直接沿用 \Alg{MG} 的停止条件；局部搜索阶段在
+以下情况下停止：
+\begin{itemize}
+  \item 全部具体邻域候选均不可行；
+  \item 最佳可行邻域候选的目标增量不大于 \(\eps\)；
+  \item 达到最大局部搜索轮数 \(R_{\mathrm{LS}}\)。
+\end{itemize}
+
+\section{四种算法的逐层递进关系}
+
+\begin{table}[htbp]
+\centering
+\renewcommand{\arraystretch}{1.35}
+\begin{tabular}{p{2.0cm}p{3.2cm}p{4.0cm}p{4.1cm}}
+\toprule
+算法 & 主评分 & 保留上一层的内容 & 本层新增能力\\
+\midrule
+\Alg{VF}
+&
+\(\displaystyle v_u+A r_k\)
+&
+统一候选、容量检查与贪心接受框架
+&
+建立最简单的单块价值基线\\
+\Alg{VDF}
+&
+\(\displaystyle\frac{v_u+A r_k}{t_{u,k}}\)
+&
+\Alg{VF} 的静态候选、排序和更新过程
+&
+用加工时间归一化，衡量资源效率\\
+\Alg{MG}
+&
+\(\score^{\mathrm{MG}}(a\mid S)\)
+&
+\Alg{VDF} 的“收益/时间”结构与单块候选
+&
+每轮重算真实边际收益，感知相邻状态\\
+\Alg{MG-LS}
+&
+\(F(S')-F(S)\)
+&
+\Alg{MG} 的动态构造结果
+&
+单块调整、精加工机会替换和相邻木块重加工\\
+\bottomrule
+\end{tabular}
+\caption{四种算法的递进关系}
+\end{table}
+
+\begin{keybox}
+\[
+\boxed{
+\Alg{VF}
+\xrightarrow{\text{加入时间效率}}
+\Alg{VDF}
+\xrightarrow{\text{加入动态邻接影响}}
+\Alg{MG}
+\xrightarrow{\text{加入局部反悔}}
+\Alg{MG-LS}
+}
+\]
+\end{keybox}
+
+\section{复杂度与候选规模}
+
+记
+\[
+n=|\U|,
+\qquad
+K=|\K|,
+\qquad
+K_P=|\KP|,
+\qquad
+e=|\E|.
+\]
+
+\subsection{\Alg{VF} 与 \Alg{VDF}}
+
+静态单块候选数量至多为
+\[
+M_1=O(nK).
+\]
+候选生成需要 \(O(nK)\)，排序需要
+\[
+O(nK\log(nK)),
+\]
+顺序扫描需要 \(O(nK)\)。因此两种算法的主复杂度均为
+\[
+\boxed{
+O(nK\log(nK))
+}.
+\]
+
+\subsection{\Alg{MG}}
+
+每轮至多枚举 \(O(nK)\) 个单块候选，并计算候选关联边上的增量。
+构造阶段最多接受 \(n\) 个木块，因此可保守写为
+\[
+\boxed{
+O\!\left(n(nK+e)\right)
+}.
+\]
+若预先建立每个木块的关联边表，则单个候选只需访问该木块的邻接边，
+实际运行通常明显快于完整重算目标函数。
+
+\subsection{\Alg{MG-LS}}
+
+\Alg{MG-LS} 的第一阶段直接调用 \Alg{MG}，因此构造阶段复杂度沿用
+\Alg{MG}。局部搜索阶段中各邻域的候选数量上界可概括为：
+\[
+\begin{array}{c|c}
+\text{邻域} & \text{候选数量级}\\
+\hline
+\mathrm{SingleAdjust} & O(nK)\\
+\mathrm{PrecisionExchange} & O(n^2K)\\
+\mathrm{EdgeRebuild} &
+O\!\left(
+\displaystyle
+\sum_{j=0}^{\rho}\binom{n}{j}eK_P^2
+\right)
+\end{array}
+\]
+当默认 \(\rho=1\) 时，
+\[
+\mathrm{EdgeRebuild}
+=
+O(neK_P^2).
+\]
+因此，\Alg{MG-LS} 的主要计算开销来自 PrecisionExchange 和 EdgeRebuild 邻域。
+实际实现中可通过木块规模阈值、候选预筛选、增量式目标更新和最大迭代
+次数限制运行时间。
+
+\section{模型口径变化时的调整说明}
+
+本文与当前确定性模型一致，允许
+\[
+q_u\in\{0,O,P\},
+\]
+即木块可以不加工。若后续题目明确改为“每个木块都必须加工”，则应将
+\[
+\sum_{k\in\K}x_{u,k}\leq1
+\]
+改为
+\[
+\sum_{k\in\K}x_{u,k}=1,
+\qquad \forall u\in\U.
+\]
+此时需要同步进行三项修改：
+\begin{enumerate}
+  \item 构造算法不能在部分方案上最终停止，必须加入修复或回溯过程，
+        直至全部木块完成分配；
+  \item 局部搜索删除纯 Drop 和纯 Add 邻域；
+  \item Swap 改为两个已加工木块之间的加工方式或设备联合重分配，
+        始终保持每个木块处于已加工状态。
+\end{enumerate}
+无论采用哪一种口径，木块的原始位置和邻接关系都始终不允许改变。
+
+\section{适合 PPT 展示的四句总结}
+
+\begin{enumerate}
+  \item \textbf{\Alg{VF}：}优先安排单块价值最高的加工方案，建立基础
+        价值基线。
+  \item \textbf{\Alg{VDF}：}在 \Alg{VF} 基础上除以加工时间，优先安排
+        单位时间价值更高的方案。
+  \item \textbf{\Alg{MG}：}将静态价值替换为当前方案下的真实边际收益，
+        每轮重算相邻组合影响。
+  \item \textbf{\Alg{MG-LS}：}以 \Alg{MG} 结果为初始解，通过单块调整、
+        精加工机会替换和相邻木块重加工修正早期贪心决策。
+\end{enumerate}
+
+\end{document}

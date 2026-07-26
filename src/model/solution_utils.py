@@ -3,8 +3,8 @@ from __future__ import annotations
 import copy
 
 from .data_models import BlockId, DeviceId, ProblemData, Solution
-from .deterministic_model import processing_time
-from .solution_evaluator import objective_breakdown
+from .data_models import processing_time
+from ..evaluation.solution_evaluator import objective_breakdown
 
 
 def empty_solution(data: ProblemData, method: str, status: str = "Feasible") -> Solution:

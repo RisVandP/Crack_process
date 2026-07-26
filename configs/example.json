@@ -4,7 +4,7 @@
     "VF",
     "VDF",
     "MG",
-    "CNAG-LS"
+    "MG-LS"
   ],
   "evaluation_weights": {
     "deterministic_quality": 0.3,

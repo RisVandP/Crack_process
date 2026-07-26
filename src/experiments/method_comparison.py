@@ -6,22 +6,22 @@ import json
 from pathlib import Path
 from typing import Dict, List
 
-from .Algorithm.CNAG_LS import solve_cnag_ls
-from .data_loader import load_problem
-from .exact_backtracking import ExactLimits, solve_exact_backtracking
-from .feasibility_checker import check_solution
-from .Algorithm.MG import solve_marginal_greedy
-from .Algorithm.VDF import solve_value_density_first
-from .Algorithm.VF import solve_value_first
-from .reporting import write_solution_outputs
-from .solution_evaluator import device_usage, objective_breakdown
+from ..Algorithm.MGLS import solve_mgls
+from ..io.data_loader import load_problem
+from ..validation.exact_backtracking import ExactLimits, solve_exact_backtracking
+from ..evaluation.solution_evaluator import check_solution
+from ..Algorithm.MG import solve_marginal_greedy
+from ..Algorithm.VDF import solve_value_density_first
+from ..Algorithm.VF import solve_value_first
+from ..output.reporting import write_solution_outputs
+from ..evaluation.solution_evaluator import device_usage, objective_breakdown
 
 
 METHOD_DIRS = {
     "VF": "vf",
     "VDF": "vdf",
     "MG": "mg",
-    "CNAG-LS": "cnag_ls",
+    "MG-LS": "mg_ls",
     "Exact": "exact",
 }
 
@@ -34,7 +34,7 @@ def run_method_comparison(data, output_dir: str | Path, include_exact: bool = Fa
         ("VF", solve_value_first),
         ("VDF", solve_value_density_first),
         ("MG", solve_marginal_greedy),
-        ("CNAG-LS", solve_cnag_ls),
+        ("MG-LS", solve_mgls),
     ]
     if include_exact:
         methods.append(("Exact", lambda instance: solve_exact_backtracking(instance, ExactLimits(max_blocks=8))))
@@ -48,11 +48,11 @@ def run_method_comparison(data, output_dir: str | Path, include_exact: bool = Fa
         breakdown = write_solution_outputs(data, solution, method_dir)
         results.append(_comparison_row(method_name, data, solution, breakdown, check.feasible, check.messages))
 
-    cnag_value = next(row["objective_value"] for row in results if row["method"] == "CNAG-LS")
+    mgls_value = next(row["objective_value"] for row in results if row["method"] == "MG-LS")
     exact_rows = [row for row in results if row["method"] == "Exact" and row["status"] == "Optimal"]
     exact_value = exact_rows[0]["objective_value"] if exact_rows else None
     for row in results:
-        row["difference_to_cnag_ls_percent"] = _gap(float(cnag_value), float(row["objective_value"]))
+        row["difference_to_mg_ls_percent"] = _gap(float(mgls_value), float(row["objective_value"]))
         row["gap_to_exact_percent"] = "" if exact_value is None else _gap(float(exact_value), float(row["objective_value"]))
 
     _write_comparison_csv(results, output_path / "method_comparison.csv")
@@ -69,7 +69,7 @@ def _comparison_row(method_name: str, data, solution, breakdown, feasible: bool,
         "feasible": feasible,
         "status": solution.status,
         "objective_value": breakdown["total_objective"],
-        "difference_to_cnag_ls_percent": 0.0,
+        "difference_to_mg_ls_percent": 0.0,
         "gap_to_exact_percent": "",
         "processed_count": sum(solution.y_ordinary[u] + solution.y_precision[u] for u in data.block_ids),
         "ordinary_count": sum(solution.y_ordinary.values()),
@@ -142,7 +142,7 @@ def main() -> None:
         print(
             f"{row['method']}: status={row['status']}, feasible={row['feasible']}, "
             f"objective={float(row['objective_value']):.6f}, "
-            f"diff_to_cnag={float(row['difference_to_cnag_ls_percent']):.3f}%"
+            f"diff_to_mgls={float(row['difference_to_mg_ls_percent']):.3f}%"
         )
 
 

@@ -26,7 +26,7 @@ F = 木块固有价值 + 普通加工增值 + 精密加工增值 + 相邻双精�
 - `VF`：单块价值优先基线。
 - `VDF`：单位加工时间价值优先基线。
 - `MG`：动态边际收益贪心，每轮按 `Delta F / t_hat[u,k]` 选择。
-- `CNAG-LS`：Crack-and-Neighborhood-Aware Greedy Local Search，包含相邻成对精加工构造、局部搜索和规模保护。
+- `MG-LS`：Marginal-Gain-Guided Local Search，以 MG 结果为初始解，通过单块调整、精加工机会替换和相邻区域重构修正早期贪心决策。
 
 所有方法返回统一的 `Solution`，并共享加工时间、目标函数重算、可行性检查和 CSV/JSON/图片输出。
 
@@ -50,7 +50,7 @@ python -m src.main --config configs/deterministic_example.json --output outputs/
 python -m src.main --config configs/deterministic_example.json --output outputs/vf --method vf
 python -m src.main --config configs/deterministic_example.json --output outputs/vdf --method vdf
 python -m src.main --config configs/deterministic_example.json --output outputs/mg --method mg
-python -m src.main --config configs/deterministic_example.json --output outputs/cnag_single --method cnag
+python -m src.main --config configs/deterministic_example.json --output outputs/mg_ls_single --method mgls
 ```
 
 ## 正式两阶段实验
@@ -66,10 +66,10 @@ configs/example.json
 运行：
 
 ```bash
-python -m src.experiment --config configs/example.json --output outputs/experiment
+python -m src.experiments.experiment --config configs/example.json --output outputs/experiment
 ```
 
-阶段一：每个确定性案例分别运行 `VF/VDF/MG/CNAG-LS`，保存固定方案。
+阶段一：每个确定性案例分别运行 `VF/VDF/MG/MG-LS`，保存固定方案。
 
 阶段二：把阶段一的固定方案放入 8 个情景中评价。情景只改变设备状态和隐藏裂纹几何；程序用 `dataclasses.replace` 生成情景数据，并重新从“观测裂纹 + 隐藏裂纹”的几何折线推导 `C_u`、`CS_u`、`L_uv`。阶段二不重新求解、不重新分配。
 
@@ -112,6 +112,20 @@ python -m src.experiment --config configs/example.json --output outputs/experime
 
 `direct` 裂纹模式仍保留给小规模测试和向后兼容，不用于正式 `configs/example.json`。
 
+## 程序模块结构
+
+```text
+src/
+  model/        数据结构、加工时间公式、方案更新工具
+  io/           JSON输入读取与问题实例构建
+  geometry/     裂纹折线几何计算
+  Algorithm/    VF、VDF、MG、MG-LS四种自研算法
+  evaluation/   目标函数重算与可行性检查
+  experiments/  四算法比较与两阶段情景实验
+  output/       CSV/JSON/图片输出
+  validation/   小规模精确回溯验证
+```
+
 ## 测试
 
 ```bash
@@ -122,7 +136,7 @@ python -m pytest -q
 
 ## 当前限制
 
-- `CNAG-LS` 是启发式局部搜索，不保证全局最优。
+- `MG-LS` 是启发式局部搜索，不保证全局最优。
 - 精确回溯验证器只用于极小规模实例。
 - 目前只支持规则网格木块和折线裂纹几何。
 - 未实现滚动调度；阶段二用于固定方案压力评估。

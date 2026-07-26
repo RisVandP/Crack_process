@@ -4,7 +4,7 @@ import json
 from pathlib import Path
 from typing import Any, Dict, Iterable, Tuple
 
-from .data_models import (
+from ..model.data_models import (
     Block,
     Board,
     Device,
@@ -15,7 +15,7 @@ from .data_models import (
     normalize_edge,
     Crack,
 )
-from .crack_geometry import compute_crack_effects
+from ..geometry.crack_geometry import compute_crack_effects
 
 
 def load_problem(path: str | Path) -> ProblemData:

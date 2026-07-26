@@ -7,16 +7,16 @@ from pathlib import Path
 
 import pytest
 
-from src.Algorithm.CNAG_LS import solve_cnag_ls
-from src.data_loader import parse_problem
-from src.deterministic_model import processing_time
-from src.feasibility_checker import check_solution
+from src.Algorithm.MGLS import solve_mgls
+from src.io.data_loader import parse_problem
+from src.model.data_models import processing_time
+from src.evaluation.solution_evaluator import check_solution
 from src.Algorithm.MG import _incident_edges, _single_move_delta, solve_marginal_greedy
 from src.Algorithm.VDF import solve_value_density_first
 from src.Algorithm.VF import solve_value_first
-from src.method_comparison import run_method_comparison
-from src.solution_evaluator import objective_breakdown
-from src.solution_utils import apply_task_copy, empty_solution
+from src.experiments.method_comparison import run_method_comparison
+from src.evaluation.solution_evaluator import objective_breakdown
+from src.model.solution_utils import apply_task_copy, empty_solution
 
 
 def comparison_raw_instance():
@@ -48,7 +48,7 @@ def comparison_raw_instance():
 
 def test_four_heuristics_are_feasible():
     data = parse_problem(comparison_raw_instance())
-    for solve in [solve_value_first, solve_value_density_first, solve_marginal_greedy, solve_cnag_ls]:
+    for solve in [solve_value_first, solve_value_density_first, solve_marginal_greedy, solve_mgls]:
         solution = solve(data)
         check = check_solution(data, solution)
         assert check.feasible, check.messages
@@ -79,22 +79,22 @@ def test_crack_severity_increases_processing_time():
     assert cracked_time > normal_time
 
 
-def test_cnag_ls_not_below_construction_value():
+def test_mgls_not_below_construction_value():
     data = parse_problem(comparison_raw_instance())
-    solution = solve_cnag_ls(data)
+    solution = solve_mgls(data)
     assert solution.objective_value + 1e-6 >= float(solution.metadata["construction_objective"])
 
 
-def test_cnag_ls_not_below_marginal_greedy():
+def test_mgls_not_below_marginal_greedy():
     data = parse_problem(comparison_raw_instance())
-    cnag = solve_cnag_ls(data)
+    mgls = solve_mgls(data)
     marginal = solve_marginal_greedy(data)
-    assert cnag.objective_value + 1e-6 >= marginal.objective_value
+    assert mgls.objective_value + 1e-6 >= marginal.objective_value
 
 
 def test_all_methods_use_unified_objective_recalculation():
     data = parse_problem(comparison_raw_instance())
-    for solution in [solve_value_first(data), solve_value_density_first(data), solve_marginal_greedy(data), solve_cnag_ls(data)]:
+    for solution in [solve_value_first(data), solve_value_density_first(data), solve_marginal_greedy(data), solve_mgls(data)]:
         breakdown = objective_breakdown(data, solution)
         assert abs(breakdown["total_objective"] - solution.objective_value) < 1e-5
 
@@ -117,7 +117,7 @@ def test_marginal_greedy_single_move_delta_matches_full_recalculation():
 def test_method_comparison_outputs_complete_files(tmp_path):
     data = parse_problem(comparison_raw_instance())
     rows = run_method_comparison(data, tmp_path)
-    assert {row["method"] for row in rows} == {"VF", "VDF", "MG", "CNAG-LS"}
+    assert {row["method"] for row in rows} == {"VF", "VDF", "MG", "MG-LS"}
     for name in ["method_comparison.csv", "method_comparison.json", "method_comparison.png"]:
         assert (tmp_path / name).exists()
     with (tmp_path / "method_comparison.json").open("r", encoding="utf-8") as f:
@@ -127,7 +127,7 @@ def test_method_comparison_outputs_complete_files(tmp_path):
         "feasible",
         "status",
         "objective_value",
-        "difference_to_cnag_ls_percent",
+        "difference_to_mg_ls_percent",
         "processed_count",
         "average_utilization",
         "max_utilization",
@@ -165,14 +165,14 @@ def test_cli_all_generates_expected_files(tmp_path):
         "all",
     ]
     completed = subprocess.run(cmd, check=True, capture_output=True, text=True)
-    assert "CNAG-LS" in completed.stdout
+    assert "MG-LS" in completed.stdout
     assert (output_dir / "method_comparison.csv").exists()
-    assert (output_dir / "cnag_ls" / "assignments.csv").exists()
+    assert (output_dir / "mg_ls" / "assignments.csv").exists()
 
 
 def test_source_and_requirements_do_not_reference_package_solvers():
     banned = ["pulp", "cbc", "gurobi", "cplex", "scip", "glpk", "ortools", "cvxpy"]
-    paths = list(Path("src").glob("*.py")) + [Path("requirements.txt")]
+    paths = list(Path("src").rglob("*.py")) + [Path("requirements.txt")]
     text = "\n".join(path.read_text(encoding="utf-8").lower() for path in paths)
     for token in banned:
         assert token not in text

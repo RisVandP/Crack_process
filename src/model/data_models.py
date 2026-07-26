@@ -144,3 +144,12 @@ def normalize_edge(u: BlockId, v: BlockId) -> EdgeKey:
     """统一相邻边顺序，避免 {u,v} 与 {v,u} 重复。"""
 
     return tuple(sorted((u, v)))  # type: ignore[return-value]
+
+
+def processing_time(data: ProblemData, block_id: BlockId, device_id: DeviceId) -> float:
+    """统一计算木块在设备上的加工时间。"""
+
+    block = data.block_by_id()[block_id]
+    device = data.device_by_id()[device_id]
+    area = data.board.area_per_block
+    return area / device.speed * (1.0 + data.values.alpha * block.crack_present * block.crack_severity)

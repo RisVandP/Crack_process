@@ -10,30 +10,30 @@ from dataclasses import replace
 from pathlib import Path
 from typing import Any, Callable, Dict, Iterable, List
 
-from .Algorithm.CNAG_LS import solve_cnag_ls
-from .crack_geometry import compute_crack_effects
-from .data_loader import parse_problem, parse_crack_items
-from .data_models import Block, ProblemData, Solution
-from .deterministic_model import processing_time
-from .feasibility_checker import check_solution
-from .Algorithm.MG import solve_marginal_greedy
-from .Algorithm.VDF import solve_value_density_first
-from .Algorithm.VF import solve_value_first
-from .solution_evaluator import device_usage, objective_breakdown
+from ..Algorithm.MGLS import solve_mgls
+from ..geometry.crack_geometry import compute_crack_effects
+from ..io.data_loader import parse_problem, parse_crack_items
+from ..model.data_models import Block, ProblemData, Solution
+from ..model.data_models import processing_time
+from ..evaluation.solution_evaluator import check_solution
+from ..Algorithm.MG import solve_marginal_greedy
+from ..Algorithm.VDF import solve_value_density_first
+from ..Algorithm.VF import solve_value_first
+from ..evaluation.solution_evaluator import device_usage, objective_breakdown
 
 
 METHODS: Dict[str, Callable[[ProblemData], Solution]] = {
     "VF": solve_value_first,
     "VDF": solve_value_density_first,
     "MG": solve_marginal_greedy,
-    "CNAG-LS": solve_cnag_ls,
+    "MG-LS": solve_mgls,
 }
 
 METHOD_FILE = {
     "VF": "vf",
     "VDF": "vdf",
     "MG": "mg",
-    "CNAG-LS": "cnag_ls",
+    "MG-LS": "mg_ls",
 }
 
 
@@ -347,7 +347,7 @@ def _validate_experiment_config(cfg: dict) -> None:
     if cfg.get("schema_version") != "2.0":
         raise ValueError("schema_version必须为2.0。")
     if set(cfg["algorithms"]) != set(METHODS):
-        raise ValueError("algorithms必须包含VF、VDF、MG、CNAG-LS。")
+        raise ValueError("algorithms必须包含VF、VDF、MG、MG-LS。")
     if len(cfg["cases"]) != 12:
         raise ValueError("正式实验必须包含12个确定性案例。")
     weight_sum = sum(float(v) for v in cfg["evaluation_weights"].values())
@@ -462,7 +462,7 @@ def _write_analysis(cfg: dict, stage1_rows: list[dict], stage2_rows: list[dict],
     lines = [
         "# 两阶段实验分析",
         "",
-        "本报告由 `src.experiment` 根据实际输出自动生成。",
+        "本报告由 `src.experiments.experiment` 根据实际输出自动生成。",
         "",
         "## 实验设计",
         "",

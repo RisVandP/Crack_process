@@ -3,9 +3,9 @@ from __future__ import annotations
 import time
 from dataclasses import dataclass
 
-from .data_models import ProblemData, Solution
-from .deterministic_model import processing_time
-from .solution_utils import assign_block, clone_solution, empty_solution, finalize_solution
+from ..model.data_models import ProblemData, Solution
+from ..model.data_models import processing_time
+from ..model.solution_utils import assign_block, clone_solution, empty_solution, finalize_solution
 
 
 @dataclass(frozen=True)

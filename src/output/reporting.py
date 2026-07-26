@@ -4,11 +4,9 @@ import csv
 import json
 from pathlib import Path
 
-from .data_loader import edge_key_to_str
-from .deterministic_model import processing_time
-from .feasibility_checker import CheckResult
-from .solution_evaluator import assigned_device, device_usage, objective_breakdown, processing_increment
-from .visualization import plot_device_assignment, plot_device_utilization, plot_processing_status
+from ..io.data_loader import edge_key_to_str
+from ..model.data_models import processing_time
+from ..evaluation.solution_evaluator import CheckResult, assigned_device, device_usage, objective_breakdown, processing_increment
 
 
 def write_solution_outputs(data, solution, output_dir: str | Path, filename_prefix: str = "") -> dict:
@@ -125,6 +123,80 @@ def write_summary(data, solution, breakdown, check_messages, path: Path) -> None
     }
     with path.open("w", encoding="utf-8") as f:
         json.dump(summary, f, ensure_ascii=False, indent=2)
+
+
+def _setup_matplotlib():
+    """延迟导入matplotlib，避免无图形环境启动时变慢。"""
+
+    import matplotlib.pyplot as plt
+
+    plt.rcParams["font.sans-serif"] = ["Microsoft YaHei", "SimHei", "Arial Unicode MS", "DejaVu Sans"]
+    plt.rcParams["axes.unicode_minus"] = False
+    return plt
+
+
+def plot_processing_status(data, solution, output_path: str | Path) -> None:
+    """生成木块加工状态网格图。"""
+
+    plt = _setup_matplotlib()
+    colors = {0: "#e8e8e8", 1: "#8ecae6", 2: "#ffb703"}
+    labels = {0: "none", 1: "ordinary", 2: "precision"}
+    fig, ax = plt.subplots(figsize=(1.5 * data.board.m, 1.2 * data.board.n))
+    for block in data.blocks:
+        state = solution.y_ordinary[block.id] + 2 * solution.y_precision[block.id]
+        rect = plt.Rectangle((block.i - 1, data.board.n - block.j), 1, 1, facecolor=colors[state], edgecolor="black")
+        ax.add_patch(rect)
+        ax.text(block.i - 0.5, data.board.n - block.j + 0.56, block.id, ha="center", va="center", fontsize=9)
+        ax.text(block.i - 0.5, data.board.n - block.j + 0.28, labels[state], ha="center", va="center", fontsize=9)
+    ax.set_xlim(0, data.board.m)
+    ax.set_ylim(0, data.board.n)
+    ax.set_aspect("equal")
+    ax.set_xticks([])
+    ax.set_yticks([])
+    ax.set_title("Processing status")
+    fig.tight_layout()
+    fig.savefig(output_path, dpi=180)
+    plt.close(fig)
+
+
+def plot_device_assignment(data, solution, output_path: str | Path) -> None:
+    """生成木块到设备的分配网格图。"""
+
+    plt = _setup_matplotlib()
+    fig, ax = plt.subplots(figsize=(1.5 * data.board.m, 1.2 * data.board.n))
+    for block in data.blocks:
+        device_id = assigned_device(solution, block.id, data.device_ids) or "None"
+        rect = plt.Rectangle((block.i - 1, data.board.n - block.j), 1, 1, facecolor="#d8f3dc", edgecolor="black")
+        ax.add_patch(rect)
+        ax.text(block.i - 0.5, data.board.n - block.j + 0.56, block.id, ha="center", va="center", fontsize=9)
+        ax.text(block.i - 0.5, data.board.n - block.j + 0.28, device_id, ha="center", va="center", fontsize=9)
+    ax.set_xlim(0, data.board.m)
+    ax.set_ylim(0, data.board.n)
+    ax.set_aspect("equal")
+    ax.set_xticks([])
+    ax.set_yticks([])
+    ax.set_title("Device assignment")
+    fig.tight_layout()
+    fig.savefig(output_path, dpi=180)
+    plt.close(fig)
+
+
+def plot_device_utilization(data, solution, output_path: str | Path) -> None:
+    """生成设备利用率柱状图。"""
+
+    plt = _setup_matplotlib()
+    usage = device_usage(data, solution)
+    device_ids = data.device_ids
+    values = [usage[k]["utilization"] for k in device_ids]
+    fig, ax = plt.subplots(figsize=(7, 4))
+    ax.bar(device_ids, values, color="#457b9d")
+    ax.axhline(1.0, color="#d00000", linestyle="--", linewidth=1)
+    ax.set_ylim(0, max(1.05, max(values, default=0) * 1.15))
+    ax.set_ylabel("Utilization")
+    ax.set_title("Device utilization")
+    fig.tight_layout()
+    fig.savefig(output_path, dpi=180)
+    plt.close(fig)
 
 
 def print_run_summary(data, solution, breakdown, output_dir: Path) -> None:

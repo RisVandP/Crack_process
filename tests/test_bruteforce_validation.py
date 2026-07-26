@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from src.data_loader import parse_problem
-from src.exact_backtracking import solve_exact_backtracking, ExactLimits
+from src.io.data_loader import parse_problem
+from src.validation.exact_backtracking import solve_exact_backtracking, ExactLimits
 from src.Algorithm.VF import solve_value_first
 
 

@@ -4,9 +4,9 @@ import time
 from dataclasses import dataclass
 from typing import Optional
 
-from ..data_models import BlockId, DeviceId, ProblemData, Solution
-from ..deterministic_model import processing_time
-from ..solution_utils import apply_task_copy, device_loads, empty_solution, finalize_solution, is_block_processed
+from ..model.data_models import BlockId, DeviceId, ProblemData, Solution
+from ..model.data_models import processing_time
+from ..model.solution_utils import apply_task_copy, device_loads, empty_solution, finalize_solution, is_block_processed
 
 
 TOL = 1e-9

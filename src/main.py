@@ -3,15 +3,15 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 
-from .Algorithm.CNAG_LS import solve_cnag_ls
-from .data_loader import load_problem
-from .exact_backtracking import solve_exact_backtracking
-from .feasibility_checker import check_solution
+from .Algorithm.MGLS import solve_mgls
+from .io.data_loader import load_problem
+from .validation.exact_backtracking import solve_exact_backtracking
+from .evaluation.solution_evaluator import check_solution
 from .Algorithm.MG import solve_marginal_greedy
 from .Algorithm.VDF import solve_value_density_first
 from .Algorithm.VF import solve_value_first
-from .method_comparison import run_method_comparison
-from .reporting import print_run_summary, write_solution_outputs
+from .experiments.method_comparison import run_method_comparison
+from .output.reporting import print_run_summary, write_solution_outputs
 
 
 def main() -> None:
@@ -20,9 +20,9 @@ def main() -> None:
     parser.add_argument("--output", required=True, help="输出目录")
     parser.add_argument(
         "--method",
-        choices=["vf", "vdf", "mg", "cnag", "exact", "all", "value_first", "value_density_first", "marginal_greedy", "cnag_ls"],
+        choices=["vf", "vdf", "mg", "mgls", "mg_ls", "exact", "all", "value_first", "value_density_first", "marginal_greedy"],
         default="all",
-        help="运行单个方法或四种启发式比较；vf/vdf/mg/cnag为四种启发式，exact为小规模自编回溯验证",
+        help="运行单个方法或四种启发式比较；vf/vdf/mg/mgls为四种启发式，exact为小规模自编回溯验证",
     )
     args = parser.parse_args()
 
@@ -36,7 +36,7 @@ def main() -> None:
             print(
                 f"{row['method']}: status={row['status']}, feasible={row['feasible']}, "
                 f"objective={float(row['objective_value']):.6f}, "
-                f"diff_to_cnag={float(row['difference_to_cnag_ls_percent']):.3f}%"
+                f"diff_to_mgls={float(row['difference_to_mg_ls_percent']):.3f}%"
             )
         return
 
@@ -55,8 +55,8 @@ def _solve_single_method(data, method: str):
         return solve_value_density_first(data)
     if method in {"mg", "marginal_greedy"}:
         return solve_marginal_greedy(data)
-    if method in {"cnag", "cnag_ls"}:
-        return solve_cnag_ls(data)
+    if method in {"mgls", "mg_ls"}:
+        return solve_mgls(data)
     if method == "exact":
         return solve_exact_backtracking(data)
     raise ValueError(f"未知方法：{method}")
